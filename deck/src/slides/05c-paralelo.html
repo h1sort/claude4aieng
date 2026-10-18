@@ -1,0 +1,97 @@
+<style>
+  .s05d .hd h2{max-width:none}
+  .s05d .split{grid-template-columns:minmax(0,.92fr) minmax(0,1.3fr);align-items:start;gap:clamp(.8rem,2.2vw,2.4rem)}
+  .s05d .split > *{min-width:0}
+  .s05d .code{font-size:clamp(.6rem,.86vw,.9rem);line-height:1.5;padding:clamp(.4rem,1vw,.8rem) clamp(.6rem,1.2vw,1rem);margin:0}
+  .s05d .code .cap{margin-bottom:.35em}
+  .s05d .code .blk{display:block}
+  .s05d .ask{padding-top:clamp(.5rem,1.1vw,.9rem);padding-bottom:clamp(.5rem,1.1vw,.9rem)}
+  .s05d .ask h3{font-family:var(--f-display);font-weight:360;font-size:clamp(1rem,1.6vw,1.7rem);letter-spacing:-.01em;line-height:1.15;margin:.15rem 0 .45rem}
+  .s05d .opts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.3rem}
+  .s05d .opts li{font-size:clamp(.74rem,1vw,1rem);line-height:1.3;color:var(--ink-2);padding-left:1.9rem;position:relative}
+  .s05d .opts li b{position:absolute;left:0;top:0;font-family:var(--f-mono);font-weight:500;color:var(--warm-ink)}
+  .s05d .note{font-size:clamp(.74rem,1vw,1rem);line-height:1.35;color:var(--ink-2);margin:0}
+  .s05d .note b{color:var(--ink);font-weight:650}
+  .s05d .ask code,.s05d .note code{font-family:var(--f-mono);font-size:.92em;color:var(--ink)}
+  .s05d .ck{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;align-items:center;padding-top:clamp(.4rem,.9vw,.75rem);padding-bottom:clamp(.4rem,.9vw,.75rem)}
+  .s05d .key{font-family:var(--f-display);font-weight:360;font-size:clamp(1.1rem,1.9vw,2rem);letter-spacing:-.01em;line-height:1.15;margin:0;color:var(--ink)}
+  .s05d .key em{color:var(--slide-accent);font-style:italic}
+  .s05d .src{max-width:none;text-transform:none;letter-spacing:.03em;font-size:clamp(.62rem,.76vw,.76rem)}
+
+  @media (max-width:760px){
+    .s05d .split{grid-template-columns:1fr}
+    .s05d .code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.6rem}
+    .s05d .code.ctx{display:none}
+  }
+</style>
+
+<!-- ============ 05d · rotura #1b: llamada paralela que no termina ============ -->
+<section class="slide s05d" data-title="Rotura #1b: una llamada paralela que no termina" data-section="Rotura #1b" data-budget="2:30"
+         style="--slide-accent:var(--action)">
+  <div class="main">
+    <div class="hd">
+      <p class="eyebrow reveal">Rotura #1b · paralelas <span class="tag live" style="margin-left:.6rem">Ejercicio · resuelto en paso-2</span></p>
+      <h2 class="reveal d1">Tres llamadas en paralelo. <em>Una no termina.</em></h2>
+    </div>
+    <div class="split reveal d2">
+      <div class="stack">
+        <div class="panel mod ask">
+          <span class="label">Predice antes de correr</span>
+          <h3>Tres consultas en paralelo; una tarda 3 s y el tope es 1.5 s. ¿Qué responde la API en la petición siguiente?</h3>
+          <ul class="opts">
+            <li><b>A</b>Espera a la lenta.</li>
+            <li><b>B</b>400.</li>
+            <li><b>C</b>El modelo inventa el dato.</li>
+          </ul>
+        </div>
+        <div class="code"><span class="cap">en vivo · latencia artificial anunciada en pantalla</span><span class="blk"><span class="a">$</span> uv run python -m taller.romper paralelo</span><span class="blk" data-step="1">OBSERVACIÓN › toolu_…4 → 200
+OBSERVACIÓN › toolu_…Y → 26
+OBSERVACIÓN › toolu_…8 → <span class="a">SIN tool_result</span>
+<span class="a">ANTES › devolviste 2 de 3 tool_result: la llamada lenta se perdió</span>
+<span class="a">RECHAZADA › 400 · tool_use ids were found without
+            tool_result blocks immediately after</span>
+gather: 1.50 s · una tras otra serían ≥ 4.6 s</span></div>
+        <p class="key" data-step="2">La que no termina <em>también regresa.</em></p>
+        <p class="note" data-step="2">Es la Rotura #1: <b>el mismo 400, la misma regla</b>. Cada <code>tool_use</code> necesita su <code>tool_result</code>, también cuando la herramienta no terminó.</p>
+      </div>
+      <div class="stack">
+        <div class="code ctx" data-step="1"><span class="cap">taller/agent.py · execute_calls · paso-1</span>hechos = <span class="k">await</span> asyncio.gather(*(asyncio.wait_for(one(c), tope) <span class="k">for</span> c <span class="k">in</span> calls),
+                             return_exceptions=<span class="k">True</span>)
+<span class="c"># Versión ingenua: solo las que terminaron</span>
+results = [r <span class="k">for</span> r <span class="k">in</span> hechos <span class="k">if</span> isinstance(r, ToolResult)]
+<span class="a"># TODO(paso-2b)</span> <span class="c">un tool_result POR CADA llamada, también la que no terminó</span></div>
+        <div class="code" data-step="2"><span class="cap">paso-2b · lo que tecleas (4 líneas) · resuelto en paso-2</span><span class="c"># un timeout es un is_error, no un hueco</span>
+results = [r <span class="k">if</span> isinstance(r, ToolResult) <span class="k">else</span> ToolResult(c.id, ToolOutcome.EXEC_ERROR,
+    f<span class="s">"{c.name} no terminó en {tope:g} s ({type(r).__name__}); reintenta …"</span>, <span class="a">True</span>)
+    <span class="k">for</span> c, r <span class="k">in</span> zip(calls, hechos)]</div>
+        <div class="code" data-step="2"><span class="cap">DESPUÉS · con tu arreglo</span>toolu_…h → <span class="k">is_error</span> · sql_query no terminó en 1.5 s (TimeoutError)
+<span class="k">DESPUÉS › 3 de 3 tool_result en un solo mensaje</span>
+<span class="k">MODELO › reintenta sql_query</span></div>
+        <div class="panel ev ck" data-step="2">
+          <span class="label">Checkpoint</span>
+          <span class="note">Mano arriba si ya ves <b>3 de 3</b>.</span>
+          <span class="note">Atrasado o con prisa: <code>git stash &amp;&amp; git checkout paso-2</code></span>
+        </div>
+      </div>
+    </div>
+    <p class="note-line src">Corrida en vivo 2026-10-18 · claude-sonnet-5-5 · la latencia es artificial y la anuncia el script (FACTS: ensayo en vivo y §5)</p>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> que la sala rompa y repare una llamada paralela que no termina, y vea que es la misma regla de la Rotura #1: cada <code>tool_use</code> necesita su <code>tool_result</code>, también la que no terminó. Es lo que prometió el bloque de arriba (“rompen y reparan”). (2:30)</p>
+    <p><strong>Plan A, ejercicio (2:30):</strong> 0:20 predecir; 0:30 correr y ver el 400; 1:30 teclean (silencio del orador; 4 líneas dentro de <code>execute_calls</code>, marcador <code>paso-2b</code>); 0:10 checkpoint.</p>
+    <p><strong>Plan B, si vas tarde (~1:00):</strong> no pidas teclear. → → revela la solución; todos <code>git stash &amp;&amp; git checkout paso-2</code>; corren <code>uv run python -m taller.romper paralelo</code> y ven el DESPUÉS, 3 de 3; seguir. <strong>Cuándo elegir B:</strong> al terminar la diapositiva anterior (Rotura #1) el reloj del plan marca 15:30; si ya pasa de ~16:30 (más de 1:00 de retraso), elige B. Es el primer recorte del plan: ahorra ~1:30 y no cambia lo que sigue. (Orden de recorte: 1 este Plan B, 2 <code>--vs</code> en Medir, 3 el detalle del autómata de pila.)</p>
+    <p>Pasos con →: 1 la salida real del ANTES (el 400) y el código ingenuo con el <code>TODO(paso-2b)</code>; 2 la solución, el DESPUÉS y el checkpoint. <strong>En Plan A no pulses el segundo → hasta que termine el silencio</strong>; en Plan B pulsa los dos seguidos.</p>
+    <p><strong>Predecir (0:20), sin pulsar →:</strong></p>
+    <blockquote>Piden tres consultas en paralelo. Dos tardan lo normal; una tarda 3 segundos y nuestro tope es 1.5. Ya les pasó algo parecido con el huérfano. ¿Qué responde la API en la petición siguiente? A, espera a la lenta; B, 400; C, el modelo inventa el dato. Manos arriba.</blockquote>
+    <p><strong>Correr (0:30):</strong> todos corren <code>uv run python -m taller.romper paralelo</code>. La latencia es artificial y el script la anuncia en pantalla (0.8 s por llamada y 3 s la última, con tope de 1.5 s): se agrega para que se note incluso en una laptop rápida. Lo que mido es nuestro código, no la API. → (paso 1).</p>
+    <blockquote>La lenta pasó el tope y se perdió. Devolvimos 2 de 3. Resultado: 400, «tool_use ids were found without tool_result blocks immediately after». Es el mismo 400 de hace un momento. Cambia el origen: antes el proceso murió; ahora la lenta no terminó.</blockquote>
+    <p>Retoma lo que dijo la sala en la predicción.</p>
+    <p><strong>Teclear (1:30, orador callado), solo Plan A:</strong> reemplazar <code># TODO(paso-2b)</code> en <code>execute_calls</code> (<code>taller/agent.py</code>, branch <code>paso-1</code>): un <code>tool_result</code> por cada llamada, con <code>zip(calls, hechos)</code>; si el resultado es una excepción (aquí <code>TimeoutError</code>), un <code>ToolResult</code> con <code>is_error</code> y un texto que diga qué pasó y qué intentar. Luego repetir <code>romper paralelo</code>: el DESPUÉS debe mostrar 3 de 3. → (paso 2) al terminar, para comparar.</p>
+    <blockquote>La que no termina también regresa. Sin resultado es un hueco; con <code>is_error</code> es información: le decimos al modelo qué pasó y qué intentar.</blockquote>
+    <p><strong>Checkpoint (0:10):</strong></p>
+    <blockquote>Mano arriba si ya ves 3 de 3. Si son menos de la mitad, todos <code>git stash &amp;&amp; git checkout paso-2</code>.</blockquote>
+    <p><strong>Dato de la corrida real</strong> (en vivo el 2026-10-18 con claude-sonnet-5-5): en <code>paso-2</code>, después del <code>is_error</code>, el modelo reintentó la consulta por su cuenta (<code>MODELO › reintenta sql_query</code>). Cuéntalo como lo que pasó en esa corrida, no como garantía.</p>
+    <p class="warn">No digas que las APIs reales pierden resultados por sí solas. El bug es nuestro: código que solo devuelve las llamadas que terminaron. La latencia y el tope son artificiales y están anunciados en pantalla. Lo que imprime la corrida del sitio puede variar unas décimas (el 1.50 s sale del tope); lee la pantalla, no la memoria. Si no hay API: <code>--inyectado</code> (el 400 que muestra es el fragmento documentado, no una respuesta de esa corrida; <code>romper</code> lo dice en pantalla).</p>
+    <p><strong>Transición:</strong> “El historial tiene que ser válido en cada turno, también cuando algo falla. Pero hay otra forma de que el tool_use llegue roto: que el modelo no termine de escribirlo. Para eso hay que mirar cómo se genera el JSON.”</p>
+  </aside>
+</section>

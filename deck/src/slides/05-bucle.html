@@ -24,7 +24,6 @@
     .s05b .split{grid-template-columns:1fr}
     
     .s05b .code{white-space:pre-wrap;overflow-wrap:anywhere}
-    .s05b .code.par{display:none}
   }
 </style>
 
@@ -120,7 +119,7 @@
 </section>
 
 <!-- ============ 05b · tu turno: paso-1 ============ -->
-<section class="slide s05b" data-title="Tu turno: paso-1 (el bucle)" data-section="Cable" data-budget="4:00"
+<section class="slide s05b" data-title="Tu turno: paso-1 (el bucle)" data-section="Cable" data-budget="3:30"
          style="--slide-accent:var(--evidence)">
   <div class="main">
     <div class="hd">
@@ -157,15 +156,13 @@ tool_choice={"type": "<span class="k">auto</span>"}  <span class="c"># + strict:
           <span class="body">Mano arriba si el agente respondió 26 con una consulta real.</span>
           <span class="body">Atrasado: <code>git stash &amp;&amp; git checkout paso-1</code></span>
         </div>
-        <div class="code par" data-step="1"><span class="cap">en vivo · 30 s · latencia artificial de 0.8 s por herramienta</span><span class="a">$</span> uv run python -m taller.romper paralelo
-<span class="c">secuencial ≈ 2.4 s   ·   asyncio.gather ≈ 0.8 s</span></div>
       </div>
     </div>
     <p class="note-line src">Fuente de la trampa: docs de Anthropic, define-tools · verificado 2026-10-18 (FACTS §1)</p>
   </div>
   <aside class="notes">
-    <p><strong>Propósito:</strong> que cada quien escriba el núcleo del bucle: ejecutar y contestar con <code>tool_result</code> bien armados. Es el primer paso de código que ellos teclean. (4:00)</p>
-    <p><strong>Tiempo de silencio planeado: 2:30 de teclado.</strong> Orador callado; solo circular. Desglose (4:00): 0:30 instrucciones, 2:30 teclean, 0:30 checkpoint, 0:30 momento en vivo de llamadas paralelas (abajo).</p>
+    <p><strong>Propósito:</strong> que cada quien escriba el núcleo del bucle: ejecutar y contestar con <code>tool_result</code> bien armados. Es el primer paso de código que ellos teclean. (3:30)</p>
+    <p><strong>Tiempo de silencio planeado: 2:30 de teclado.</strong> Orador callado; solo circular. Desglose (3:30): 0:30 instrucciones, 2:30 teclean, 0:30 checkpoint. Las llamadas paralelas ya no se miden aquí: se rompen y se reparan en la Rotura #1b.</p>
     <ol>
       <li><code>git stash &amp;&amp; git checkout paso-0</code>; abrir <code>taller/agent.py</code>; localizar <code># TODO(paso-1)</code> dentro de <code>Agent.run</code>.</li>
       <li>Completar el TODO: ejecutar con <code>execute_calls(turn.calls, self.tools)</code> y agregar a <code>messages</code> UN mensaje de usuario con un <code>tool_result</code> por llamada (<code>tool_use_id</code>, <code>content</code>, y <code>is_error</code> si falló).</li>
@@ -176,9 +173,6 @@ tool_choice={"type": "<span class="k">auto</span>"}  <span class="c"># + strict:
     <p><strong>Checkpoint (al terminar el silencio):</strong></p>
     <blockquote>Mano arriba: ¿quién tiene la respuesta de las tarjetas bloqueadas? Si son menos de la mitad, todos hacen <code>git stash &amp;&amp; git checkout paso-1</code> y seguimos; el que quiera terminar el suyo lo hace en el siguiente silencio.</blockquote>
     <p><strong>Primer checkpoint, una línea más:</strong> quien clonó el repo antes de que existieran las ramas <code>paso-N</code> corre <code>git fetch</code> primero (si no, <code>git stash &amp;&amp; git checkout paso-1</code> dice que la rama no existe).</p>
-    <p><strong>Momento en vivo: llamadas paralelas (0:30, primer recorte opcional).</strong> Con → (paso 1) aparece el comando. Todos pueden correr <code>uv run python -m taller.romper paralelo</code>; no depende de lo que hayan tecleado.</p>
-    <blockquote>Una pregunta que dispara tres herramientas independientes. Cada una tarda 0.8 segundos, y esa latencia es artificial: la agrega el script para que se note incluso en una laptop rápida. En serie son unos 2.4 segundos; con <code>asyncio.gather</code>, unos 0.8. Lo que mido aquí es nuestro código, no la API.</blockquote>
-    <p class="warn">Las cifras (~2.4 s y ~0.8 s) salen de la latencia artificial de 0.8 s anunciada en pantalla por <code>romper paralelo</code>; lee lo que imprima la corrida real, que puede variar unas décimas. Si vamos tarde, este momento es el PRIMER recorte opcional (ahorra 0:30) y no cambia nada de lo que sigue.</p>
     <p>Qué buscar mientras circulas: <code>tool_result</code> con el texto de otro mensaje; olvidar <code>tool_use_id</code>; un mensaje de usuario por cada resultado en lugar de uno solo; texto antes de los <code>tool_result</code> (400). Para quien termine antes: dejar corridas con una pregunta que dispare dos llamadas y ver el orden en los logs de <code>runs/</code>.</p>
     <p class="warn">No expliques el código mientras teclean. Si la API falla en la sala (créditos o red), plan B: <code>git stash &amp;&amp; git checkout paso-1</code> y mostrar tú la corrida en pantalla. «Strict valida forma, no sentido» se retoma en el bloque «Válido ≠ correcto»; aquí solo se menciona. Cifras y modelos: FACTS §1.</p>
     <p><strong>Transición:</strong> “Ya funciona con la API tal como la documentan. Ahora lo que importa de un taller: romperlo.”</p>

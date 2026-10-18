@@ -102,14 +102,14 @@
     <p>Pasos con →: 1 esquema → gramática; 2 autómata de pila y precálculo; 3 el fragmento del esquema (<code>"monto": {"type": "integer"}</code>) y los logits en bruto de un paso (el modelo prefería la comilla, que rompería el esquema); 4 la máscara: inválidos a −∞, el resto renormalizado.</p>
     <p>Dato de la fuente (XGrammar, MLSys 2025, arXiv:2411.15100): separa los tokens independientes del contexto, que se precalculan, de los dependientes, que se revisan al ejecutar, con un autómata de pila a nivel de bytes. Los autores reportan hasta 100x menos latencia por token para gramáticas libres de contexto y hasta 80x de aceleración de servicio de extremo a extremo con Llama 3.1 en H100: son cifras de los autores, di “según los autores”. La clase de CMU (diap. 31–33) es de donde sale este recorrido.</p>
     <p class="warn">Las barras son ilustrativas, no medidas. No afirmes cómo implementa Anthropic <code>strict: true</code> por dentro: la documentación solo dice que el input sigue el <code>input_schema</code>. Lo que muestro es el mecanismo de la clase y de XGrammar.</p>
-    <p class="warn">Si vamos tarde (recorte 3 del plan): no hables del paso 2; pasa → dos veces seguidas y explica solo la máscara de logits (paso 3 y 4). Ahorra ~1:00 para el truncado.</p>
+    <p class="warn">Si vamos tarde: no hables del paso 2; pasa → dos veces seguidas y explica solo la máscara de logits (paso 3 y 4). Es el detalle del autómata de pila: el tercero en el orden de recorte (1 Plan B de la Rotura #1b, 2 <code>--vs</code> en Medir, 3 el autómata de pila).</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué parte de tu salida estructurada hoy depende de “pedirlo bien” y no de una restricción?</p>
     <p><strong>Transición:</strong> “Con esto, cada paso es válido. Entonces, ¿dónde falla todavía?”</p>
   </aside>
 </section>
 
 <!-- ============ 06b · el límite: predecir y revelar ============ -->
-<section class="slide s06b" data-title="El límite: la gramática no te salva del corte" data-section="Decodificación" data-budget="1:30"
+<section class="slide s06b" data-title="El límite: la gramática no te salva del corte" data-section="Decodificación" data-budget="1:00"
          style="--slide-accent:var(--action)">
   <div class="main">
     <div class="hd">
@@ -155,9 +155,9 @@
     </div>
   </div>
   <aside class="notes">
-    <p><strong>Propósito:</strong> que la sala se comprometa con una respuesta antes de verla, y que llegue a esta idea: la gramática garantiza que cada paso es válido, pero no que la generación termine. (1:30)</p>
+    <p><strong>Propósito:</strong> que la sala se comprometa con una respuesta antes de verla, y que llegue a esta idea: la gramática garantiza que cada paso es válido, pero no que la generación termine. (1:00)</p>
     <ol>
-      <li>Antes de pulsar →: “Acabo de decirles que el modelo solo puede elegir tokens válidos. ¿Dónde falla todavía? Griten o levanten la mano.” Espera 15–20 s. Anota en voz alta lo que digan.</li>
+      <li>Antes de pulsar →: “Acabo de decirles que el modelo solo puede elegir tokens válidos. ¿Dónde falla todavía? Griten o levanten la mano.” Espera ~10 s (el tiempo es corto: 1:00). Anota en voz alta lo que digan.</li>
       <li>Es probable que digan “valores incorrectos / semántica”: es cierto y es el siguiente bloque (minuto 22). Hoy la respuesta de este quiz es otra: el corte.</li>
       <li>Pulsa → y revela.</li>
     </ol>

@@ -1,5 +1,5 @@
 <!-- ============ 10 · MCP en una diapositiva ============ -->
-<section class="slide s10" data-title="MCP: aislamiento de credenciales" data-section="Válido ≠ correcto" data-budget="2:00"
+<section class="slide s10" data-title="MCP: aislamiento de credenciales" data-section="Válido ≠ correcto" data-budget="1:00"
          style="--slide-accent:var(--evidence)">
   <div class="main">
     <div class="hd">
@@ -68,16 +68,16 @@
     </div>
   </div>
   <aside class="notes">
-    <p><strong>Propósito:</strong> que la sala se lleve el porqué de MCP que da la clase: aislar las credenciales. El punto no es que “el modelo no ve las claves” (eso vale para cualquier herramienta que escribas tú), sino que el <em>proceso del agente</em> nunca tiene el token de la API de abajo: si hay una inyección de prompt o una fuga desde el agente, ese token no está ahí para sacarlo. No es un tutorial; otros ponentes cubren MCP. (2:00)</p>
-    <blockquote>MCP tiene muchas razones. La que quiero que se lleven hoy, la de la clase de CMU, es el aislamiento de credenciales.</blockquote>
-    <blockquote>Que el modelo no vea las claves no distingue a MCP: tampoco las ve con una herramienta que escribas tú. La diferencia es dónde vive el token. En el servidor MCP, no en el proceso del agente.</blockquote>
-    <blockquote>El agente se autentica con su propia clave MCP. El servidor llama a la API real con otra. Si alguien logra inyectar un prompt que haga que el agente imprima o envíe lo que tiene en memoria, el token de la API no está entre eso.</blockquote>
-    <blockquote>Es la misma idea que la compuerta: el modelo propone, quien tiene las llaves ejecuta.</blockquote>
+    <p><strong>Propósito:</strong> que la sala se lleve el porqué de MCP que da la clase: aislar las credenciales. El punto no es que “el modelo no ve las claves” (eso vale para cualquier herramienta que escribas tú), sino que el <em>proceso del agente</em> nunca tiene el token de la API de abajo: si hay una inyección de prompt o una fuga desde el agente, ese token no está ahí para sacarlo. No es un tutorial; otros ponentes cubren MCP. (1:00)</p>
+    <blockquote>MCP tiene muchas razones. La que me llevo hoy, la de la clase de CMU, es el aislamiento de credenciales.</blockquote>
+    <blockquote>Que el modelo no vea las claves no distingue a MCP. Lo que sí: el token de la API vive en el servidor MCP, no en el proceso del agente. Si una inyección de prompt logra que el agente suelte lo que tiene en memoria, ese token no está ahí.</blockquote>
+    <blockquote>Misma idea que la compuerta: el modelo propone, quien tiene las llaves ejecuta.</blockquote>
     <p>Pasos con →: 1 el modelo propone un <code>tool_use</code>; 2 el agente llama al servidor con su clave MCP; 3 el servidor llama a la API con el token real, y el recuadro punteado dice que ese token no está en el proceso del agente; 4 el resultado vuelve como <code>tool_result</code> y la consecuencia.</p>
     <p>Fuente: clase de CMU 11-768, lección 2 (diapositivas 44–45, “credential brokering”): el agente usa su propia clave MCP, el servidor llama a la API con otra, y el modelo no ve ninguna. La clase aclara que las claves estáticas son para enseñanza y que en producción se usan JWT u OAuth.</p>
     <p class="warn">La consecuencia sobre la inyección de prompt (“no puede sacar lo que el proceso no tiene”) es razonamiento nuestro a partir de esa arquitectura, no una cita de la clase: dilo así. Y tiene un límite: el agente SÍ tiene su clave MCP, así que una fuga puede exponer esa clave, acotada a lo que el servidor le permite; la autorización de cada llamada sigue siendo del servidor. No afirmes que MCP “resuelve la seguridad”.</p>
     <p class="warn">No es un tutorial y no hay demo de MCP en vivo. Si preguntan por detalles de MCP, remite a las otras charlas del evento.</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué token de tu agente está en la memoria o en las variables de entorno de un proceso que lee texto no confiable?</p>
+    <p class="warn">Tiempo: 1:00. Pulsa → sin pausas (los 4 pasos en ~40 s) y di solo las tres frases de arriba; no hay preguntas ni historia aquí.</p>
     <p><strong>Transición:</strong> “Ya tenemos las tres roturas. Falta lo que nos dice si funcionan: medir.”</p>
   </aside>
 </section>
