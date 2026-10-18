@@ -209,3 +209,21 @@ def test_log_and_on_message(tmp_path):
     row = json.loads((tmp_path / "x.jsonl").read_text().splitlines()[0])
     assert row["stop_reason"] == "end_turn" and row["input_tokens"] == 10 and row["categories"] == []
     assert saved == [2]
+
+
+def test_timeout_in_parallel_call_comes_back_as_is_error():
+    """paso-2b: la llamada que pasa el tope también regresa, como is_error, y en su lugar (orden conservado)."""
+    def rapida(inp):
+        return "ok"
+
+    def lenta(inp):
+        time.sleep(0.5)
+        return "tarde"
+
+    tools = [ToolSpec("rapida", "r", {"type": "object", "properties": {}}, rapida),
+             ToolSpec("lenta", "l", {"type": "object", "properties": {}}, lenta)]
+    calls = [ToolCall("t1", "rapida", {}), ToolCall("t2", "lenta", {}), ToolCall("t3", "rapida", {})]
+    results = asyncio.run(execute_calls(calls, tools, timeout_s=0.1))
+    assert [r.tool_use_id for r in results] == ["t1", "t2", "t3"]
+    assert results[1].is_error and results[1].outcome is ToolOutcome.EXEC_ERROR and "no terminó" in results[1].content
+    assert not results[0].is_error and not results[2].is_error

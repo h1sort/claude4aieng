@@ -287,10 +287,14 @@ SQL_PARALELO = ["SELECT COUNT(*) FROM clientes",
                 "SELECT COUNT(*) FROM cuentas WHERE tipo = 'credito'"]
 
 
-def con_latencia(tools, segundos: float):
+TOPE_DEMO_S = 1.5   # tope por llamada en esta demo (en el agente es TIMEOUT_HERRAMIENTA_S)
+LENTA_S = 3.0       # la tercera consulta tarda más que el tope, a propósito
+
+
+def con_latencia(tools, segundos: float, lenta_sql: str | None = None):
     def envolver(spec):
         def func(inp, _f=spec.func):
-            time.sleep(segundos)
+            time.sleep(LENTA_S if lenta_sql and inp.get("sql") == lenta_sql else segundos)
             return _f(inp)
         return dataclasses.replace(spec, func=func)
     return [envolver(t) for t in tools]
@@ -298,35 +302,66 @@ def con_latencia(tools, segundos: float):
 
 async def paralelo(client, inyectado: bool) -> None:
     llamadas: list[ToolCall] = []
+    asistente: list[dict] = []
     if not inyectado:
         r = await client.messages.create(model=get_model_id(), max_tokens=1024, tools=tools_payload(TOOLS),
                                          messages=[{"role": "user", "content": PROMPT_PARALELO}])
         llamadas = [ToolCall(b.id, b.name, b.input) for b in r.content if b.type == "tool_use"]
+        asistente = blocks_json(r.content)
         if len(llamadas) < 3:
             stage("AVISO", f"el modelo pidió {len(llamadas)} llamada(s) en este turno; se inyectan 3")
             llamadas = []
     if not llamadas:
         llamadas = [ToolCall(f"toolu_fabricado{i}", "sql_query", {"sql": s}) for i, s in enumerate(SQL_PARALELO)]
+        asistente = [{"type": "tool_use", "id": c.id, "name": c.name, "input": c.input} for c in llamadas]
         if inyectado:
             stage("AVISO", "--inyectado: 3 tool_use fabricados (las consultas sí se ejecutan contra data/banco.sqlite)")
-    lentas = con_latencia(TOOLS, LATENCIA_S)
-    tools_mod.ECHO.set(False)  # silencia las etapas de execute_calls: aquí solo importan los tiempos
-    stage("ANTES", f"{len(llamadas)} llamadas independientes, una tras otra")
-    stage("AVISO", f"latencia artificial de {LATENCIA_S} s por llamada, para que se note incluso en una laptop rápida")
+    lenta = llamadas[-1]
+    stage("SOLICITUD", f"{len(llamadas)} tool_use independientes en UN turno: " + ", ".join(c.id for c in llamadas))
+    stage("AVISO", f"latencia artificial: {LATENCIA_S} s por llamada, y {LENTA_S} s la última ({lenta.id}); "
+                   f"tope por llamada: {TOPE_DEMO_S} s")
+    tools_mod.ECHO.set(False)  # aquí importan los resultados y el tiempo, no cada etapa
     t0 = time.perf_counter()
-    for c in llamadas:
-        await execute_calls([c], lentas)
-    secuencial = time.perf_counter() - t0
-    print(f"  secuencial: {secuencial:.2f} s")
-    stage("DESPUÉS", "las mismas llamadas con execute_calls (asyncio.gather)")
-    t0 = time.perf_counter()
-    resultados = await execute_calls(llamadas, lentas)
-    paralelo_s = time.perf_counter() - t0
+    resultados = await execute_calls(llamadas, con_latencia(TOOLS, LATENCIA_S, lenta.input.get("sql")), timeout_s=TOPE_DEMO_S)
+    transcurrido = time.perf_counter() - t0
     tools_mod.ECHO.set(True)
-    for c, res in zip(llamadas, resultados):
-        stage("OBSERVACIÓN", f"{c.id} → {res.content.splitlines()[-1] if res.content else ''}")
-    print(f"  gather: {paralelo_s:.2f} s · {secuencial / paralelo_s:.1f}x más rápido")
-    stage("LECCIÓN", "las llamadas independientes cuestan el máximo, no la suma, y los tool_result vuelven juntos en un mensaje.")
+    por_id = {res.tool_use_id: res for res in resultados}
+    for c in llamadas:
+        res = por_id.get(c.id)
+        txt = "SIN tool_result" if res is None else (("is_error · " if res.is_error else "") + (res.content.splitlines() or [""])[-1])
+        stage("OBSERVACIÓN", f"{c.id} → {txt}")
+    print(f"  gather: {transcurrido:.2f} s · una tras otra serían ≥ {LATENCIA_S * (len(llamadas) - 1) + LENTA_S:.1f} s")
+    historial = [{"role": "user", "content": PROMPT_PARALELO},
+                 {"role": "assistant", "content": asistente},
+                 {"role": "user", "content": [{"type": "tool_result", "tool_use_id": res.tool_use_id,
+                                               "content": res.content, "is_error": res.is_error} for res in resultados]}]
+    faltan = huerfanos(historial)
+    if faltan:
+        stage("ANTES", f"devolviste {len(resultados)} de {len(llamadas)} tool_result: la llamada lenta se perdió ({faltan})")
+        if inyectado:
+            stage("AVISO", "--inyectado: sin API. Error documentado (no es la respuesta de esta corrida):")
+            print(f'  400 · "{ERROR_DOC}"')
+        else:
+            try:
+                await client.messages.create(model=get_model_id(), max_tokens=256, tools=tools_payload(TOOLS), messages=historial)
+                stage("AVISO", "la API aceptó los resultados incompletos; la rotura no se reprodujo")
+            except anthropic.APIStatusError as exc:
+                stage("RECHAZADA", error_api(exc))
+        stage("LECCIÓN", "en paralelo, la llamada que no termina también necesita su tool_result: escribe el TODO(paso-2b) y repite.")
+        return
+    stage("DESPUÉS", f"{len(resultados)} de {len(llamadas)} tool_result en un solo mensaje; la lenta vuelve como is_error")
+    if inyectado:
+        stage("AVISO", "--inyectado: sin API no hay respuesta del modelo; el mensaje pasa la validación local (0 huérfanos)")
+    else:
+        try:
+            r2 = await client.messages.create(model=get_model_id(), max_tokens=512, tools=tools_payload(TOOLS), messages=historial)
+            stage("MODELO", "respuesta real · " + resumen(r2))
+            texto = " ".join(b.text for b in r2.content if b.type == "text").strip()
+            if texto:
+                stage("MODELO", texto[:300])
+        except anthropic.APIStatusError as exc:
+            stage("RECHAZADA", f"falló: {error_api(exc)}")
+    stage("LECCIÓN", "las independientes cuestan el máximo, no la suma; y toda llamada, termine o no, regresa con su tool_result.")
 
 
 # ---------- modo 4: drop ----------

@@ -71,8 +71,11 @@ def sanitize_history(messages: list) -> list:
     return fixed
 
 
-async def execute_calls(calls: list[ToolCall], tools: list[ToolSpec]) -> list[ToolResult]:
-    """Ejecuta las llamadas en paralelo (asyncio.gather conserva el orden). Nunca lanza: todo error es un tool_result."""
+TIMEOUT_HERRAMIENTA_S = 5.0  # tope por llamada: una herramienta lenta no detiene al agente
+
+
+async def execute_calls(calls: list[ToolCall], tools: list[ToolSpec], timeout_s: float | None = None) -> list[ToolResult]:
+    """Ejecuta las llamadas en paralelo con un tope de tiempo por llamada (asyncio.gather conserva el orden)."""
     by_name = {t.name: t for t in tools}
 
     async def one(call: ToolCall) -> ToolResult:
@@ -91,7 +94,17 @@ async def execute_calls(calls: list[ToolCall], tools: list[ToolSpec]) -> list[To
         stage("OBSERVACIÓN", "\n" + "\n".join(out.splitlines()[:12]))
         return ToolResult(call.id, ToolOutcome.REJECTED if rejected else ToolOutcome.OK, out, rejected)
 
-    return list(await asyncio.gather(*(one(c) for c in calls)))
+    tope = TIMEOUT_HERRAMIENTA_S if timeout_s is None else timeout_s
+    hechos = await asyncio.gather(*(asyncio.wait_for(one(c), tope) for c in calls), return_exceptions=True)
+    # Versión ingenua: devuelve solo las que terminaron. La que pasó el tope se pierde y su tool_use queda huérfano.
+    results = [r for r in hechos if isinstance(r, ToolResult)]
+    # >>> paso-2b
+    # Cada tool_use necesita su tool_result, también la llamada que no terminó: un timeout es un is_error.
+    results = [r if isinstance(r, ToolResult) else ToolResult(c.id, ToolOutcome.EXEC_ERROR,
+               f"{c.name} no terminó en {tope:g} s ({type(r).__name__}); reintenta con una consulta más simple o explica el problema.", True)
+               for c, r in zip(calls, hechos)]
+    # <<< paso-2b
+    return results
 
 
 def turn_categories(turn: TurnRecord) -> list[ErrorCategory]:

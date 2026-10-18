@@ -190,8 +190,9 @@ def test_main_tiene_los_cuatro_marcadores_una_sola_vez():
         if rel in cp.PROPIOS or rel.startswith((".venv/", "deck/", "node_modules/")):
             continue
         for b in cp.buscar_bloques(ruta.read_text(encoding="utf-8")):
-            encontrados.setdefault(b.n, []).append(rel)
-    assert {n: len(v) for n, v in encontrados.items()} == {1: 1, 2: 1, 3: 1, 4: 1}, encontrados
+            encontrados.setdefault(f"{b.n}{b.sub}" if b.sub else b.n, []).append(rel)
+    assert {n: len(v) for n, v in encontrados.items()} == {1: 1, 2: 1, "2b": 1, 3: 1, 4: 1}, encontrados
+    assert set(cp.SUBREEMPLAZOS) == {"2b"}
     for n, r in cp.REEMPLAZOS.items():
         if r.requiere_despues:
             assert r.requiere_despues in (ROOT / encontrados[n][0]).read_text(encoding="utf-8")
@@ -202,3 +203,10 @@ def test_cortar_todo_el_codigo_real_sigue_compilando():
     for ruta in ("taller/agent.py", "taller/tools.py"):
         original = (ROOT / ruta).read_text(encoding="utf-8")
         compile(cp.cortar_bloques(original, cp.PASOS), ruta, "exec")
+
+
+def test_subbloque_2b_se_corta_con_el_paso_2_y_con_su_pista():
+    texto = "a\n    # >>> paso-2b\n    x = 1\n    # <<< paso-2b\nb\n"
+    cortado = cp.cortar_bloques(texto, cp.ramas_de(1))
+    assert "# TODO(paso-2b):" in cortado and "x = 1" not in cortado
+    assert cp.cortar_bloques(texto, cp.ramas_de(2)) == texto

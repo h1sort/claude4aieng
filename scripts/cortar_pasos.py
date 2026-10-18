@@ -38,8 +38,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BRANCHES = tuple(range(6))  # paso-0 … paso-5
 PASOS = (1, 2, 3, 4)  # bloques con marcador
-MARCA_ABRE = re.compile(r"^(?P<sangria>[ \t]*)# >>> paso-(?P<n>\d+)[ \t]*$")
-MARCA_CIERRA = re.compile(r"^(?P<sangria>[ \t]*)# <<< paso-(?P<n>\d+)[ \t]*$")
+MARCA_ABRE = re.compile(r"^(?P<sangria>[ \t]*)# >>> paso-(?P<n>\d+)(?P<sub>[a-z]?)[ \t]*$")
+MARCA_CIERRA = re.compile(r"^(?P<sangria>[ \t]*)# <<< paso-(?P<n>\d+)(?P<sub>[a-z]?)[ \t]*$")
 # Los dos archivos de este cortador citan marcadores en sus cadenas: nunca se transforman.
 PROPIOS = {"scripts/cortar_pasos.py", "tests/test_cortar_pasos.py"}
 TRAILERS = (
@@ -78,7 +78,7 @@ REEMPLAZOS: dict[int, Reemplazo] = {
     # Sin la rama (no-op: el bucle sigue de largo), el tool_use cortado entra al historial y el siguiente turno da 400.
     3: Reemplazo(
         'con stop_reason == "max_tokens" y algún tool_use el JSON puede estar cortado: ni lo ejecutes ni lo guardes',
-        ("# Sube self.max_tokens (min(.. * 2, MAX_TOKENS_TOPE)), registra el turno con self._log(turn) y `continue`:",
+        ("# Sube self.max_tokens (min(.. * 4, MAX_TOKENS_TOPE)), registra el turno con self._log(turn) y `continue`:",
          "# se repite la misma petición. Mientras falte, el tool_use cortado se guarda y el siguiente mensaje da 400."),
     ),
     # Sin compuerta, la lectura de `secretos` llega a SQLite y devuelve las claves; el DROP lo frena solo la
@@ -88,6 +88,18 @@ REEMPLAZOS: dict[int, Reemplazo] = {
         ('stage("VALIDACIÓN", "SIN COMPUERTA (TODO paso-4): el SQL llega a SQLite sin validar")',),
     ),
 }
+
+# Bloques secundarios de un paso (`# >>> paso-2b`): se cortan y se resuelven junto con su paso, con su propia pista.
+SUBREEMPLAZOS: dict[str, Reemplazo] = {
+    # Sin el bloque queda la versión ingenua (solo los resultados que terminaron): la llamada que pasa el tope
+    # pierde su tool_result y la siguiente petición da el mismo 400 del huérfano.
+    "2b": Reemplazo(
+        "un tool_result POR CADA llamada, también la que no terminó: un timeout se devuelve como is_error",
+        ("# Recorre zip(calls, hechos): si r es ToolResult úsalo; si no (timeout/excepción), arma",
+         "# ToolResult(c.id, ToolOutcome.EXEC_ERROR, \"<qué pasó y qué intentar>\", True). Mientras falte, `romper paralelo` da 400."),
+    ),
+}
+
 
 # Pruebas de main que ejercitan un paso: se saltan en los branches donde ese paso aún no está escrito
 # (paso-K tiene escritos los pasos <= K). Clave: "archivo::prueba" o "archivo" completo.
@@ -102,6 +114,8 @@ REQUIERE: dict[str, int] = {
     "tests/test_agent.py::test_truncated_retry_is_capped": 3,
     "tests/test_medir.py::test_con_agent_real_consulta_y_bloqueo_rechazado": 1,
     "tests/test_romper.py::test_huerfano": 2,
+    "tests/test_romper.py::test_paralelo": 2,
+    "tests/test_agent.py::test_timeout_in_parallel_call_comes_back_as_is_error": 2,
     "tests/test_romper.py::test_truncado": 3,
     "tests/test_romper.py::test_drop": 4,
     "tests/test_romper.py::test_detectar_compuerta_es_en_ejecucion": 4,
@@ -116,21 +130,22 @@ class Bloque:
     abre: int      # índice de línea del `# >>>`
     cierra: int    # índice de línea del `# <<<`
     sangria: str
+    sub: str = ""  # `paso-2b`: segundo bloque del paso 2 (se corta y se resuelve junto con él)
 
 
 def buscar_bloques(texto: str) -> list[Bloque]:
     """Bloques de un texto, en orden. Falla si hay anidación, cierres huérfanos o N distinto."""
     bloques: list[Bloque] = []
-    abierto: tuple[int, int, str] | None = None
+    abierto: tuple[int, int, str, str] | None = None
     for i, linea in enumerate(texto.splitlines()):
         if m := MARCA_ABRE.match(linea):
             if abierto:
                 raise ValueError(f"línea {i + 1}: `>>> paso-{m['n']}` dentro del bloque paso-{abierto[0]} abierto en la línea {abierto[1] + 1}")
-            abierto = (int(m["n"]), i, m["sangria"])
+            abierto = (int(m["n"]), i, m["sangria"], m["sub"])
         elif m := MARCA_CIERRA.match(linea):
-            if not abierto or abierto[0] != int(m["n"]):
-                raise ValueError(f"línea {i + 1}: `<<< paso-{m['n']}` sin su `>>> paso-{m['n']}`")
-            bloques.append(Bloque(abierto[0], abierto[1], i, abierto[2]))
+            if not abierto or (abierto[0], abierto[3]) != (int(m["n"]), m["sub"]):
+                raise ValueError(f"línea {i + 1}: `<<< paso-{m['n']}{m['sub']}` sin su `>>> paso-{m['n']}{m['sub']}`")
+            bloques.append(Bloque(abierto[0], abierto[1], i, abierto[2], abierto[3]))
             abierto = None
     if abierto:
         raise ValueError(f"el bloque paso-{abierto[0]} (línea {abierto[1] + 1}) no se cierra")
@@ -145,10 +160,10 @@ def cortar_bloques(texto: str, cortar: Iterable[int], reemplazos: dict[int, Reem
     for b in sorted(buscar_bloques(texto), key=lambda x: -x.abre):  # de atrás hacia delante: los índices no se mueven
         if b.n not in cortar:
             continue
-        r = reemplazos[b.n]
+        r = SUBREEMPLAZOS[f"{b.n}{b.sub}"] if b.sub else reemplazos[b.n]
         if "\n" in r.pista:
             raise ValueError(f"la pista de paso-{b.n} debe ser de una sola línea")
-        nuevo = [f"{b.sangria}# TODO(paso-{b.n}): {r.pista}{fin}"] + [f"{b.sangria}{x}{fin}" for x in r.codigo]
+        nuevo = [f"{b.sangria}# TODO(paso-{b.n}{b.sub}): {r.pista}{fin}"] + [f"{b.sangria}{x}{fin}" for x in r.codigo]
         lineas[b.abre:b.cierra + 1] = nuevo
     return "".join(lineas)
 

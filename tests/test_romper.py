@@ -58,9 +58,11 @@ def test_truncado_sin_arreglo_el_seguimiento_da_400(capsys, monkeypatch, modulo_
 
 def test_paralelo(capsys):
     out = correr("paralelo", capsys)
-    assert "latencia artificial" in out
-    assert "secuencial:" in out and "gather:" in out and "más rápido" in out
-    assert "toolu_fabricado2" in out
+    assert "latencia artificial" in out and "tope por llamada: 1.5 s" in out
+    assert "gather:" in out and "una tras otra serían" in out
+    assert "toolu_fabricado2 → is_error" in out and "no terminó en 1.5 s" in out
+    assert "3 de 3 tool_result" in out and "SIN tool_result" not in out
+    assert "LECCIÓN" in out
 
 
 def test_drop(capsys):
