@@ -49,7 +49,10 @@ def _gate(sql: str) -> str | None:
         if exc.name != "taller.gate":
             raise
         return None
-    return gate.validate(sql)
+    motivo = gate.validate(sql)
+    if motivo is None:
+        stage("VALIDACIÓN", "compuerta · solo lectura sobre tablas permitidas")
+    return motivo
 
 
 MAX_ROWS = 200
@@ -79,9 +82,9 @@ def sql_query(sql: str) -> str:
         motivo = motivo if motivo.startswith(RECHAZADA) else f"{RECHAZADA} {motivo}"
         stage("RECHAZADA", motivo)
         return motivo
-    stage("VALIDACIÓN", "ok · solo lectura")
     # Defensa en profundidad: aunque la compuerta falle o no exista, esta conexión no puede escribir,
     # devuelve un máximo de filas y se aborta pasado el límite de tiempo.
+    stage("VALIDACIÓN", f"segunda capa · conexión de solo lectura · máx. {MAX_ROWS} filas · {TIME_LIMIT_S:.0f} s")
     con = sqlite3.connect(f"file:{contracts.DB_PATH}?mode=ro", uri=True)
     t0 = time.monotonic()
     con.set_progress_handler(lambda: int(time.monotonic() - t0 > TIME_LIMIT_S), 10_000)

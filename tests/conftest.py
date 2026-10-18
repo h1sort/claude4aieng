@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import importlib.util
 import sqlite3
+import sys
+import types
 from pathlib import Path
 
 import pytest
@@ -27,3 +29,20 @@ def seeded_db(tmp_path: Path, seed_module) -> Path:
     seed_module.build(con, random.Random(seed_module.SEED))
     con.close()
     return path
+
+
+@pytest.fixture(scope="session")
+def modulo_cortado():
+    """modulo_cortado("taller/agent.py", {3}) -> el módulo con esos pasos sin escribir (# TODO), como en un branch paso-*."""
+    spec = importlib.util.spec_from_file_location("cortar_pasos_fixture", ROOT / "scripts" / "cortar_pasos.py")
+    cp = importlib.util.module_from_spec(spec)
+    sys.modules["cortar_pasos_fixture"] = cp  # dataclasses lo busca ahí
+    spec.loader.exec_module(cp)
+
+    def cargar(ruta: str, pasos: set[int]) -> types.ModuleType:
+        fuente = cp.cortar_bloques((ROOT / ruta).read_text(encoding="utf-8"), pasos)
+        mod = types.ModuleType("cortado_" + Path(ruta).stem)
+        exec(compile(fuente, ruta, "exec"), mod.__dict__)
+        return mod
+
+    return cargar

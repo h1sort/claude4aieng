@@ -38,33 +38,36 @@ def block_to_dict(block) -> dict:
     return block.model_dump(exclude_none=True)  # p. ej. thinking: debe viajar de vuelta intacto
 
 
+HUERFANO_MSG = ("El proceso se interrumpió antes de ejecutar esta herramienta; no hay resultado. "
+                "Si la información sigue siendo necesaria, vuelve a llamar a la herramienta.")
+
+
 def sanitize_history(messages: list) -> list:
-    """Repara un historial con `tool_use` huérfanos (proceso muerto entre el tool_use y su tool_result)."""
+    """Repara un historial con `tool_use` huérfanos (proceso muerto entre el tool_use y su tool_result).
+
+    La API exige un tool_result para CADA tool_use, en el mensaje de usuario inmediato siguiente; si falta,
+    responde 400 "tool_use ids were found without tool_result blocks immediately after". No borramos nada:
+    le decimos al modelo, con is_error, qué pasó y que reintente si aún hace falta.
+    """
     fixed = [dict(m) for m in messages]
-    # >>> paso-2
-    # La API exige un tool_result para CADA tool_use, en el mensaje de usuario inmediato siguiente;
-    # si falta, responde 400 "tool_use ids were found without tool_result blocks immediately after".
-    # No borramos nada: le decimos al modelo, con is_error, qué pasó y que reintente si aún hace falta.
-    i = 0
-    while i < len(fixed):
-        msg = fixed[i]
-        ids = [b["id"] for b in msg["content"] if b.get("type") == "tool_use"] if (
-            msg["role"] == "assistant" and isinstance(msg["content"], list)) else []
-        if ids:
-            nxt = fixed[i + 1] if i + 1 < len(fixed) and fixed[i + 1]["role"] == "user" else None
-            content = nxt["content"] if nxt else []
-            content = [{"type": "text", "text": content}] if isinstance(content, str) else list(content)
-            done = {b.get("tool_use_id") for b in content if b.get("type") == "tool_result"}
-            orphans = [{"type": "tool_result", "tool_use_id": t, "is_error": True,
-                        "content": "El proceso se interrumpió antes de ejecutar esta herramienta; no hay resultado. "
-                                   "Si la información sigue siendo necesaria, vuelve a llamar a la herramienta."}
-                       for t in ids if t not in done]
-            if orphans:
-                # los tool_result van PRIMERO en el mensaje de usuario; texto antes de ellos -> 400
-                merged = {"role": "user", "content": orphans + content}
-                fixed[i + 1:i + 2 if nxt else i + 1] = [merged]
-        i += 1
-    # <<< paso-2
+    for i, msg in enumerate(fixed):
+        if msg["role"] != "assistant" or not isinstance(msg["content"], list):
+            continue
+        ids = [b["id"] for b in msg["content"] if b.get("type") == "tool_use"]  # lo que el modelo pidió
+        if not ids:
+            continue
+        nxt = fixed[i + 1] if i + 1 < len(fixed) and fixed[i + 1]["role"] == "user" else None
+        content = nxt["content"] if nxt else []  # el mensaje de usuario que sigue (puede no existir)
+        content = [{"type": "text", "text": content}] if isinstance(content, str) else list(content)
+        done = {b.get("tool_use_id") for b in content if b.get("type") == "tool_result"}
+        orphans = [t for t in ids if t not in done]  # tool_use sin su tool_result
+        hasta = i + 2 if nxt else i + 1  # el mensaje de usuario siguiente (si existe) se reemplaza por el unido
+        # >>> paso-2
+        # los tool_result van PRIMERO en el mensaje de usuario; texto antes de ellos -> 400
+        if orphans:
+            errores = [{"type": "tool_result", "tool_use_id": t, "is_error": True, "content": HUERFANO_MSG} for t in orphans]
+            fixed[i + 1:hasta] = [{"role": "user", "content": errores + content}]
+        # <<< paso-2
     return fixed
 
 
@@ -102,6 +105,9 @@ def turn_categories(turn: TurnRecord) -> list[ErrorCategory]:
     return cats
 
 
+MAX_TOKENS_TOPE = 16_384
+"""Tope al que sube max_tokens al reintentar una llamada cortada."""
+
 SYSTEM_BASE = (
     "Eres un agente de datos de un banco minorista mexicano. Respondes preguntas con la herramienta sql_query "
     "(una sola sentencia SELECT de SQLite) y, solo si el usuario lo pide, bloqueas tarjetas con bloquear_tarjeta "
@@ -138,8 +144,10 @@ class Agent:
     async def run(self, messages: list) -> list[TurnRecord]:
         """Itera mientras el modelo pida herramientas. Modifica `messages` en sitio; devuelve un TurnRecord por turno."""
         tools_mod.ECHO.set(self.echo)
-        turns: list[TurnRecord] = []
+        self.turns = turns = []  # visible desde fuera aunque run() termine con una excepción (lo usa romper.py)
         for index in range(self.max_turns):
+            if turns and ErrorCategory.TRUNCATED in turn_categories(turns[-1]):
+                stage("MODELO", f"reintento de la misma petición con max_tokens={self.max_tokens}")
             t0 = time.monotonic()
             resp = await self.client.messages.create(  # tool_choice queda en auto: any/tool dan 400 en Sonnet/Opus 5.5
                 model=self.model, max_tokens=self.max_tokens, system=self.system,
@@ -152,19 +160,14 @@ class Agent:
                     stage("MODELO", block.text.strip())
             uses = [b for b in resp.content if b.type == "tool_use"]
             turn.calls = [ToolCall(b.id, b.name, b.input) for b in uses]
+            if resp.stop_reason == "max_tokens":
+                stage("MODELO", f"stop_reason=max_tokens con max_tokens={self.max_tokens}"
+                                + (f": la llamada a {', '.join(b.name for b in uses)} puede venir cortada" if uses else ""))
             # >>> paso-3
-            # Con max_tokens el último bloque puede estar cortado a la mitad (JSON incompleto): jamás se
-            # ejecuta ni se parsea. Tampoco lo guardamos: un tool_use en el historial exigiría su tool_result.
-            if resp.stop_reason == "max_tokens" and uses:
-                kept = [block_to_dict(b) for b in resp.content if b.type != "tool_use"]
-                if kept:
-                    messages.append({"role": "assistant", "content": kept})
-                    self._save(messages)
-                stage("RECHAZADA", f"respuesta cortada por max_tokens={self.max_tokens} en mitad de una llamada a "
-                                   f"herramienta ({', '.join(b.name for b in uses)}); no se ejecutó. "
-                                   "Sube max_tokens y repite la pregunta.")
+            if resp.stop_reason == "max_tokens" and uses:  # JSON cortado: ni se ejecuta ni se guarda en el historial
+                self.max_tokens = min(self.max_tokens * 2, MAX_TOKENS_TOPE)  # y se repite la petición con más margen
                 self._log(turn)
-                break
+                continue
             # <<< paso-3
             messages.append({"role": "assistant", "content": [block_to_dict(b) for b in resp.content]})
             self._save(messages)

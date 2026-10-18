@@ -140,3 +140,45 @@ Revisión en frío de diapositivas, notas, `sources.html`, `taller/*.py` y `orig
 - El código de s04 queda en ~12 px a 1280x720.
 - s07, regla 3, dice "Reintenta", pero el código no reintenta.
 - s12: cinco preguntas antes de la frase final la diluyen.
+
+## FIX-CODE
+
+Cambios en `taller/agent.py`, `tools.py`, `romper.py`, `scripts/cortar_pasos.py`, `tests/`. `uv run pytest -q` en main: 125 pasan; `cortar_pasos.py --sin-push` verde en los 6 branches (cortado desde un commit temporal; los branches locales se restauraron a lo que está en origin: hay que recortar tras commitear). Verificado cada comando en el branch de partida y en el de llegada con `--inyectado` (sin clave); el modo API se probó con un cliente simulado que valida huérfanos como la API.
+
+**Rotura #1** · `uv run python -m taller.romper huerfano` · parte de `paso-1`.
+- ANTES: `RECHAZADA › 400 …` (sin clave: el texto documentado, marcado) y `AVISO › sanitize_history todavía es un TODO (paso-2)…`; no dice que insertó nada.
+- DESPUÉS (`paso-2`/main): `DESPUÉS › sanitize_history inserta un tool_result con is_error…` y el historial saneado (con clave: respuesta real del modelo; el segundo error de API se captura).
+- Teclea (3 líneas, el esqueleto ya queda en el branch: bucle, ids, mensaje siguiente, `orphans`, `hasta`):
+  `if orphans:` / `errores = [{"type": "tool_result", "tool_use_id": t, "is_error": True, "content": HUERFANO_MSG} for t in orphans]` / `fixed[i + 1:hasta] = [{"role": "user", "content": errores + content}]`
+
+**Rotura #2** · `uv run python -m taller.romper truncado` · parte de `paso-2` (el TODO(paso-3) es un no-op: el agente guarda el tool_use cortado y termina).
+- ANTES: `ANTES › el agente GUARDÓ el tool_use cortado en el historial (sin tool_result: ['toolu_…'])`, luego el seguimiento `Gracias. Ahora dime cuántos clientes hay en total.` → `RECHAZADA › 400 · tool_use ids were found without tool_result blocks immediately after` (con clave: el 400 real; sin clave: `AVISO … Error documentado (no es la respuesta de esta corrida)`). `ejecuciones de sql_query: 0` sale en ambos: el daño no es ejecutar.
+- DESPUÉS (`paso-3`/main): `MODELO › reintento de la misma petición con max_tokens=48`, `DESPUÉS › … tool_use sin tool_result: 0`, `max_tokens 24 -> 48`; con clave, respuesta real al seguimiento; sin clave: "sin API no hay respuesta… pasa la validación local".
+- Teclea (4 líneas, en `Agent.run`):
+  `if resp.stop_reason == "max_tokens" and uses:` / `self.max_tokens = min(self.max_tokens * 2, MAX_TOKENS_TOPE)` / `self._log(turn)` / `continue`
+- Con API se procesa la misma respuesta truncada que se mostró (ClienteFalso con `real=client`). Quitado el aviso de `partial_json`. El agente descarta TODO el turno cortado (también el texto) y reintenta con el doble (tope 16384).
+
+**Rotura #3** · `uv run python -m taller.romper drop` · parte de `paso-3`. `romper` detecta en ejecución si `sql_query` consulta la compuerta (espía `gate.validate`) y rotula la cabecera según eso.
+- ANTES: `ANTES › sql_query NO consulta la compuerta…`; `SELECT clave, valor FROM secretos` → `SIN COMPUERTA`, `EJECUCIÓN › sqlite · 5 filas`, las 5 claves falsas, `LLEGÓ A SQLITE … fuga de secretos`; `DROP TABLE tarjetas` → `readonly database` → `segunda capa: la conexión de solo lectura … (error de ejecución, no un rechazo)`.
+- DESPUÉS (`paso-4`/main): ambas `RECHAZADA` por la compuerta antes de ejecutar (`outcome=rejected · is_error=True`). Con clave el siguiente turno del modelo es real (se imprime lo que haga, rotulado); sin clave: "no inventamos la respuesta del modelo".
+- Teclea (1 línea): `motivo = _gate(sql)`
+- Con clave: el prompt pide leer `secretos` y luego el DROP; lo que el modelo no proponga se inyecta y se anuncia.
+
+**Para las diapositivas / README**: la predicción y el checkpoint de s09/s09b van sobre `secretos`, el DROP es "segunda capa"; s07 checkpoint = seguimiento 400 → OK, y "Reintenta" ahora es cierto (sube max_tokens); s05b: el TODO(paso-2) son 3 líneas con el esqueleto ya puesto; s07: el paso-3 son 4 líneas (PLAN §7 dice leer y correr: decidir); README L66–68 (tabla) sigue describiendo los TODO viejos. `tools.py`: las etapas VALIDACIÓN cambiaron ("compuerta · solo lectura…" solo con compuerta; "segunda capa · conexión de solo lectura…" siempre). `Agent.turns` es nuevo (lo usa romper aunque `run` lance).
+
+## FIX-DECK
+
+`--expect 40:00` ✓; shot 1280x720 y 390x844 sin desbordes. Solo `deck/src/slides/*.html` y `sources.html`; sin commit.
+
+- **s04**: «La API te entrega la llamada ya estructurada»; nota de `query` corregida (el arg es `sql`).
+- **s05b** (4:00): teclean 2:30; +momento en vivo `romper paralelo` (0:30, ~2.4 s vs ~0.8 s, latencia artificial declarada), primer recorte opcional. Nota con `git fetch` en el primer checkpoint.
+- **s05c** (3:30 → **4:30**): teclean 2:45, panel de ≈5 líneas dentro del esqueleto.
+- **s06**: fragmento `"monto": {"type": "integer"}` en la máscara.
+- **s07** (3:00): predicción y checkpoint sobre el 400 del mensaje siguiente; paso-3 ≤4 líneas, teclean 1:00; ranura «[Historia propia…]».
+- **s09** (2:30): fuga de `secretos` en paso-3 como rotura; DROP = capa 2 (solo lectura); predicción «¿se rinde, repite o reescribe?» (usar respuesta en vivo); ranura de historia propia.
+- **s09b** (3:00 → **2:00**): TODO de una línea, teclean 1:00.
+- **s10**: el proceso del agente nunca tiene el token; matiz sobre la clave MCP.
+- **s11/s11b/s12**: «tareas resueltas X/20» y «costo por tarea resuelta»; `gate_rejected` gana por a01/a02.
+- Todos los `git checkout paso-N` → `git stash && git checkout paso-N`. Recortes: 1) paralelo, 2) `--vs`, 3) autómata de pila.
+
+Pendiente: contrastar el código mostrado en s05c/s07/s09b con los TODO reales de FIX-CODE; tabla de s11b sigue como marcador; QR sin cambios.

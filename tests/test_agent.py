@@ -118,26 +118,36 @@ def test_gate_rejection_is_error_result():
     assert turns[0].results[0].outcome in (ToolOutcome.REJECTED, ToolOutcome.EXEC_ERROR)
 
 
-def test_truncated_tool_use_is_not_executed():
+def test_truncated_tool_use_is_not_executed_and_is_retried():
     called = []
     spy = ToolSpec("spy", "d", {"type": "object", "properties": {}, "additionalProperties": False},
                    lambda a: called.append(a) or "x")
-    client = FakeClient(reply("max_tokens", text("voy a"), use("t1", "spy")))
+    client = FakeClient(reply("max_tokens", text("voy a"), use("t1", "spy")), reply("end_turn", text("listo")))
     messages = [{"role": "user", "content": "x"}]
     turns = run(make_agent(client, [spy], max_tokens=16), messages)
     assert called == []
-    assert len(client.requests) == 1  # no hubo reintento silencioso
-    assert turns[0].stop_reason == "max_tokens" and turns[0].results == []
-    assert turn_categories(turns[0]) == [ErrorCategory.TRUNCATED]
+    assert [r["max_tokens"] for r in client.requests] == [16, 32]  # misma petición, el doble de margen
+    assert client.requests[1]["messages"] == [{"role": "user", "content": "x"}]  # nada del turno cortado entró
+    assert [t.stop_reason for t in turns] == ["max_tokens", "end_turn"]
+    assert turns[0].results == [] and turn_categories(turns[0]) == [ErrorCategory.TRUNCATED]
     # el historial queda válido: ningún tool_use sin tool_result
     assert all(b["type"] != "tool_use" for m in messages[1:] for b in m["content"])
 
 
+def test_truncated_retry_is_capped():
+    from taller.agent import MAX_TOKENS_TOPE
+    client = FakeClient(*[reply("max_tokens", use(f"t{i}", "sql_query")) for i in range(6)])
+    agent = make_agent(client, max_tokens=MAX_TOKENS_TOPE // 2, max_turns=3)
+    run(agent, [{"role": "user", "content": "x"}])
+    assert [r["max_tokens"] for r in client.requests] == [MAX_TOKENS_TOPE // 2, MAX_TOKENS_TOPE, MAX_TOKENS_TOPE]
+
+
 def test_truncated_run_prints_clear_message(capsys):
-    client = FakeClient(reply("max_tokens", use("t1", "sql_query")))
+    client = FakeClient(reply("max_tokens", use("t1", "sql_query")), reply("end_turn", text("ok")))
     agent = Agent(client, model="m", system="s", echo=True)
     run(agent, [{"role": "user", "content": "x"}])
-    assert "max_tokens" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "max_tokens" in out
 
 
 def test_sanitize_inserts_error_result_first():

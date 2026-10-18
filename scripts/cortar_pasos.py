@@ -67,18 +67,22 @@ REEMPLAZOS: dict[int, Reemplazo] = {
          "# Mientras falte, `results` queda vacío y el bucle falla justo debajo con NotImplementedError."),
         'raise NotImplementedError("paso-1',
     ),
-    # Sin cuerpo, sanitize_history devuelve el historial intacto: `--reanudar` produce el 400 real de la API.
+    # El esqueleto de sanitize_history queda (el bucle, los ids de tool_use, el mensaje de usuario siguiente);
+    # sin la inserción devuelve el historial intacto: `--reanudar` produce el 400 real de la API.
     2: Reemplazo(
-        "inserta un tool_result con is_error=True, PRIMERO, por cada tool_use huérfano (sin él la API da 400)",
-        ("# Un tool_use huérfano es el de un assistant cuyo mensaje de usuario siguiente no trae su tool_result.",
+        "si hay `orphans`, mete un tool_result (is_error=True) por cada uno AL PRINCIPIO del mensaje de usuario siguiente",
+        ("# Arma `errores`: un {type: tool_result, tool_use_id, is_error: True, content: HUERFANO_MSG} por huérfano.",
+         "# Luego reemplaza fixed[i + 1:hasta] por un mensaje de usuario con errores + content (resultados primero).",
          "# Sin esto el historial se reenvía tal cual y la API responde 400."),
     ),
-    # Sin la rama, un tool_use cortado por max_tokens se guarda en el historial (quedaría huérfano).
+    # Sin la rama (no-op: el bucle sigue de largo), el tool_use cortado entra al historial y el siguiente turno da 400.
     3: Reemplazo(
-        'con stop_reason == "max_tokens" y algún tool_use el JSON puede estar cortado: no lo ejecutes ni lo guardes',
-        ("# Sin esto la llamada cortada entra al historial; guarda solo lo que no es tool_use, avisa y sal del bucle.",),
+        'con stop_reason == "max_tokens" y algún tool_use el JSON puede estar cortado: ni lo ejecutes ni lo guardes',
+        ("# Sube self.max_tokens (min(.. * 2, MAX_TOKENS_TOPE)), registra el turno con self._log(turn) y `continue`:",
+         "# se repite la misma petición. Mientras falte, el tool_use cortado se guarda y el siguiente mensaje da 400."),
     ),
-    # El DROP llega a SQLite; lo frena solo la conexión de solo lectura (error de ejecución, no rechazo).
+    # Sin compuerta, la lectura de `secretos` llega a SQLite y devuelve las claves; el DROP lo frena solo la
+    # conexión de solo lectura (segunda capa: error de ejecución, no rechazo).
     4: Reemplazo(
         "falta la compuerta: llama a _gate(sql) y deja el resultado en `motivo` (None = permitido)",
         ('stage("VALIDACIÓN", "SIN COMPUERTA (TODO paso-4): el SQL llega a SQLite sin validar")',),
@@ -94,10 +98,13 @@ REQUIERE: dict[str, int] = {
     "tests/test_agent.py::test_sanitize_inserts_error_result_first": 2,
     "tests/test_agent.py::test_sanitize_when_history_ends_at_tool_use_and_is_idempotent": 2,
     "tests/test_agent.py::test_sanitize_string_user_message_after_orphan": 2,
-    "tests/test_agent.py::test_truncated_tool_use_is_not_executed": 3,
+    "tests/test_agent.py::test_truncated_tool_use_is_not_executed_and_is_retried": 3,
+    "tests/test_agent.py::test_truncated_retry_is_capped": 3,
     "tests/test_medir.py::test_con_agent_real_consulta_y_bloqueo_rechazado": 1,
     "tests/test_romper.py::test_huerfano": 2,
+    "tests/test_romper.py::test_truncado": 3,
     "tests/test_romper.py::test_drop": 4,
+    "tests/test_romper.py::test_detectar_compuerta_es_en_ejecucion": 4,
 }
 
 
@@ -159,17 +166,17 @@ SIGUIENTE = {
         "contesta con UN mensaje de usuario con un `tool_result` por llamada.",
         "`uv run python -m taller.agent` y pregunta «¿cuántas tarjetas bloqueadas hay?» (respuesta: 26)."),
     1: ("el paso 2, el saneo del historial huérfano",
-        "Busca `# TODO(paso-2)` dentro de `sanitize_history` (`taller/agent.py`): inserta un `tool_result` con `is_error` "
-        "PRIMERO en el mensaje de usuario siguiente a cada `tool_use` huérfano.",
-        "`uv run python -m taller.romper huerfano` (antes: el 400 real; después: el modelo continúa)."),
+        "Busca `# TODO(paso-2)` dentro de `sanitize_history` (`taller/agent.py`): el esqueleto ya encuentra los `orphans`; "
+        "tú inserta (3 líneas) un `tool_result` con `is_error` PRIMERO en el mensaje de usuario siguiente.",
+        "`uv run python -m taller.romper huerfano` (antes: el 400 y «sanitize_history todavía es un TODO»; después: el modelo continúa)."),
     2: ("el paso 3, la rama `max_tokens`",
-        'Busca `# TODO(paso-3)` en el bucle de `taller/agent.py`: con `stop_reason == "max_tokens"` y algún `tool_use`, '
-        "no lo ejecutes ni lo guardes (guarda solo lo demás, avisa y sal del bucle).",
-        "`uv run python -m taller.romper truncado` (ejecuciones de sql_query: 0)."),
+        'Busca `# TODO(paso-3)` en el bucle de `taller/agent.py` (4 líneas): con `stop_reason == "max_tokens"` y algún '
+        "`tool_use`, no lo ejecutes ni lo guardes: sube `max_tokens`, registra el turno y `continue` (repite la petición).",
+        "`uv run python -m taller.romper truncado` (antes: el 400 del seguimiento; después: el seguimiento funciona y el reintento sube max_tokens)."),
     3: ("el paso 4, la compuerta",
         "Busca `# TODO(paso-4)` en `sql_query` (`taller/tools.py`): `motivo = _gate(sql)`; si hay motivo, la consulta "
         "no se ejecuta y vuelve al modelo como `is_error`.",
-        "`uv run python -m taller.romper drop` (el DROP es rechazado y el modelo se corrige)."),
+        "`uv run python -m taller.romper drop` (antes: `secretos` se lee; después: la compuerta rechaza la lectura y el DROP)."),
     4: ("el paso 5, medir",
         "No hay nada que teclear: corre la medición sobre tu propio agente y lee la tabla por categoría de error, "
         "con tokens y costo por tarea resuelta.",
