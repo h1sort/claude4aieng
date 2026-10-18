@@ -27,3 +27,5 @@ cover (slide 1) 1200×630 JPEG                    ──▶  h1sort-website/publ
 - 2026-10-18 · `main` had been behind production since 2026-10-13: the Snowflake talk was deployed from `feat/snowflake-world-tour` (branch push = deploy) and never merged. Merged as PR #20 (tree identical to the deployed branch, no visible change). Rule: always merge the same day a branch deploys.
 - 2026-10-18 · First mount of `/claude4aieng/` via PR #21 (`039a04b`), from claude4aieng `b1b7e43`. Build and deploy checks succeeded.
 - 2026-10-18 · Branch deletion is blocked from Claude Code cloud sessions (API and git push both 403); delete merged branches from the GitHub UI.
+- 2026-10-18 · Refresh via PR #22 (`3aaff2f`) from claude4aieng `2d87bab` after the live dry run (measured table on slide 16). Deploy succeeded.
+- 2026-10-18 · To check the `paso-*` branches on GitHub, use `git ls-remote origin 'paso-*'` or fetch them explicitly (`git fetch origin '+refs/heads/paso-*:refs/remotes/origin/paso-*'`): a plain `git fetch` in this shallow clone only updates `main` and leaves stale `origin/paso-*` refs.
