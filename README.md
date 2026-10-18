@@ -128,7 +128,7 @@ Uno por paso. Ninguno es necesario para seguir el taller.
 
 ## Diapositivas
 
-https://h1sort.com/claude4aieng/ (se publica después del evento)
+https://h1sort.com/claude4aieng/
 
 Para abrir el deck local, desde la raíz del repo:
 

@@ -231,5 +231,5 @@ Cada tarea es independiente dentro de su ola. Modelo: **Sonnet 5.5** salvo que s
 
 ## 8. Fuera de alcance (por ahora)
 
-- Publicar el deck en `h1sort.com/claude4aieng` (se hará con un skill como `publish-to-site` de GBM).
+- ~~Publicar el deck en `h1sort.com/claude4aieng`~~: publicado el 2026-10-18 (h1sort-website PR #21); refrescar con `.claude/skills/publish-to-site`.
 - MCP en vivo (otros ponentes probablemente lo cubren; aquí solo el porqué de las credenciales).
