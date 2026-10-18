@@ -1,0 +1,140 @@
+<style>
+  .s11 .split{align-items:stretch}
+  .s11 .col{display:flex;flex-direction:column;gap:var(--gap);justify-content:center;min-height:0}
+  .s11 .code{margin:0;font-size:clamp(.78rem,1.2vw,1.15rem)}
+  .s11 .split > *{min-width:0}
+  @media (max-width:760px){.s11 .code{white-space:pre-wrap;overflow-wrap:anywhere}}
+  .s11 .cats{display:grid;grid-template-columns:auto 1fr;gap:clamp(.35rem,1vh,.7rem) clamp(.8rem,1.6vw,1.6rem);align-items:baseline;margin:0}
+  .s11 .cats dt{font-family:var(--f-mono);font-size:calc(var(--t-lede)*.85);color:var(--ink);white-space:nowrap}
+  .s11 .cats dd{margin:0;font-size:var(--t-lede);line-height:1.35;color:var(--ink-2)}
+  .s11 .cats .r{font-family:var(--f-mono);font-size:var(--t-label);letter-spacing:.08em;text-transform:uppercase;color:var(--action);white-space:nowrap}
+
+  .s11b .split{align-items:stretch}
+  .s11b .col{display:flex;flex-direction:column;gap:var(--gap);justify-content:center;min-height:0}
+  .s11b .med{width:100%;border-collapse:collapse;font-size:var(--t-body);background:color-mix(in srgb,var(--paper-hi),transparent 20%)}
+  .s11b .med caption{caption-side:top;text-align:left;padding-bottom:.4rem}
+  .s11b .med th,.s11b .med td{padding:.28em .7em;border-bottom:1px solid var(--ink-faint);text-align:left;line-height:1.3}
+  .s11b .med thead th{font-family:var(--f-mono);font-size:var(--t-label);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);font-weight:500;border-bottom:2px solid var(--ink)}
+  .s11b .med tbody th{font-family:var(--f-mono);font-size:var(--t-code);font-weight:400;color:var(--ink)}
+  .s11b .med td{font-variant-numeric:tabular-nums;color:var(--ink-dim)}
+  .s11b .med tr.sum th,.s11b .med tr.sum td{border-top:2px solid var(--ink)}
+  .s11b .prices{width:100%;border-collapse:collapse;font-size:var(--t-body)}
+  .s11b .prices th,.s11b .prices td{padding:.2em .5em;text-align:left;border-bottom:1px solid var(--ink-faint);font-variant-numeric:tabular-nums}
+  .s11b .prices th{font-family:var(--f-mono);font-size:var(--t-code);font-weight:400}
+  .s11b .prices thead th{font-size:var(--t-label);color:var(--ink-dim);letter-spacing:.08em;text-transform:uppercase}
+  .s11b .panel p{font-size:var(--t-body);line-height:1.45;color:var(--ink-2);max-width:none}
+  .s11b .panel b{color:var(--ink);font-weight:650}
+  .s11b .small{font-size:var(--t-label);color:var(--ink-dim);margin-top:.4rem;line-height:1.4}
+</style>
+
+<!-- ============ 11 · medir: el comando y las categorías ============ -->
+<section class="slide s11" data-title="Medir: categorías de error por tarea" data-section="Medir" data-budget="2:30"
+         style="--slide-accent:var(--evidence)">
+  <div class="main">
+    <div class="hd">
+      <p class="eyebrow reveal">Paso 5 · medir <span class="tag live">En vivo</span></p>
+      <h2 class="reveal d1">La tasa de error se <em>mide</em>, por categoría</h2>
+    </div>
+    <div class="split even reveal d2">
+      <div class="col">
+        <div class="code"><span class="cap">terminal · paso 5</span><span class="a">$</span> uv run python -m taller.medir
+<span class="a">$</span> uv run python -m taller.medir --vs claude-opus-5-5   <span class="c"># opcional</span></div>
+        <p class="lede" data-step="2">Tokens y costo <b style="color:var(--ink)">por tarea resuelta</b>, no por llamada: los intentos fallidos también cuestan.</p>
+        <p class="note-line" data-step="3">¿Atrás? <b style="color:var(--ink)">git checkout paso-5</b></p>
+      </div>
+      <dl class="cats" data-step="1">
+        <dt>wrong_tool</dt><dd>eligió otra herramienta, o una donde no hacía falta</dd>
+        <dt>bad_args</dt><dd>argumentos inválidos</dd>
+        <dt>gate_rejected</dt><dd>válida, pero la compuerta la rechazó <span class="r">Rotura #3</span></dd>
+        <dt>exec_error</dt><dd>la herramienta falló al ejecutarse</dd>
+        <dt>truncated</dt><dd><code style="font-family:var(--f-mono)">max_tokens</code> cortó el tool_use <span class="r">Rotura #2</span></dd>
+        <dt>orphaned</dt><dd>tool_use sin tool_result <span class="r">Rotura #1</span></dd>
+      </dl>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> que cada quien corra la medición sobre su propio agente y vea sus errores por categoría. Las tres roturas de hoy ya tienen casilla. (2:30: ~0:45 explicar, ~1:30 de espera con el programa corriendo, ~0:15 punto de control)</p>
+    <ol>
+      <li>0:00 · “Tres roturas, tres arreglos. ¿Cuántas veces falla su agente y de qué manera? Sin medir es una impresión.”</li>
+      <li>0:15 · Todos corren <code>uv run python -m taller.medir</code>. La concurrencia está acotada para no pegarle al límite de peticiones; tarda.</li>
+      <li><strong>Silencio planeado: ~1:30</strong> mientras corre. Camina; mira pantallas.</li>
+      <li>2:15 · <strong>Punto de control:</strong> “Levanten la mano si ya les salió la tabla.” Si menos de la mitad: <code>git checkout paso-5</code> y se sigue con los números de la pantalla.</li>
+    </ol>
+    <blockquote>Seis categorías. Tres son las roturas que acabamos de arreglar: huérfanos, truncado y compuerta. Las otras tres son las que uno tiende a no ver.</blockquote>
+    <blockquote>Y el costo se mide por tarea resuelta. Si una corrida falla, igual se pagó.</blockquote>
+    <p>Pasos con →: 1 las seis categorías; 2 la unidad de costo; 3 el comando de respaldo.</p>
+    <p class="warn">Las definiciones de la diapositiva son las de <code>taller/contracts.py</code> (<code>ErrorCategory</code>); la clasificación exacta la hace <code>taller/medir.py</code>: si difieren, manda el código. Si la API no responde o no hay créditos: corre <code>--vs</code> solo en tu máquina y enseña la tabla de la siguiente diapositiva; el taller no depende de que todos terminen.</p>
+    <p class="warn">Recorte (plan): si vamos tarde, nunca se recorta Medir. Se recorta primero <code>--vs</code> (la comparación de dos modelos), después las llamadas paralelas, después el autómata de pila. Aquí: corre solo el primer comando.</p>
+    <p><strong>Pregunta para llevarse:</strong> ¿qué categoría domina en tu agente, y quién se entera cuando sube?</p>
+    <p><strong>Transición:</strong> “Veamos una tabla. Primero, la de ustedes.”</p>
+  </aside>
+</section>
+
+<!-- ============ 11b · la tabla (W2-C la reemplaza con la corrida real) ============ -->
+<section class="slide s11b" data-title="Medir: tabla de errores y costo por tarea" data-section="Medir" data-budget="3:30"
+         style="--slide-accent:var(--evidence)">
+  <div class="main">
+    <div class="hd">
+      <p class="eyebrow reveal">Tu tabla <span class="tag illus">Ilustrativo · sin datos</span></p>
+      <h2 class="reveal d1">Lo que cuesta no es la llamada, es la <em>tarea resuelta</em></h2>
+    </div>
+    <div class="split wide-left reveal d2">
+      <div class="col">
+        <div data-step="1">
+          <!-- W2-C: reemplazar solo este bloque (hasta el comentario de cierre) con la corrida real de medir.py --vs -->
+          <table class="med" data-placeholder="medicion">
+            <caption class="label">Marcador de posición · aún sin corrida real</caption>
+            <thead><tr><th>Métrica</th><th>Modelo A</th><th>Modelo B (--vs)</th></tr></thead>
+            <tbody>
+              <tr><th>tareas resueltas</th><td>—</td><td>—</td></tr>
+              <tr><th>wrong_tool</th><td>—</td><td>—</td></tr>
+              <tr><th>bad_args</th><td>—</td><td>—</td></tr>
+              <tr><th>gate_rejected</th><td>—</td><td>—</td></tr>
+              <tr><th>exec_error</th><td>—</td><td>—</td></tr>
+              <tr><th>truncated</th><td>—</td><td>—</td></tr>
+              <tr><th>orphaned</th><td>—</td><td>—</td></tr>
+              <tr class="sum"><th>tokens (entrada / salida)</th><td>—</td><td>—</td></tr>
+              <tr><th>costo por tarea resuelta</th><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <!-- /W2-C -->
+        </div>
+      </div>
+      <div class="col">
+        <div class="panel" data-step="2">
+          <p class="label" style="margin-bottom:.4rem">Precio por MTok · entrada / salida</p>
+          <table class="prices">
+            <tbody>
+              <tr><th>claude-haiku-5-5</th><td>$0.10 / $0.50</td></tr>
+              <tr><th>claude-sonnet-5-5</th><td>$2 / $10</td></tr>
+              <tr><th>claude-opus-5-5</th><td>$4 / $20</td></tr>
+            </tbody>
+          </table>
+          <p class="small">Página de precios, consultada el 2026-10-18. Haiku: prompts de hasta 100K tokens.</p>
+        </div>
+        <div class="panel mod" data-step="3">
+          <p class="label" style="margin-bottom:.4rem">Hipótesis para la sala</p>
+          <p>Un modelo más caro por token puede salir <b>más barato por tarea resuelta</b> si falla y reintenta menos. No es un hecho: lo decide la columna de la derecha.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> leer la tabla propia, ver qué categoría domina y plantear, como hipótesis que la sala prueba, que el costo por tarea resuelta no sigue al precio por token. (3:30)</p>
+    <ol>
+      <li>0:00 · Antes de mostrar nada: “Levanten la mano por la categoría que más les salió.” Cuenta manos por <code>wrong_tool</code>, <code>bad_args</code>, <code>gate_rejected</code>, <code>exec_error</code>, <code>truncated</code>, <code>orphaned</code>. Di en voz alta cuál ganó. Es el dato del cuarto: úsalo en el cierre.</li>
+      <li>1:30 · → muestra la tabla de la corrida de ejemplo (la reemplaza W2-C con números reales; hasta entonces es un marcador de posición “ilustrativo”: no leas cifras que no existan).</li>
+      <li>2:15 · → precios. → hipótesis. Quien tenga <code>--vs</code> dice en voz alta si le salió más barato por tarea resuelta, y de qué modelo.</li>
+      <li>3:15 · Cierra con la categoría ganadora: “Esa es la que van a medir el lunes en su agente.”</li>
+    </ol>
+    <blockquote>Precio por token no es costo por tarea. Si un modelo falla más, reintenta más y cada reintento se paga.</blockquote>
+    <blockquote>Esto es una hipótesis, no un hecho. Lo decide su corrida, no mi diapositiva.</blockquote>
+    <p>Pasos con →: 1 la tabla; 2 los precios por MTok; 3 la hipótesis.</p>
+    <p>Fuente de precios: página de pricing de Anthropic, consultada el 2026-10-18 (<code>FACTS.md</code> §7): Sonnet 5.5 $2 / $10, Haiku 5.5 $0.10 / $0.50 (prompts hasta 100K tokens), Opus 5.5 $4 / $20, por MTok. La página no muestra fecha de vigencia y remite a claude.com/pricing. Usar herramientas añade 286 tokens de system prompt con <code>tool_choice</code> <code>auto</code>.</p>
+    <p class="warn">La tabla es un marcador de posición (<code>data-placeholder="medicion"</code>); W2-C la reemplaza con la corrida real. No inventes números. Si W2-C no llegó, usa la pantalla de un asistente voluntario o tu propia corrida.</p>
+    <p class="warn">La idea de “un modelo más caro puede salir más barato por tarea” se atribuye a la clase de CMU, pero no pude verificarla y no está en <code>FACTS.md</code>: preséntala solo como hipótesis. Si preguntan la fuente exacta: “no sé la diapositiva, lo verifico y lo publico en el repo”.</p>
+    <p class="warn">Recorte (plan): si vamos tarde, salta los pasos 2–3 y la comparación <code>--vs</code>; nunca recortes la tabla propia ni el punto de control de categorías. Orden de recorte del plan: 1) comparación de dos modelos, 2) llamadas paralelas, 3) detalle del autómata de pila.</p>
+    <p><strong>Pregunta para llevarse:</strong> ¿cuánto te cuesta resolver una tarea, no una llamada?</p>
+    <p><strong>Transición:</strong> “Con esto cerramos.”</p>
+  </aside>
+</section>

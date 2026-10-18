@@ -3,12 +3,14 @@
   .s08 .panel{display:flex;flex-direction:column;gap:clamp(.4rem,1.2vh,.9rem)}
   .s08 .panel h3{font-size:clamp(1.05rem,1.7vw,1.7rem)}
   .s08 .ticks{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:clamp(.3rem,1vh,.7rem)}
-  .s08 .ticks li{position:relative;padding-left:1.6em;font-size:var(--t-body);line-height:1.4;color:var(--ink-2)}
+  .s08 .ticks li{position:relative;padding-left:1.6em;font-size:var(--t-lede);line-height:1.4;color:var(--ink-2)}
   .s08 .ticks li::before{position:absolute;left:0;top:0;font-weight:700}
   .s08 .ev .ticks li::before{content:'✓';color:var(--evidence)}
   .s08 .act .ticks li::before{content:'✕';color:var(--action)}
   .s08 .panel h3 code,.s08 .ticks code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
-  .s08 .code{margin:0}
+  .s08 .code{margin:0;font-size:clamp(.8rem,1.3vw,1.25rem)}
+  .s08 .split > *{min-width:0}
+  @media (max-width:760px){.s08 .code{white-space:pre-wrap;overflow-wrap:anywhere}}
   .s08 .verdict{display:flex;flex-wrap:wrap;gap:.3rem 1.6rem;margin-top:.5rem;font-family:var(--f-mono);font-size:var(--t-label);letter-spacing:.08em}
 </style>
 

@@ -2,11 +2,13 @@
   .s07 .split{align-items:stretch}
   .s07 .col{display:flex;flex-direction:column;gap:var(--gap);justify-content:center;min-height:0}
   .s07 .rules{display:flex;flex-direction:column;gap:clamp(.4rem,1.2vh,.9rem);margin:0;padding:0;list-style:none;counter-reset:r}
-  .s07 .rules li{counter-increment:r;position:relative;padding-left:2.2em;font-size:var(--t-body);line-height:1.4;color:var(--ink-2)}
+  .s07 .rules li{counter-increment:r;position:relative;padding-left:2.2em;font-size:var(--t-lede);line-height:1.4;color:var(--ink-2)}
   .s07 .rules li::before{content:counter(r);position:absolute;left:0;top:0;width:1.5em;height:1.5em;display:grid;place-items:center;font-family:var(--f-mono);font-size:.85em;color:var(--action);border:1.5px solid var(--action);transform:rotate(0)}
   .s07 .rules b{color:var(--ink);font-weight:650}
   .s07 .rules code,.s07 .lede code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
-  .s07 .code{margin:0}
+  .s07 .code{margin:0;font-size:clamp(.78rem,1.15vw,1.1rem)}
+  .s07 .split > *{min-width:0}
+  @media (max-width:760px){.s07 .code{white-space:pre-wrap;overflow-wrap:anywhere}}
   .s07 .checkpoint{display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center}
 </style>
 
@@ -18,7 +20,7 @@
       <p class="eyebrow reveal">Rotura #2 · truncado <span class="tag live">En vivo</span></p>
       <h2 class="reveal d1">Pide poco espacio y obtén <em>media llamada</em></h2>
     </div>
-    <div class="split wide-left reveal d2">
+    <div class="split reveal d2">
       <div class="col">
         <div class="code"><span class="cap">terminal · rotura #2</span><span class="a">$</span> uv run python -m taller.romper truncado</div>
         <div data-step="1">
@@ -32,14 +34,15 @@
         <p class="note-line" data-step="3">¿Atrás? <b style="color:var(--ink)">git checkout paso-3</b> · luego seguimos</p>
       </div>
       <div class="col">
-        <div class="code"><span class="cap">taller/agent.py · el bucle</span><span class="c">resp = client.messages.create(…, max_tokens=max_tokens)</span>
+        <div class="code"><span class="cap">taller/agent.py · el bucle</span><span class="c">resp = client.messages.create(…)</span>
 <span class="a"># TODO(paso-3)</span> <span class="c">¿y si stop_reason == "max_tokens"?</span>
 <span class="k">if</span> resp.stop_reason == <span class="s">"tool_use"</span>: …</div>
         <div class="code" data-step="2"><span class="cap">paso-3 · la solución</span><span class="k">if</span> resp.stop_reason == <span class="s">"max_tokens"</span>:
-    <span class="c"># el último tool_use puede estar cortado: no se ejecuta</span>
-    <span class="k">if</span> max_tokens &gt;= TOPE: <span class="k">raise</span> RuntimeError(<span class="s">"truncado"</span>)
+    <span class="c"># puede estar cortado: no se ejecuta</span>
+    <span class="k">if</span> max_tokens &gt;= TOPE:
+        <span class="k">raise</span> RuntimeError(<span class="s">"truncado"</span>)
     max_tokens *= 2
-    <span class="k">continue</span>   <span class="c"># misma petición, más espacio</span></div>
+    <span class="k">continue</span>  <span class="c"># misma petición, más espacio</span></div>
       </div>
     </div>
   </div>

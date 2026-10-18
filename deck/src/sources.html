@@ -1,2 +1,62 @@
 <!-- Fuentes y apéndice del deck (overlay #sourcesPanel, tecla S).
-     HTML suelto: <h3>, <p>, <ul>, <table>. Cada hecho del deck debe poder rastrearse a FACTS.md. -->
+     Cada hecho del deck se rastrea a FACTS.md (verificado 2026-10-18). Lo marcado NO VERIFICADO no entra al deck. -->
+<h3>La clase</h3>
+<ul>
+  <li><strong>CMU 11-768 “AI Agents”, Fall 2026</strong> (Language Technologies Institute): profesores Graham Neubig y Daniel Fried. Lección 2, <em>Tool Use for Language Model Agents</em>, a cargo de Neubig; video subido el 2026-09-08: <a href="https://youtu.be/jXChFB4JSyw">youtu.be/jXChFB4JSyw</a>. Curso: <a href="https://www.cmu-agents.com/">cmu-agents.com</a>.</li>
+  <li>Diapositivas oficiales: <a href="https://www.cmu-agents.com/slides/lecture-02-tool-use.pdf">cmu-agents.com/slides/lecture-02-tool-use.pdf</a>. Usadas aquí: 22–25 (formatos de tool call e IDs), 26–35 (decodificación restringida; 28: forma, no verdad ni permisos; 31–33: autómata de pila y XGrammar), 44–45 (credenciales MCP, “credential brokering”).</li>
+  <li>Los minutos del video están verificados por capítulo (27:04 decodificación basada en gramática; 35:36 REST y MCP), no minuto a minuto. La fecha de la sesión en vivo no está verificada.</li>
+</ul>
+
+<h3>Papers</h3>
+<ul>
+  <li>XGrammar: <em>Flexible and Efficient Structured Generation Engine for Large Language Models</em>. Dong, Ruan, Cai, Lai, Xu, Zhao, Chen. MLSys 2025. <a href="https://arxiv.org/abs/2411.15100">arXiv:2411.15100</a>. Las cifras de aceleración (hasta 100x por token, hasta 80x de extremo a extremo con Llama 3.1 en H100) son de los autores.</li>
+  <li>CodeAct: <em>Executable Code Actions Elicit Better LLM Agents</em>. Wang, Chen, Yuan, Zhang, Li, Peng, Ji. ICML 2024. <a href="https://arxiv.org/abs/2402.01030">arXiv:2402.01030</a>.</li>
+</ul>
+
+<h3>Documentación de Anthropic</h3>
+<ul>
+  <li>Manejo de llamadas (orden de <code>tool_result</code>, <code>is_error</code>): <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls">tool-use/handle-tool-calls</a></li>
+  <li>Strict tool use: <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/strict-tool-use">tool-use/strict-tool-use</a></li>
+  <li>Definir herramientas (<code>tool_choice</code>, <code>name</code>): <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools">tool-use/define-tools</a></li>
+  <li>Llamadas paralelas (<code>disable_parallel_tool_use</code>): <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/parallel-tool-use">tool-use/parallel-tool-use</a></li>
+  <li>Tool Runner (beta): <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner">tool-use/tool-runner</a></li>
+  <li>Resumen de tool use (286 tokens de system prompt con <code>auto</code>): <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview">tool-use/overview</a></li>
+  <li>Motivos de parada (<code>max_tokens</code> con un <code>tool_use</code> incompleto): <a href="https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons">build-with-claude/handling-stop-reasons</a></li>
+  <li>Salidas estructuradas (límites del esquema; con <code>max_tokens</code> la salida puede quedar incompleta): <a href="https://platform.claude.com/docs/en/build-with-claude/structured-outputs">build-with-claude/structured-outputs</a></li>
+  <li>Precios: <a href="https://platform.claude.com/docs/en/about-claude/pricing">about-claude/pricing</a> · Modelos: <a href="https://platform.claude.com/docs/en/about-claude/models/overview">about-claude/models/overview</a></li>
+</ul>
+
+<h3>Precios usados en “Medir” (por MTok, entrada / salida; consultados el 2026-10-18)</h3>
+<ul>
+  <li><code>claude-haiku-5-5</code>: $0.10 / $0.50 (prompts de hasta 100K tokens; $0.50 / $2.50 por encima)</li>
+  <li><code>claude-sonnet-5-5</code>: $2 / $10</li>
+  <li><code>claude-opus-5-5</code>: $4 / $20</li>
+  <li>La página de precios no muestra fecha de vigencia y remite a claude.com/pricing.</li>
+</ul>
+
+<h3>OpenRouter</h3>
+<ul>
+  <li>Auto Exacto (GLM-5: de ~8 % a cerca de 1 % de error de tool calls; publicado 2026-03-12, actualizado 2026-06-24): <a href="https://openrouter.ai/blog/announcements/auto-exacto/">openrouter.ai/blog/announcements/auto-exacto</a></li>
+  <li>Variación entre proveedores (Exacto): <a href="https://openrouter.ai/blog/announcements/provider-variance-introducing-exacto/">openrouter.ai/blog/announcements/provider-variance-introducing-exacto</a></li>
+  <li>Definición de la métrica “Tool Call Error Rate” (por petición): <a href="https://openrouter.ai/docs/guides/routing/auto-exacto">openrouter.ai/docs/guides/routing/auto-exacto</a></li>
+  <li>τ²-Bench Airline: <a href="https://openrouter.ai/benchmarks/tau2-bench-airline">openrouter.ai/benchmarks/tau2-bench-airline</a></li>
+</ul>
+
+<h3>Plantillas de chat y otras</h3>
+<ul>
+  <li>Qwen3-8B, <code>tokenizer_config.json</code>: <a href="https://huggingface.co/Qwen/Qwen3-8B/blob/main/tokenizer_config.json">huggingface.co/Qwen/Qwen3-8B</a></li>
+  <li>DeepSeek-V3, <code>tokenizer_config.json</code>: <a href="https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/tokenizer_config.json">huggingface.co/deepseek-ai/DeepSeek-V3</a></li>
+  <li>Plantillas con herramientas en Transformers: <a href="https://huggingface.co/docs/transformers/en/chat_extras">huggingface.co/docs/transformers/en/chat_extras</a></li>
+  <li>Texto completo del 400 por <code>tool_use</code> huérfano (fuente secundaria, reporte de usuarios): <a href="https://claudeissues.com/issue/3086-missing-tool-result-block-for-tool-use-id">claudeissues.com/issue/3086</a>. En la demo se muestra el que devuelve la API.</li>
+</ul>
+
+<h3>No verificado (no entra al deck)</h3>
+<ul>
+  <li>La cifra “~15 % vs ~0.01–0.05 %” de la clase para GLM 5.3 en OpenRouter.</li>
+  <li>El minuto exacto de cada tema del video y la fecha de la sesión en vivo.</li>
+  <li>La historia del clasificador que devolvió <code>null</code> y el reintento sin tope (unos diez mil dólares) es un relato, no un hecho de este deck.</li>
+  <li>El planteamiento “un modelo más caro puede salir más barato por tarea resuelta” se presenta como hipótesis, no como hecho.</li>
+</ul>
+
+<h3>Código del taller</h3>
+<p>Deck y materiales: <a href="https://h1sort.com/claude4aieng/">h1sort.com/claude4aieng</a>. Compuerta: <code>taller/gate.py</code> (autorizador de SQLite y <code>EXPLAIN</code> sobre una copia vacía del esquema; sin LLM).</p>

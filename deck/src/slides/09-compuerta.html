@@ -3,12 +3,14 @@
   .s09 .msg{font-family:var(--f-mono);font-size:13px;fill:var(--ink)}
 
   .s09b .split{align-items:stretch}
+  .s09b .split > *{min-width:0}
   .s09b .col{display:flex;flex-direction:column;gap:var(--gap);justify-content:center;min-height:0}
-  .s09b .code{margin:0;font-size:clamp(.64rem,.9vw,.92rem)}
+  .s09b .code{margin:0;font-size:clamp(.78rem,1.12vw,1.08rem)}
+  .s09b .code .sol{display:block;margin-top:.5em}
   .s09b .panel p{font-size:var(--t-body);line-height:1.45;color:var(--ink-2);max-width:none}
-  .s09b .panel p + p{margin-top:.5rem}
   .s09b .panel code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
   .s09b .panel b{color:var(--ink);font-weight:650}
+  @media (max-width:760px){.s09b .code{white-space:pre-wrap;overflow-wrap:anywhere}}
 </style>
 
 <!-- ============ 09 · rotura #3: la compuerta ============ -->
@@ -100,9 +102,7 @@
       <p class="eyebrow reveal">Paso 4 · la llamada a la compuerta <span class="tag live">En vivo</span></p>
       <h2 class="reveal d1">Una línea decide: <em>None</em> o un motivo</h2>
     </div>
-    <div class="split wide-left reveal d2">
-      <div class="col">
-        <!--GATE_BEGIN--><div class="code"><span class="cap">taller/gate.py · L32–39</span><span class="k">def</span> _authorizer(action, arg1, arg2, db, trigger):
+    <!--GATE_BEGIN--><div class="code"><span class="cap">taller/gate.py · L32–39</span><span class="k">def</span> _authorizer(action, arg1, arg2, db, trigger):
     <span class="k">if</span> action <span class="k">in</span> (sqlite3.SQLITE_SELECT, sqlite3.SQLITE_RECURSIVE):
         <span class="k">return</span> sqlite3.SQLITE_OK
     <span class="k">if</span> action == sqlite3.SQLITE_FUNCTION <span class="k">and</span> arg2 != <span class="s">"load_extension"</span>:
@@ -110,12 +110,13 @@
     <span class="k">if</span> action == sqlite3.SQLITE_READ <span class="k">and</span> arg1 <span class="k">in</span> ALLOWED_TABLES:
         <span class="k">return</span> sqlite3.SQLITE_OK
     <span class="k">return</span> sqlite3.SQLITE_DENY  <span class="c"># escrituras, DDL, PRAGMA, ATTACH, secretos, load_extension...</span></div><!--GATE_END-->
+    <div class="split even reveal d2">
+      <div class="col">
+        <div class="code"><span class="cap">taller/tools.py · sql_query</span><span class="a"># TODO(paso-4)</span> <span class="c">validar antes de ejecutar</span><span class="sol" data-step="1">motivo = validate(args[<span class="s">"sql"</span>])   <span class="c"># None = permitido</span>
+<span class="k">if</span> motivo:
+    <span class="k">return</span> REJECTED, motivo     <span class="c"># → is_error: true</span></span></div>
       </div>
       <div class="col">
-        <div class="code"><span class="cap">taller/tools.py · sql_query</span><span class="a"># TODO(paso-4)</span> <span class="c">validar antes de ejecutar</span></div>
-        <div class="code" data-step="1"><span class="cap">paso-4 · la solución</span>motivo = validate(args[<span class="s">"sql"</span>])   <span class="c"># None = permitido</span>
-<span class="k">if</span> motivo:
-    <span class="k">return</span> REJECTED, motivo     <span class="c"># → is_error: true</span></div>
         <div class="panel mod" data-step="2">
           <p><b>bloquear_tarjeta</b> es una escritura: pide <b>confirmación humana</b> en la terminal antes de ejecutar. La compuerta cubre la lectura; las escrituras las confirma una persona.</p>
         </div>
@@ -126,7 +127,7 @@
   <aside class="notes">
     <p><strong>Propósito:</strong> que cada quien escriba la llamada a la compuerta y vea el DROP rechazado en su terminal. (3:00: ~0:45 explicar, ~1:45 de teclado en silencio, ~0:30 punto de control)</p>
     <ol>
-      <li>0:00 · Lee el código de la izquierda en voz alta, sin prisa: el autorizador es una función de ocho líneas.</li>
+      <li>0:00 · Lee el código de arriba en voz alta, sin prisa: el autorizador es una función de ocho líneas.</li>
       <li>0:30 · Corre <code>uv run python -m taller.romper drop</code>. Con → aparece la solución de <code>paso-4</code>.</li>
       <li>0:45 · <strong>Silencio planeado: ~1:45</strong> mientras reemplazan <code># TODO(paso-4)</code> en <code>taller/tools.py</code> y vuelven a correr <code>romper drop</code>.</li>
       <li>2:30 · <strong>Punto de control:</strong> “Levanten la mano si su DROP fue rechazado y el modelo se corrigió.” Si menos de la mitad: <code>git checkout paso-4</code>.</li>
@@ -135,7 +136,7 @@
     <blockquote>Cualquier acción que no sea un SELECT o la lectura de una tabla permitida se niega. La tabla de secretos no está en la lista.</blockquote>
     <blockquote>Las escrituras, como bloquear una tarjeta, no pasan por aquí: las confirma una persona en la terminal.</blockquote>
     <p>Pasos con →: 1 la solución de <code>paso-4</code>; 2 la confirmación humana de <code>bloquear_tarjeta</code>; 3 el comando de respaldo.</p>
-    <p class="warn">El código de la izquierda es literal de <code>taller/gate.py</code>. El de la derecha usa nombres ilustrativos (<code>validate</code> sí es real; <code>args</code> y <code>REJECTED</code> deben coincidir con <code>taller/tools.py</code>): revisa antes de presentar.</p>
+    <p class="warn">El código de arriba es literal de <code>taller/gate.py</code>. El de abajo usa nombres ilustrativos (<code>validate</code> sí es real; <code>args</code> y <code>REJECTED</code> deben coincidir con <code>taller/tools.py</code>): revisa antes de presentar.</p>
     <p class="warn">Plan B sin API: <code>git checkout paso-4</code> y enseña la compuerta con las pruebas: <code>uv run pytest -q tests/test_gate.py</code>.</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué herramienta de tu agente necesita una compuerta antes que cualquier otra cosa?</p>
     <p><strong>Transición:</strong> “La compuerta nos protege de lo que el agente hace. Y las credenciales: ¿quién las ve?”</p>

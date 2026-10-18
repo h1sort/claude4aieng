@@ -1,0 +1,74 @@
+<!-- ============ 10 · MCP en una diapositiva ============ -->
+<section class="slide s10" data-title="MCP: aislamiento de credenciales" data-section="Válido ≠ correcto" data-budget="2:00"
+         style="--slide-accent:var(--evidence)">
+  <div class="main">
+    <div class="hd">
+      <p class="eyebrow reveal">MCP · solo el porqué</p>
+      <h2 class="reveal d1">El token de la API vive en el <em>servidor</em>, no en el agente</h2>
+    </div>
+    <div class="figure fill reveal d2">
+      <svg class="dg" viewBox="0 0 1000 410" role="img" aria-label="El modelo propone un tool_use al agente. El agente llama al servidor MCP con su propia clave MCP. El servidor MCP llama a la API externa con el token de la API, que vive solo en el servidor. El resultado vuelve como tool_result. El modelo no ve ninguna de las dos claves.">
+        <!-- modelo -->
+        <rect class="model" x="10" y="30" width="160" height="330" rx="28"/>
+        <text class="t-mono t-mod" x="32" y="64">Modelo</text>
+        <text class="t-sub" x="32" y="88">solo propone</text>
+        <rect class="node ghost" x="26" y="240" width="128" height="70" rx="4"/>
+        <text class="t-lbl" x="38" y="268">sin claves</text>
+        <text class="t-sub" x="38" y="290">no ve ninguna</text>
+
+        <!-- agente -->
+        <rect class="app" x="250" y="30" width="200" height="330" rx="6"/>
+        <text class="t-mono" x="270" y="64">Agente</text>
+        <text class="t-sub" x="270" y="88">tu aplicación</text>
+
+        <!-- servidor MCP -->
+        <rect class="app" x="550" y="30" width="200" height="330" rx="6"/>
+        <text class="t-mono" x="570" y="64">Servidor MCP</text>
+        <text class="t-sub" x="570" y="88">intermediario</text>
+
+        <!-- API -->
+        <rect class="node ev" x="850" y="110" width="140" height="120" rx="4" style="stroke-width:2"/>
+        <text class="t-lbl" x="866" y="150">Servicio</text>
+        <text class="t-lbl" x="866" y="172">externo</text>
+        <text class="t-sub" x="866" y="200">la API real</text>
+
+        <g data-step="1">
+          <path class="propose draw" d="M170,170 H245" marker-end="url(#arr-mod)"/>
+          <text class="t-sub" x="178" y="150">tool_use</text>
+        </g>
+        <g data-step="2">
+          <path class="exec big draw" pathLength="1" d="M450,170 H545" marker-end="url(#arr-ev)"/>
+          <text class="t-sub t-ev" x="460" y="132" font-weight="700">llamada</text>
+          <text class="t-sub t-ev" x="460" y="150" font-weight="700">+ clave MCP</text>
+          <rect class="node act" x="266" y="240" width="168" height="70" rx="4"/>
+          <text class="t-lbl" x="282" y="268">clave MCP</text>
+          <text class="t-sub" x="282" y="290">la del agente</text>
+        </g>
+        <g data-step="3">
+          <path class="exec big draw" pathLength="1" d="M750,170 H845" marker-end="url(#arr-ev)"/>
+          <text class="t-sub t-ev" x="760" y="132" font-weight="700">llamada</text>
+          <text class="t-sub t-ev" x="760" y="150" font-weight="700">+ token API</text>
+          <rect class="node act" x="566" y="240" width="168" height="70" rx="4" style="stroke-width:2.6"/>
+          <text class="t-lbl" x="580" y="268">token de la API</text>
+          <text class="t-sub" x="580" y="290">vive solo aquí</text>
+        </g>
+        <g data-step="4">
+          <path class="return draw" d="M915,232 V336 H100" marker-end="url(#arr-ev)"/>
+          <text class="t-sub t-ev" x="762" y="326">tool_result</text>
+          <text class="t-sub t-act" x="500" y="394" text-anchor="middle" font-weight="700">El modelo no ve ninguna de las dos claves.</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> que la sala se lleve el porqué de MCP que da la clase: aislar las credenciales. No es un tutorial; otros ponentes cubren MCP. (2:00)</p>
+    <blockquote>MCP tiene muchas razones. La que quiero que se lleven hoy, la de la clase de CMU, es el aislamiento de credenciales.</blockquote>
+    <blockquote>El agente se autentica con su propia clave. El servidor MCP llama a la API real con otra. El modelo no ve ninguna de las dos.</blockquote>
+    <blockquote>Es la misma idea que la compuerta: el modelo propone, quien tiene las llaves ejecuta.</blockquote>
+    <p>Pasos con →: 1 el modelo propone un <code>tool_use</code>; 2 el agente llama al servidor con su clave MCP; 3 el servidor llama a la API con el token real; 4 el resultado vuelve como <code>tool_result</code>.</p>
+    <p>Fuente: clase de CMU 11-768, lección 2 (diapositivas 44–45, “credential brokering”): el agente usa su propia clave MCP, el servidor llama a la API con otra, y el modelo no ve ninguna. La clase aclara que las claves estáticas son para enseñanza y que en producción se usan JWT u OAuth.</p>
+    <p class="warn">No es un tutorial y no hay demo de MCP en vivo. No afirmes que MCP “resuelve la seguridad”: aísla una clase de credenciales; la autorización de cada llamada sigue siendo tuya. Si preguntan por detalles de MCP, remite a las otras charlas del evento.</p>
+    <p><strong>Pregunta para llevarse:</strong> ¿qué token de tu agente podría estar al alcance del modelo hoy?</p>
+    <p><strong>Transición:</strong> “Ya tenemos las tres roturas. Falta lo que nos dice si funcionan: medir.”</p>
+  </aside>
+</section>
