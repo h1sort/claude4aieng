@@ -38,7 +38,7 @@
         <g data-step="1">
           <rect class="node mod" x="36" y="100" width="246" height="66" rx="4"/>
           <text class="t-lbl" x="52" y="124">tool_use #1 · sql_query</text>
-          <text class="tok" x="52" y="150">DROP TABLE clientes</text>
+          <text class="tok" x="52" y="150">DROP TABLE tarjetas</text>
           <path class="propose draw" d="M282,133 H405" marker-end="url(#arr-mod)"/>
         </g>
 
@@ -54,7 +54,7 @@
         <g data-step="3">
           <rect class="node act" x="452" y="178" width="516" height="62" rx="4"/>
           <text class="t-mono t-act" x="468" y="198">tool_result · is_error: true</text>
-          <text class="msg" x="468" y="218">rechazada: solo se permite leer cuentas, clientes,</text>
+          <text class="msg" x="468" y="218">rechazada: solo se permite leer clientes, cuentas,</text>
           <text class="msg" x="468" y="234">tarjetas, transacciones; reescribe la consulta como un SELECT</text>
           <path class="return draw" d="M452,209 H316" marker-end="url(#arr-ev)"/>
         </g>
@@ -82,13 +82,13 @@
   </div>
   <aside class="notes">
     <p><strong>Propósito:</strong> que la sala vea que un <code>tool_use</code> válido por esquema puede ser peligroso, y que la defensa es una compuerta determinista en la aplicación que devuelve <code>is_error</code>. Nada de “otro LLM revisa al LLM”. (2:30)</p>
-    <p><strong>Predecir y revelar:</strong> antes de pulsar →, pregunta: “El modelo propone <code>DROP TABLE clientes</code>, perfectamente válido para el esquema. ¿Qué creen que pasa?” Espera 15 s. Después retoma lo que dijeron.</p>
+    <p><strong>Predecir y revelar:</strong> antes de pulsar →, pregunta: “El modelo propone <code>DROP TABLE tarjetas</code>, perfectamente válido para el esquema. ¿Qué creen que pasa?” Espera 15 s. Después retoma lo que dijeron.</p>
     <blockquote>Ese DROP cumple el esquema. Aquí no lo para <code>strict</code>. Lo para la aplicación.</blockquote>
     <blockquote>La compuerta no le pregunta a otro modelo si le parece bien. Le pregunta al compilador de SQLite qué acciones haría esta sentencia. No hay probabilidad ahí.</blockquote>
     <blockquote>Y lo que vuelve al modelo es un <code>tool_result</code> con <code>is_error</code> y un mensaje que dice qué falló y qué intentar. Con eso, el modelo se corrige.</blockquote>
-    <p>Pasos con →: 1 el modelo propone el DROP; 2 la compuerta lo rechaza, sin efecto; 3 vuelve el <code>tool_result</code> con <code>is_error</code> (el texto del recuadro es el mensaje real de <code>gate.py</code>); 4 el modelo propone un SELECT; 5 se autoriza, se ejecuta y regresa el resultado.</p>
+    <p>Pasos con →: 1 el modelo propone el DROP; 2 la compuerta lo rechaza, sin efecto; 3 vuelve el <code>tool_result</code> con <code>is_error</code> (el texto del recuadro es el mensaje real de <code>gate.py</code> para este DROP); 4 el modelo propone un SELECT; 5 se autoriza, se ejecuta y regresa el resultado.</p>
     <p>Fuente: la doc dice que el <code>tool_result</code> con <code>is_error: true</code> debe tener contenido instructivo, y que ante llamadas inválidas Claude reintenta 2–3 veces con correcciones. Eso no garantiza que se corrija: por eso el agente tiene un límite de turnos. Es la misma lección de la historia del clasificador: error instructivo y tope de reintentos.</p>
-    <p class="warn">“El modelo se corrige” es lo esperado, no una garantía: si no se corrige en la corrida en vivo, dilo y muestra que el tope de turnos corta el bucle. <code>romper drop</code> inyecta el DROP si el modelo no cae en la trampa y lo dice en pantalla.</p>
+    <p class="warn">El SELECT del paso 4 es ilustrativo: lo que proponga el modelo en vivo varía. “El modelo se corrige” es lo esperado, no una garantía: si no se corrige en la corrida en vivo, dilo y muestra que el tope de turnos corta el bucle. <code>romper drop</code> inyecta el DROP si el modelo no cae en la trampa y lo dice en pantalla (<code>--inyectado</code> fuerza ese modo sin API).</p>
     <p class="warn">Cuidado con “la compuerta es segura”. Valida lo que dice el código de la siguiente diapositiva y nada más; no limita el costo de una consulta (una CTE recursiva sin tope pasa la compuerta; se acota al ejecutar con solo lectura, límite de filas y tiempo).</p>
     <p><strong>Transición:</strong> “Veamos qué hay dentro de esa compuerta y la línea que van a escribir.”</p>
   </aside>
@@ -110,11 +110,12 @@
     <span class="k">if</span> action == sqlite3.SQLITE_READ <span class="k">and</span> arg1 <span class="k">in</span> ALLOWED_TABLES:
         <span class="k">return</span> sqlite3.SQLITE_OK
     <span class="k">return</span> sqlite3.SQLITE_DENY  <span class="c"># escrituras, DDL, PRAGMA, ATTACH, secretos, load_extension...</span></div><!--GATE_END-->
-    <div class="split even reveal d2">
+    <div class="split wide-left reveal d2">
       <div class="col">
-        <div class="code"><span class="cap">taller/tools.py · sql_query</span><span class="a"># TODO(paso-4)</span> <span class="c">validar antes de ejecutar</span><span class="sol" data-step="1">motivo = validate(args[<span class="s">"sql"</span>])   <span class="c"># None = permitido</span>
-<span class="k">if</span> motivo:
-    <span class="k">return</span> REJECTED, motivo     <span class="c"># → is_error: true</span></span></div>
+        <div class="code"><span class="cap">taller/tools.py · sql_query (abreviado)</span><span class="k">def</span> sql_query(sql: str) -&gt; str:
+    motivo = <span class="k">None</span>
+    <span class="a"># TODO(paso-4)</span> <span class="c">validar antes de ejecutar</span><span class="sol" data-step="1">    motivo = _gate(sql)  <span class="c"># None = permitido</span></span>    <span class="k">if</span> motivo:            <span class="c"># rechazada: no se ejecuta</span>
+        <span class="k">return</span> motivo     <span class="c"># → is_error: true</span></div>
       </div>
       <div class="col">
         <div class="panel mod" data-step="2">
@@ -136,7 +137,7 @@
     <blockquote>Cualquier acción que no sea un SELECT o la lectura de una tabla permitida se niega. La tabla de secretos no está en la lista.</blockquote>
     <blockquote>Las escrituras, como bloquear una tarjeta, no pasan por aquí: las confirma una persona en la terminal.</blockquote>
     <p>Pasos con →: 1 la solución de <code>paso-4</code>; 2 la confirmación humana de <code>bloquear_tarjeta</code>; 3 el comando de respaldo.</p>
-    <p class="warn">El código de arriba es literal de <code>taller/gate.py</code>. El de abajo usa nombres ilustrativos (<code>validate</code> sí es real; <code>args</code> y <code>REJECTED</code> deben coincidir con <code>taller/tools.py</code>): revisa antes de presentar.</p>
+    <p class="warn">El código de arriba es literal de <code>taller/gate.py</code>. El de abajo es <code>taller/tools.py</code> abreviado (en el repo hay más líneas entre marcadores y el rechazo se marca con el prefijo <code>rechazada:</code>); revisa que siga coincidiendo antes de presentar.</p>
     <p class="warn">Plan B sin API: <code>git checkout paso-4</code> y enseña la compuerta con las pruebas: <code>uv run pytest -q tests/test_gate.py</code>.</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué herramienta de tu agente necesita una compuerta antes que cualquier otra cosa?</p>
     <p><strong>Transición:</strong> “La compuerta nos protege de lo que el agente hace. Y las credenciales: ¿quién las ve?”</p>

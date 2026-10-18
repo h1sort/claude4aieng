@@ -367,11 +367,6 @@
 html[data-still] .cover .motif *{animation:none!important}
 @media (prefers-reduced-motion:reduce){.cover.active .motif *{animation:none!important}}
 
-/* --- 00-smoke.html --- */
-.s00 .main{justify-content:center}
-  .s00 .statement{max-width:15ch}
-  .s00b .hd{margin-bottom:.2rem}
-
 /* --- 01-portada.html --- */
 .s01 .motif .gate{fill:var(--paper);stroke:var(--action);stroke-width:2.4}
   .s01 .motif{width:54%}
@@ -503,7 +498,7 @@ html[data-still] .cover .motif *{animation:none!important}
   .s07 .rules code,.s07 .lede code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
   .s07 .code{margin:0;font-size:clamp(.78rem,1.15vw,1.1rem)}
   .s07 .split > *{min-width:0}
-  @media (max-width:760px){.s07 .code{white-space:pre-wrap;overflow-wrap:anywhere}}
+  @media (max-width:760px){.s07 .code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.6rem;padding:.45rem .6rem}.s07 .rules li{font-size:.82rem}}
   .s07 .checkpoint{display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center}
 
 /* --- 08-valido-correcto.html --- */
@@ -540,6 +535,7 @@ html[data-still] .cover .motif *{animation:none!important}
   .s11 .col{display:flex;flex-direction:column;gap:var(--gap);justify-content:center;min-height:0}
   .s11 .code{margin:0;font-size:clamp(.78rem,1.2vw,1.15rem)}
   .s11 .split > *{min-width:0}
+  .s11 .split{margin-top:clamp(.5rem,2vh,1.5rem)}
   @media (max-width:760px){.s11 .code{white-space:pre-wrap;overflow-wrap:anywhere}}
   .s11 .cats{display:grid;grid-template-columns:auto 1fr;gap:clamp(.35rem,1vh,.7rem) clamp(.8rem,1.6vw,1.6rem);align-items:baseline;margin:0}
   .s11 .cats dt{font-family:var(--f-mono);font-size:calc(var(--t-lede)*.85);color:var(--ink);white-space:nowrap}
@@ -594,90 +590,9 @@ html[data-still] .cover .motif *{animation:none!important}
 
   <main class="deck" id="deck">
 
-<!-- ===== 00-smoke.html ===== -->
-<!-- PRUEBA DE HUMO del sistema visual. Dos diapositivas: statement + diagrama .dg con data-step.
-     BORRAR (o excluir) antes del ensamblado final: suma 0:40 al presupuesto. -->
-
-
-<!-- ============ statement ============ -->
-<section class="slide s00" data-title="Humo: statement" data-section="Humo" data-budget="0:20" data-clock="0:00–0:20" style="--slide-accent:var(--action)">
-  <div class="main">
-    <p class="eyebrow reveal">Tesis</p>
-    <h1 class="statement reveal d1">El modelo <em>propone</em>. La aplicación ejecuta.</h1>
-    <p class="lede reveal d2">Y eso se mide: por categoría de error, con costo por tarea.</p>
-  </div>
-  <aside class="notes">
-    <p><strong>Propósito:</strong> comprobar que el statement ensambla con tipografía, atmósfera y chrome. (0:20)</p>
-    <blockquote>Un <code>tool_use</code> es una solicitud, no un efecto.</blockquote>
-    <p class="warn">Diapositiva de prueba: no se presenta.</p>
-    <p><strong>Transición:</strong> “Veamos el diagrama.”</p>
-  </aside>
-</section>
-
-<!-- ============ diagrama: propose → gate → exec / refuse ============ -->
-<section class="slide s00b" data-title="Humo: propone, compuerta, ejecuta o rechaza" data-section="Humo" data-budget="0:20" data-clock="0:20–0:40" style="--slide-accent:var(--action)">
-  <div class="main">
-    <div class="hd">
-      <p class="eyebrow reveal">La frontera</p>
-      <h2 class="reveal d1">Una llamada válida <em>no es</em> una llamada autorizada</h2>
-    </div>
-    <div class="figure fill reveal d2">
-      <svg class="dg" viewBox="0 0 1000 440" role="img" aria-label="El modelo propone un tool_use que solo cruza por la compuerta de la aplicación. Si se autoriza, la herramienta se ejecuta y el tool_result regresa al modelo; si no, se rechaza y el rechazo regresa como tool_result con is_error.">
-        <!-- región del modelo -->
-        <rect class="model" x="20" y="60" width="290" height="330" rx="28"/>
-        <text class="t-mono t-mod" x="46" y="94">Modelo</text>
-        <text class="t-sub" x="46" y="124">Propone la siguiente acción.</text>
-        <text class="t-sub" x="46" y="144">No la ejecuta.</text>
-        <rect class="node mod" x="46" y="184" width="236" height="62" rx="4"/>
-        <text class="t-lbl" x="62" y="210">tool_use</text>
-        <text class="t-sub" x="62" y="232">aún sin efecto</text>
-
-        <!-- región de la aplicación + compuerta -->
-        <rect class="app" x="420" y="40" width="560" height="370" rx="6"/>
-        <text class="t-mono" x="452" y="72">Aplicación · runtime de confianza</text>
-        <rect class="gate" x="409" y="108" width="22" height="254" rx="2"/>
-        <path d="M409,196 h22 M409,206 h22" stroke="var(--action)" stroke-width="1.4" fill="none"/>
-        <text class="t-mono t-act" x="452" y="394">compuerta · permisos · validación</text>
-
-        <g data-step="1">
-          <path class="propose draw" pathLength="1" d="M282,215 H405" marker-end="url(#arr-mod)"/>
-          <text class="t-sub t-act" x="292" y="262" font-weight="700">llega a la puerta</text>
-        </g>
-
-        <g data-step="2">
-          <path class="exec big draw flow" pathLength="1" d="M431,206 H700" marker-end="url(#arr-ev)"/>
-          <text class="t-sub t-ev" x="470" y="188" font-weight="700">autorizada · ejecuta</text>
-          <rect class="node ev" x="706" y="166" width="250" height="80" rx="4" style="stroke-width:2.4"/>
-          <text class="t-lbl" x="728" y="200">✓ Herramienta</text>
-          <text class="t-sub" x="728" y="223">efecto y resultado reales</text>
-        </g>
-
-        <g data-step="3">
-          <path class="refuse draw" pathLength="1" d="M431,318 H700" marker-end="url(#bar-act)"/>
-          <text class="t-sub t-act" x="470" y="302" font-weight="700">✕ rechazada</text>
-          <text class="t-sub" x="470" y="346">sin permiso o argumentos inválidos</text>
-          <text class="t-sub t-act" x="722" y="323">sin efecto</text>
-        </g>
-
-        <g data-step="4">
-          <path class="return draw" pathLength="1" d="M830,166 V128 H316" marker-end="url(#arr-ev)"/>
-          <text class="t-sub t-ev" x="470" y="119">tool_result · resultado o is_error</text>
-        </g>
-      </svg>
-    </div>
-  </div>
-  <aside class="notes">
-    <p><strong>Propósito:</strong> probar la gramática <code>.dg</code>: <code>.propose</code> discontinuo, <code>.exec</code> sólido, <code>.refuse</code> que termina en ⊣, <code>.return</code> punteado, y los cuatro <code>data-step</code>. (0:20)</p>
-    <blockquote>El modelo propone; la compuerta decide; lo que vuelve al modelo es siempre un <code>tool_result</code>.</blockquote>
-    <p>Pasos con →: 1 la solicitud llega a la puerta; 2 autorizada, se ejecuta; 3 rechazada, sin efecto; 4 el resultado o el rechazo regresa.</p>
-    <p class="warn">Diapositiva de prueba: no se presenta.</p>
-    <p><strong>Transición:</strong> “Ahora el cable.”</p>
-  </aside>
-</section>
-
 <!-- ===== 01-portada.html ===== -->
 <!-- ============ 01 · portada ============ -->
-<section class="slide cover bare s01" data-title="Portada" data-section="Apertura" data-budget="0:30" data-clock="0:40–1:10"
+<section class="slide cover bare s01" data-title="Portada" data-section="Apertura" data-budget="0:30" data-clock="0:00–0:30"
          style="--slide-accent:var(--action)">
   <div class="motif" aria-hidden="true">
   <svg viewBox="0 0 700 640" role="img" aria-label="Motivo: filas de tokens de texto; una fila resaltada contiene la llamada a la herramienta, que avanza hasta una compuerta.">
@@ -795,7 +710,7 @@ html[data-still] .cover .motif *{animation:none!important}
 
 <!-- ===== 02-gancho.html ===== -->
 <!-- ============ 02 · gancho OpenRouter ============ -->
-<section class="slide s02" data-title="Gancho: el mismo modelo, otro ruteo" data-section="Apertura" data-budget="1:30" data-clock="1:10–2:40"
+<section class="slide s02" data-title="Gancho: el mismo modelo, otro ruteo" data-section="Apertura" data-budget="1:30" data-clock="0:30–2:00"
          style="--slide-accent:var(--action)">
   <div class="main">
     <div class="split">
@@ -860,7 +775,7 @@ html[data-still] .cover .motif *{animation:none!important}
 
 <!-- ===== 03-quien.html ===== -->
 <!-- ============ 03 · quién es este tipo ============ -->
-<section class="slide s03" data-title="¿Quién es este tipo?" data-section="Apertura" data-budget="0:30" data-clock="2:40–3:10"
+<section class="slide s03" data-title="¿Quién es este tipo?" data-section="Apertura" data-budget="0:30" data-clock="2:00–2:30"
          style="--slide-accent:var(--evidence)">
   <div class="main">
     <div class="split">
@@ -887,7 +802,7 @@ html[data-still] .cover .motif *{animation:none!important}
 
 <!-- ===== 04-texto.html ===== -->
 <!-- ============ 04 · las herramientas son texto ============ -->
-<section class="slide s04" data-title="Las herramientas son texto" data-section="Apertura" data-budget="2:30" data-clock="3:10–5:40"
+<section class="slide s04" data-title="Las herramientas son texto" data-section="Apertura" data-budget="2:30" data-clock="2:30–5:00"
          style="--slide-accent:var(--evidence)">
   <div class="main">
     <div class="hd">
@@ -952,7 +867,7 @@ Eres un asistente del banco.
 
 <!-- ===== 05-bucle.html ===== -->
 <!-- ============ 05 · el bucle a nivel cable ============ -->
-<section class="slide s05" data-title="El bucle a nivel cable" data-section="Cable" data-budget="2:30" data-clock="5:40–8:10"
+<section class="slide s05" data-title="El bucle a nivel cable" data-section="Cable" data-budget="2:30" data-clock="5:00–7:30"
          style="--slide-accent:var(--evidence)">
   <div class="main">
     <div class="hd">
@@ -1043,7 +958,7 @@ Eres un asistente del banco.
 </section>
 
 <!-- ============ 05b · tu turno: paso-1 ============ -->
-<section class="slide s05b" data-title="Tu turno: paso-1 (el bucle)" data-section="Cable" data-budget="4:00" data-clock="8:10–12:10"
+<section class="slide s05b" data-title="Tu turno: paso-1 (el bucle)" data-section="Cable" data-budget="4:00" data-clock="7:30–11:30"
          style="--slide-accent:var(--evidence)">
   <div class="main">
     <div class="hd">
@@ -1104,7 +1019,7 @@ tool_choice={"type": "<span class="k">auto</span>"}  <span class="c"># + strict:
 
 <!-- ===== 05b-huerfano.html ===== -->
 <!-- ============ 05c · rotura #1: huérfano ============ -->
-<section class="slide s05c" data-title="Rotura #1: el tool_use huérfano" data-section="Rotura #1" data-budget="3:30" data-clock="12:10–15:40"
+<section class="slide s05c" data-title="Rotura #1: el tool_use huérfano" data-section="Rotura #1" data-budget="3:30" data-clock="11:30–15:00"
          style="--slide-accent:var(--action)">
   <div class="main">
     <div class="hd">
@@ -1169,7 +1084,7 @@ merged = {"role": "user", "content": orphans + content}</div>
 
 <!-- ===== 06-restringida.html ===== -->
 <!-- ============ 06 · decodificación restringida: del esquema a la máscara ============ -->
-<section class="slide s06" data-title="Decodificación restringida: esquema → máscara" data-section="Decodificación" data-budget="2:30" data-clock="15:40–18:10"
+<section class="slide s06" data-title="Decodificación restringida: esquema → máscara" data-section="Decodificación" data-budget="2:30" data-clock="15:00–17:30"
          style="--slide-accent:var(--evidence)">
   <div class="main">
     <div class="hd">
@@ -1216,7 +1131,7 @@ merged = {"role": "user", "content": orphans + content}</div>
           <!-- barras de logits en bruto -->
           <rect class="bar ok"  x="50"  y="302" width="90" height="84" rx="3"/>
           <rect class="bar ok"  x="200" y="322" width="90" height="64" rx="3"/>
-          <rect class="bar bad" x="350" y="274" width="90" height="112" rx="3"/>
+          <rect class="bar bad" x="350" y="290" width="90" height="96" rx="3"/>
           <rect class="bar bad" x="500" y="314" width="90" height="72" rx="3"/>
           <rect class="bar bad" x="650" y="340" width="90" height="46" rx="3"/>
           <rect class="bar bad" x="800" y="350" width="90" height="36" rx="3"/>
@@ -1234,7 +1149,7 @@ merged = {"role": "user", "content": orphans + content}</div>
           <text class="t-sub t-ev" x="95"  y="286" text-anchor="middle" font-weight="700">✓ sigue</text>
           <text class="t-sub t-ev" x="245" y="306" text-anchor="middle" font-weight="700">✓ sigue</text>
           <!-- inválidos: −∞ -->
-          <text class="t-lbl t-act" x="395" y="262" text-anchor="middle">−∞</text>
+          <text class="t-lbl t-act" x="395" y="278" text-anchor="middle">−∞</text>
           <text class="t-lbl t-act" x="545" y="302" text-anchor="middle">−∞</text>
           <text class="t-lbl t-act" x="695" y="328" text-anchor="middle">−∞</text>
           <text class="t-lbl t-act" x="845" y="338" text-anchor="middle">−∞</text>
@@ -1262,7 +1177,7 @@ merged = {"role": "user", "content": orphans + content}</div>
 </section>
 
 <!-- ============ 06b · el límite: predecir y revelar ============ -->
-<section class="slide s06b" data-title="El límite: la gramática no te salva del corte" data-section="Decodificación" data-budget="1:30" data-clock="18:10–19:40"
+<section class="slide s06b" data-title="El límite: la gramática no te salva del corte" data-section="Decodificación" data-budget="1:30" data-clock="17:30–19:00"
          style="--slide-accent:var(--action)">
   <div class="main">
     <div class="hd">
@@ -1326,7 +1241,7 @@ merged = {"role": "user", "content": orphans + content}</div>
 
 <!-- ===== 07-truncado.html ===== -->
 <!-- ============ 07 · rotura #2: truncado ============ -->
-<section class="slide s07" data-title="Rotura #2: tool_use truncado por max_tokens" data-section="Rotura #2" data-budget="3:00" data-clock="19:40–22:40"
+<section class="slide s07" data-title="Rotura #2: tool_use truncado por max_tokens" data-section="Rotura #2" data-budget="3:00" data-clock="19:00–22:00"
          style="--slide-accent:var(--action)">
   <div class="main">
     <div class="hd">
@@ -1340,40 +1255,41 @@ merged = {"role": "user", "content": orphans + content}</div>
           <p class="label" style="margin-bottom:.6rem">El arreglo, en tres reglas</p>
           <ol class="rules">
             <li><b>Mira <code>stop_reason</code></b> antes de leer el <code>content</code>.</li>
-            <li>Con <code>"max_tokens"</code> el último <code>tool_use</code> puede estar cortado: <b>no se parsea ni se ejecuta</b>.</li>
-            <li><b>Reintenta</b> la misma petición con más <code>max_tokens</code>, y con tope.</li>
+            <li>Con <code>"max_tokens"</code> el último <code>tool_use</code> puede estar cortado: <b>no se ejecuta ni se guarda</b> (guardarlo crearía un huérfano).</li>
+            <li><b>Reintenta</b> con más <code>max_tokens</code>: una vez, no en bucle.</li>
           </ol>
         </div>
         <p class="note-line" data-step="3">¿Atrás? <b style="color:var(--ink)">git checkout paso-3</b> · luego seguimos</p>
       </div>
       <div class="col">
-        <div class="code"><span class="cap">taller/agent.py · el bucle</span><span class="c">resp = client.messages.create(…)</span>
+        <div class="code"><span class="cap">taller/agent.py · el bucle</span><span class="c">turn.calls = [ToolCall(b.id, b.name, b.input) for b in uses]</span>
 <span class="a"># TODO(paso-3)</span> <span class="c">¿y si stop_reason == "max_tokens"?</span>
-<span class="k">if</span> resp.stop_reason == <span class="s">"tool_use"</span>: …</div>
-        <div class="code" data-step="2"><span class="cap">paso-3 · la solución</span><span class="k">if</span> resp.stop_reason == <span class="s">"max_tokens"</span>:
-    <span class="c"># puede estar cortado: no se ejecuta</span>
-    <span class="k">if</span> max_tokens &gt;= TOPE:
-        <span class="k">raise</span> RuntimeError(<span class="s">"truncado"</span>)
-    max_tokens *= 2
-    <span class="k">continue</span>  <span class="c"># misma petición, más espacio</span></div>
+<span class="c">messages.append({"role": "assistant", "content": [… todo …]})</span></div>
+        <div class="code" data-step="2"><span class="cap">paso-3 · la solución (abreviada)</span><span class="k">if</span> resp.stop_reason == <span class="s">"max_tokens"</span> <span class="k">and</span> uses:
+    <span class="c"># el tool_use puede estar cortado: ni se ejecuta ni se guarda</span>
+    kept = [block_to_dict(b) <span class="k">for</span> b <span class="k">in</span> resp.content
+            <span class="k">if</span> b.type != <span class="s">"tool_use"</span>]
+    …                    <span class="c"># guarda solo lo demás y avisa</span>
+    <span class="k">break</span>                <span class="c"># el reintento es con más max_tokens</span></div>
       </div>
     </div>
   </div>
   <aside class="notes">
-    <p><strong>Propósito:</strong> que cada quien vea una llamada cortada, entienda por qué no hay que ejecutarla y escriba el arreglo de cuatro líneas. (3:00 en total: ~0:45 planteamiento, ~1:30 de teclado en silencio, ~0:45 punto de control)</p>
+    <p><strong>Propósito:</strong> que cada quien vea una llamada cortada, entienda por qué no hay que ejecutarla y escriba el arreglo: un bloque corto en el bucle. (3:00 en total: ~0:45 planteamiento, ~1:30 de teclado en silencio, ~0:45 punto de control)</p>
     <p><strong>Predecir y revelar:</strong> retoma lo que dijo la sala en la diapositiva anterior (“¿dónde falla aun con gramática?”). Si alguien dijo “cuando se corta”, nómbralo: “tenían razón”.</p>
     <ol>
       <li>0:00 · Corre en tu pantalla: <code>uv run python -m taller.romper truncado</code>. Pide que todos lo corran también.</li>
-      <li>Señala en la salida el bloque cortado y que el agente no lo ejecuta. Lo que se imprima es lo real; no leas de memoria.</li>
+      <li>Señala en la salida el bloque cortado (ANTES), que el agente no lo ejecuta, y el reintento con <code>max_tokens=4096</code> (DESPUÉS). Lo que se imprima es lo real; no leas de memoria.</li>
       <li>→ muestra las tres reglas. → de nuevo muestra la solución de <code>paso-3</code> (para quien se atore, no para leerla).</li>
       <li>0:45 · <strong>Silencio planeado: ~1:30</strong> mientras reemplazan <code># TODO(paso-3)</code> en <code>taller/agent.py</code>. No hables; camina por la sala.</li>
       <li>2:15 · <strong>Punto de control:</strong> “Levanten la mano si ya vieron el bloque cortado y su agente se negó a ejecutarlo.” Si menos de la mitad: todos <code>git checkout paso-3</code> y seguimos.</li>
     </ol>
     <blockquote>Una llamada cortada no es una llamada: es un fragmento. Se descarta y se pide de nuevo con más espacio.</blockquote>
-    <blockquote>Y el reintento lleva tope. Un bucle que reintenta sin límite es una factura, no un arreglo.</blockquote>
+    <blockquote>Y el reintento es uno, con más espacio. Un bucle que reintenta sin límite es una factura, no un arreglo.</blockquote>
+    <p>Detalle que conecta con la rotura #1: el agente tampoco guarda el <code>tool_use</code> cortado en el historial, porque un <code>tool_use</code> guardado exige su <code>tool_result</code>: sería un huérfano.</p>
     <p>Fuente: la página de <em>stop reasons</em> recomienda, si <code>stop_reason</code> es <code>max_tokens</code> y el último bloque es un <code>tool_use</code>, reintentar con un <code>max_tokens</code> mayor (su ejemplo usa 4096; no fija un valor). La regla “no parsear ni ejecutar la llamada cortada” es decisión de diseño nuestra, consistente con la doc.</p>
-    <p class="warn">Los nombres del código (<code>resp</code>, <code>max_tokens</code>, <code>TOPE</code>) son ilustrativos: deben coincidir con <code>taller/agent.py</code>; revisa antes de presentar. Si el modelo no trunca como se espera, <code>romper</code> inyecta la llamada cortada y lo dice en pantalla: dilo igual.</p>
-    <p class="warn">Plan B sin API: <code>git checkout paso-3</code> ya trae la solución; muestra el código y corre el modo inyectado.</p>
+    <p class="warn">El código de la diapositiva es <code>taller/agent.py</code> abreviado (las líneas con … reemplazan el aviso por pantalla); revisa que siga coincidiendo antes de presentar. Si el modelo no trunca como se espera, <code>romper</code> inyecta la llamada cortada y lo dice en pantalla: dilo igual.</p>
+    <p class="warn">Plan B sin API: <code>git checkout paso-3</code> ya trae la solución; muestra el código y corre <code>uv run python -m taller.romper truncado --inyectado</code> (sin API).</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué haría tu agente hoy con un <code>tool_use</code> cortado?</p>
     <p><strong>Transición:</strong> “Ya no ejecutamos medias llamadas. Pero una llamada completa y válida también puede ser un problema.”</p>
   </aside>
@@ -1381,7 +1297,7 @@ merged = {"role": "user", "content": orphans + content}</div>
 
 <!-- ===== 08-valido-correcto.html ===== -->
 <!-- ============ 08 · válido ≠ correcto ============ -->
-<section class="slide s08" data-title="Válido ≠ correcto: strict garantiza forma, no significado" data-section="Válido ≠ correcto" data-budget="2:30" data-clock="22:40–25:10"
+<section class="slide s08" data-title="Válido ≠ correcto: strict garantiza forma, no significado" data-section="Válido ≠ correcto" data-budget="2:30" data-clock="22:00–24:30"
          style="--slide-accent:var(--action)">
   <div class="main">
     <div class="hd">
@@ -1408,7 +1324,7 @@ merged = {"role": "user", "content": orphans + content}</div>
     </div>
     <div data-step="3" class="reveal d3">
       <div class="code"><span class="cap">input de sql_query · dos llamadas que cumplen el esquema</span>{"sql": <span class="s">"SELECT nombre FROM clientes LIMIT 5"</span>}      <span class="k">✓ forma válida</span>
-{"sql": <span class="s">"DROP TABLE clientes"</span>}                      <span class="a">✓ forma válida · ✕ no debería ejecutarse</span></div>
+{"sql": <span class="s">"DROP TABLE tarjetas"</span>}                      <span class="a">✓ forma válida · ✕ no debería ejecutarse</span></div>
     </div>
   </div>
   <aside class="notes">
@@ -1431,7 +1347,7 @@ merged = {"role": "user", "content": orphans + content}</div>
 
 <!-- ===== 09-compuerta.html ===== -->
 <!-- ============ 09 · rotura #3: la compuerta ============ -->
-<section class="slide s09" data-title="Rotura #3: la compuerta determinista" data-section="Rotura #3" data-budget="2:30" data-clock="25:10–27:40"
+<section class="slide s09" data-title="Rotura #3: la compuerta determinista" data-section="Rotura #3" data-budget="2:30" data-clock="24:30–27:00"
          style="--slide-accent:var(--action)">
   <div class="main">
     <div class="hd">
@@ -1455,7 +1371,7 @@ merged = {"role": "user", "content": orphans + content}</div>
         <g data-step="1">
           <rect class="node mod" x="36" y="100" width="246" height="66" rx="4"/>
           <text class="t-lbl" x="52" y="124">tool_use #1 · sql_query</text>
-          <text class="tok" x="52" y="150">DROP TABLE clientes</text>
+          <text class="tok" x="52" y="150">DROP TABLE tarjetas</text>
           <path class="propose draw" d="M282,133 H405" marker-end="url(#arr-mod)"/>
         </g>
 
@@ -1471,7 +1387,7 @@ merged = {"role": "user", "content": orphans + content}</div>
         <g data-step="3">
           <rect class="node act" x="452" y="178" width="516" height="62" rx="4"/>
           <text class="t-mono t-act" x="468" y="198">tool_result · is_error: true</text>
-          <text class="msg" x="468" y="218">rechazada: solo se permite leer cuentas, clientes,</text>
+          <text class="msg" x="468" y="218">rechazada: solo se permite leer clientes, cuentas,</text>
           <text class="msg" x="468" y="234">tarjetas, transacciones; reescribe la consulta como un SELECT</text>
           <path class="return draw" d="M452,209 H316" marker-end="url(#arr-ev)"/>
         </g>
@@ -1499,20 +1415,20 @@ merged = {"role": "user", "content": orphans + content}</div>
   </div>
   <aside class="notes">
     <p><strong>Propósito:</strong> que la sala vea que un <code>tool_use</code> válido por esquema puede ser peligroso, y que la defensa es una compuerta determinista en la aplicación que devuelve <code>is_error</code>. Nada de “otro LLM revisa al LLM”. (2:30)</p>
-    <p><strong>Predecir y revelar:</strong> antes de pulsar →, pregunta: “El modelo propone <code>DROP TABLE clientes</code>, perfectamente válido para el esquema. ¿Qué creen que pasa?” Espera 15 s. Después retoma lo que dijeron.</p>
+    <p><strong>Predecir y revelar:</strong> antes de pulsar →, pregunta: “El modelo propone <code>DROP TABLE tarjetas</code>, perfectamente válido para el esquema. ¿Qué creen que pasa?” Espera 15 s. Después retoma lo que dijeron.</p>
     <blockquote>Ese DROP cumple el esquema. Aquí no lo para <code>strict</code>. Lo para la aplicación.</blockquote>
     <blockquote>La compuerta no le pregunta a otro modelo si le parece bien. Le pregunta al compilador de SQLite qué acciones haría esta sentencia. No hay probabilidad ahí.</blockquote>
     <blockquote>Y lo que vuelve al modelo es un <code>tool_result</code> con <code>is_error</code> y un mensaje que dice qué falló y qué intentar. Con eso, el modelo se corrige.</blockquote>
-    <p>Pasos con →: 1 el modelo propone el DROP; 2 la compuerta lo rechaza, sin efecto; 3 vuelve el <code>tool_result</code> con <code>is_error</code> (el texto del recuadro es el mensaje real de <code>gate.py</code>); 4 el modelo propone un SELECT; 5 se autoriza, se ejecuta y regresa el resultado.</p>
+    <p>Pasos con →: 1 el modelo propone el DROP; 2 la compuerta lo rechaza, sin efecto; 3 vuelve el <code>tool_result</code> con <code>is_error</code> (el texto del recuadro es el mensaje real de <code>gate.py</code> para este DROP); 4 el modelo propone un SELECT; 5 se autoriza, se ejecuta y regresa el resultado.</p>
     <p>Fuente: la doc dice que el <code>tool_result</code> con <code>is_error: true</code> debe tener contenido instructivo, y que ante llamadas inválidas Claude reintenta 2–3 veces con correcciones. Eso no garantiza que se corrija: por eso el agente tiene un límite de turnos. Es la misma lección de la historia del clasificador: error instructivo y tope de reintentos.</p>
-    <p class="warn">“El modelo se corrige” es lo esperado, no una garantía: si no se corrige en la corrida en vivo, dilo y muestra que el tope de turnos corta el bucle. <code>romper drop</code> inyecta el DROP si el modelo no cae en la trampa y lo dice en pantalla.</p>
+    <p class="warn">El SELECT del paso 4 es ilustrativo: lo que proponga el modelo en vivo varía. “El modelo se corrige” es lo esperado, no una garantía: si no se corrige en la corrida en vivo, dilo y muestra que el tope de turnos corta el bucle. <code>romper drop</code> inyecta el DROP si el modelo no cae en la trampa y lo dice en pantalla (<code>--inyectado</code> fuerza ese modo sin API).</p>
     <p class="warn">Cuidado con “la compuerta es segura”. Valida lo que dice el código de la siguiente diapositiva y nada más; no limita el costo de una consulta (una CTE recursiva sin tope pasa la compuerta; se acota al ejecutar con solo lectura, límite de filas y tiempo).</p>
     <p><strong>Transición:</strong> “Veamos qué hay dentro de esa compuerta y la línea que van a escribir.”</p>
   </aside>
 </section>
 
 <!-- ============ 09b · la compuerta en código (paso-4) ============ -->
-<section class="slide s09b" data-title="La compuerta en código: paso-4" data-section="Rotura #3" data-budget="3:00" data-clock="27:40–30:40"
+<section class="slide s09b" data-title="La compuerta en código: paso-4" data-section="Rotura #3" data-budget="3:00" data-clock="27:00–30:00"
          style="--slide-accent:var(--action)">
   <div class="main">
     <div class="hd">
@@ -1527,11 +1443,12 @@ merged = {"role": "user", "content": orphans + content}</div>
     <span class="k">if</span> action == sqlite3.SQLITE_READ <span class="k">and</span> arg1 <span class="k">in</span> ALLOWED_TABLES:
         <span class="k">return</span> sqlite3.SQLITE_OK
     <span class="k">return</span> sqlite3.SQLITE_DENY  <span class="c"># escrituras, DDL, PRAGMA, ATTACH, secretos, load_extension...</span></div><!--GATE_END-->
-    <div class="split even reveal d2">
+    <div class="split wide-left reveal d2">
       <div class="col">
-        <div class="code"><span class="cap">taller/tools.py · sql_query</span><span class="a"># TODO(paso-4)</span> <span class="c">validar antes de ejecutar</span><span class="sol" data-step="1">motivo = validate(args[<span class="s">"sql"</span>])   <span class="c"># None = permitido</span>
-<span class="k">if</span> motivo:
-    <span class="k">return</span> REJECTED, motivo     <span class="c"># → is_error: true</span></span></div>
+        <div class="code"><span class="cap">taller/tools.py · sql_query (abreviado)</span><span class="k">def</span> sql_query(sql: str) -&gt; str:
+    motivo = <span class="k">None</span>
+    <span class="a"># TODO(paso-4)</span> <span class="c">validar antes de ejecutar</span><span class="sol" data-step="1">    motivo = _gate(sql)  <span class="c"># None = permitido</span></span>    <span class="k">if</span> motivo:            <span class="c"># rechazada: no se ejecuta</span>
+        <span class="k">return</span> motivo     <span class="c"># → is_error: true</span></div>
       </div>
       <div class="col">
         <div class="panel mod" data-step="2">
@@ -1553,7 +1470,7 @@ merged = {"role": "user", "content": orphans + content}</div>
     <blockquote>Cualquier acción que no sea un SELECT o la lectura de una tabla permitida se niega. La tabla de secretos no está en la lista.</blockquote>
     <blockquote>Las escrituras, como bloquear una tarjeta, no pasan por aquí: las confirma una persona en la terminal.</blockquote>
     <p>Pasos con →: 1 la solución de <code>paso-4</code>; 2 la confirmación humana de <code>bloquear_tarjeta</code>; 3 el comando de respaldo.</p>
-    <p class="warn">El código de arriba es literal de <code>taller/gate.py</code>. El de abajo usa nombres ilustrativos (<code>validate</code> sí es real; <code>args</code> y <code>REJECTED</code> deben coincidir con <code>taller/tools.py</code>): revisa antes de presentar.</p>
+    <p class="warn">El código de arriba es literal de <code>taller/gate.py</code>. El de abajo es <code>taller/tools.py</code> abreviado (en el repo hay más líneas entre marcadores y el rechazo se marca con el prefijo <code>rechazada:</code>); revisa que siga coincidiendo antes de presentar.</p>
     <p class="warn">Plan B sin API: <code>git checkout paso-4</code> y enseña la compuerta con las pruebas: <code>uv run pytest -q tests/test_gate.py</code>.</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué herramienta de tu agente necesita una compuerta antes que cualquier otra cosa?</p>
     <p><strong>Transición:</strong> “La compuerta nos protege de lo que el agente hace. Y las credenciales: ¿quién las ve?”</p>
@@ -1562,7 +1479,7 @@ merged = {"role": "user", "content": orphans + content}</div>
 
 <!-- ===== 10-mcp.html ===== -->
 <!-- ============ 10 · MCP en una diapositiva ============ -->
-<section class="slide s10" data-title="MCP: aislamiento de credenciales" data-section="Válido ≠ correcto" data-budget="2:00" data-clock="30:40–32:40"
+<section class="slide s10" data-title="MCP: aislamiento de credenciales" data-section="Válido ≠ correcto" data-budget="2:00" data-clock="30:00–32:00"
          style="--slide-accent:var(--evidence)">
   <div class="main">
     <div class="hd">
@@ -1638,7 +1555,7 @@ merged = {"role": "user", "content": orphans + content}</div>
 
 <!-- ===== 11-medir.html ===== -->
 <!-- ============ 11 · medir: el comando y las categorías ============ -->
-<section class="slide s11" data-title="Medir: categorías de error por tarea" data-section="Medir" data-budget="2:30" data-clock="32:40–35:10"
+<section class="slide s11" data-title="Medir: categorías de error por tarea" data-section="Medir" data-budget="2:30" data-clock="32:00–34:30"
          style="--slide-accent:var(--evidence)">
   <div class="main">
     <div class="hd">
@@ -1648,7 +1565,8 @@ merged = {"role": "user", "content": orphans + content}</div>
     <div class="split even reveal d2">
       <div class="col">
         <div class="code"><span class="cap">terminal · paso 5</span><span class="a">$</span> uv run python -m taller.medir
-<span class="a">$</span> uv run python -m taller.medir --vs claude-opus-5-5   <span class="c"># opcional</span></div>
+<span class="c"># opcional: comparar con otro modelo</span>
+<span class="a">$</span> uv run python -m taller.medir --vs claude-opus-5-5</div>
         <p class="lede" data-step="2">Tokens y costo <b style="color:var(--ink)">por tarea resuelta</b>, no por llamada: los intentos fallidos también cuestan.</p>
         <p class="note-line" data-step="3">¿Atrás? <b style="color:var(--ink)">git checkout paso-5</b></p>
       </div>
@@ -1681,7 +1599,7 @@ merged = {"role": "user", "content": orphans + content}</div>
 </section>
 
 <!-- ============ 11b · la tabla (W2-C la reemplaza con la corrida real) ============ -->
-<section class="slide s11b" data-title="Medir: tabla de errores y costo por tarea" data-section="Medir" data-budget="3:30" data-clock="35:10–38:40"
+<section class="slide s11b" data-title="Medir: tabla de errores y costo por tarea" data-section="Medir" data-budget="3:30" data-clock="34:30–38:00"
          style="--slide-accent:var(--evidence)">
   <div class="main">
     <div class="hd">
@@ -1751,7 +1669,7 @@ merged = {"role": "user", "content": orphans + content}</div>
 
 <!-- ===== 12-cierre.html ===== -->
 <!-- ============ 12 · cierre ============ -->
-<section class="slide s12 quiet" data-title="Cierre: el modelo propone, la aplicación ejecuta, y eso se mide" data-section="Cierre" data-budget="2:00" data-clock="38:40–40:40"
+<section class="slide s12 quiet" data-title="Cierre: el modelo propone, la aplicación ejecuta, y eso se mide" data-section="Cierre" data-budget="2:00" data-clock="38:00–40:00"
          style="--slide-accent:var(--action)">
   <div class="main">
     <div class="split wide-left">

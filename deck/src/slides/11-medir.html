@@ -3,6 +3,7 @@
   .s11 .col{display:flex;flex-direction:column;gap:var(--gap);justify-content:center;min-height:0}
   .s11 .code{margin:0;font-size:clamp(.78rem,1.2vw,1.15rem)}
   .s11 .split > *{min-width:0}
+  .s11 .split{margin-top:clamp(.5rem,2vh,1.5rem)}
   @media (max-width:760px){.s11 .code{white-space:pre-wrap;overflow-wrap:anywhere}}
   .s11 .cats{display:grid;grid-template-columns:auto 1fr;gap:clamp(.35rem,1vh,.7rem) clamp(.8rem,1.6vw,1.6rem);align-items:baseline;margin:0}
   .s11 .cats dt{font-family:var(--f-mono);font-size:calc(var(--t-lede)*.85);color:var(--ink);white-space:nowrap}
@@ -38,7 +39,8 @@
     <div class="split even reveal d2">
       <div class="col">
         <div class="code"><span class="cap">terminal · paso 5</span><span class="a">$</span> uv run python -m taller.medir
-<span class="a">$</span> uv run python -m taller.medir --vs claude-opus-5-5   <span class="c"># opcional</span></div>
+<span class="c"># opcional: comparar con otro modelo</span>
+<span class="a">$</span> uv run python -m taller.medir --vs claude-opus-5-5</div>
         <p class="lede" data-step="2">Tokens y costo <b style="color:var(--ink)">por tarea resuelta</b>, no por llamada: los intentos fallidos también cuestan.</p>
         <p class="note-line" data-step="3">¿Atrás? <b style="color:var(--ink)">git checkout paso-5</b></p>
       </div>

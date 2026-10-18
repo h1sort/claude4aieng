@@ -8,7 +8,7 @@
   .s07 .rules code,.s07 .lede code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
   .s07 .code{margin:0;font-size:clamp(.78rem,1.15vw,1.1rem)}
   .s07 .split > *{min-width:0}
-  @media (max-width:760px){.s07 .code{white-space:pre-wrap;overflow-wrap:anywhere}}
+  @media (max-width:760px){.s07 .code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.6rem;padding:.45rem .6rem}.s07 .rules li{font-size:.82rem}}
   .s07 .checkpoint{display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center}
 </style>
 
@@ -27,40 +27,41 @@
           <p class="label" style="margin-bottom:.6rem">El arreglo, en tres reglas</p>
           <ol class="rules">
             <li><b>Mira <code>stop_reason</code></b> antes de leer el <code>content</code>.</li>
-            <li>Con <code>"max_tokens"</code> el último <code>tool_use</code> puede estar cortado: <b>no se parsea ni se ejecuta</b>.</li>
-            <li><b>Reintenta</b> la misma petición con más <code>max_tokens</code>, y con tope.</li>
+            <li>Con <code>"max_tokens"</code> el último <code>tool_use</code> puede estar cortado: <b>no se ejecuta ni se guarda</b> (guardarlo crearía un huérfano).</li>
+            <li><b>Reintenta</b> con más <code>max_tokens</code>: una vez, no en bucle.</li>
           </ol>
         </div>
         <p class="note-line" data-step="3">¿Atrás? <b style="color:var(--ink)">git checkout paso-3</b> · luego seguimos</p>
       </div>
       <div class="col">
-        <div class="code"><span class="cap">taller/agent.py · el bucle</span><span class="c">resp = client.messages.create(…)</span>
+        <div class="code"><span class="cap">taller/agent.py · el bucle</span><span class="c">turn.calls = [ToolCall(b.id, b.name, b.input) for b in uses]</span>
 <span class="a"># TODO(paso-3)</span> <span class="c">¿y si stop_reason == "max_tokens"?</span>
-<span class="k">if</span> resp.stop_reason == <span class="s">"tool_use"</span>: …</div>
-        <div class="code" data-step="2"><span class="cap">paso-3 · la solución</span><span class="k">if</span> resp.stop_reason == <span class="s">"max_tokens"</span>:
-    <span class="c"># puede estar cortado: no se ejecuta</span>
-    <span class="k">if</span> max_tokens &gt;= TOPE:
-        <span class="k">raise</span> RuntimeError(<span class="s">"truncado"</span>)
-    max_tokens *= 2
-    <span class="k">continue</span>  <span class="c"># misma petición, más espacio</span></div>
+<span class="c">messages.append({"role": "assistant", "content": [… todo …]})</span></div>
+        <div class="code" data-step="2"><span class="cap">paso-3 · la solución (abreviada)</span><span class="k">if</span> resp.stop_reason == <span class="s">"max_tokens"</span> <span class="k">and</span> uses:
+    <span class="c"># el tool_use puede estar cortado: ni se ejecuta ni se guarda</span>
+    kept = [block_to_dict(b) <span class="k">for</span> b <span class="k">in</span> resp.content
+            <span class="k">if</span> b.type != <span class="s">"tool_use"</span>]
+    …                    <span class="c"># guarda solo lo demás y avisa</span>
+    <span class="k">break</span>                <span class="c"># el reintento es con más max_tokens</span></div>
       </div>
     </div>
   </div>
   <aside class="notes">
-    <p><strong>Propósito:</strong> que cada quien vea una llamada cortada, entienda por qué no hay que ejecutarla y escriba el arreglo de cuatro líneas. (3:00 en total: ~0:45 planteamiento, ~1:30 de teclado en silencio, ~0:45 punto de control)</p>
+    <p><strong>Propósito:</strong> que cada quien vea una llamada cortada, entienda por qué no hay que ejecutarla y escriba el arreglo: un bloque corto en el bucle. (3:00 en total: ~0:45 planteamiento, ~1:30 de teclado en silencio, ~0:45 punto de control)</p>
     <p><strong>Predecir y revelar:</strong> retoma lo que dijo la sala en la diapositiva anterior (“¿dónde falla aun con gramática?”). Si alguien dijo “cuando se corta”, nómbralo: “tenían razón”.</p>
     <ol>
       <li>0:00 · Corre en tu pantalla: <code>uv run python -m taller.romper truncado</code>. Pide que todos lo corran también.</li>
-      <li>Señala en la salida el bloque cortado y que el agente no lo ejecuta. Lo que se imprima es lo real; no leas de memoria.</li>
+      <li>Señala en la salida el bloque cortado (ANTES), que el agente no lo ejecuta, y el reintento con <code>max_tokens=4096</code> (DESPUÉS). Lo que se imprima es lo real; no leas de memoria.</li>
       <li>→ muestra las tres reglas. → de nuevo muestra la solución de <code>paso-3</code> (para quien se atore, no para leerla).</li>
       <li>0:45 · <strong>Silencio planeado: ~1:30</strong> mientras reemplazan <code># TODO(paso-3)</code> en <code>taller/agent.py</code>. No hables; camina por la sala.</li>
       <li>2:15 · <strong>Punto de control:</strong> “Levanten la mano si ya vieron el bloque cortado y su agente se negó a ejecutarlo.” Si menos de la mitad: todos <code>git checkout paso-3</code> y seguimos.</li>
     </ol>
     <blockquote>Una llamada cortada no es una llamada: es un fragmento. Se descarta y se pide de nuevo con más espacio.</blockquote>
-    <blockquote>Y el reintento lleva tope. Un bucle que reintenta sin límite es una factura, no un arreglo.</blockquote>
+    <blockquote>Y el reintento es uno, con más espacio. Un bucle que reintenta sin límite es una factura, no un arreglo.</blockquote>
+    <p>Detalle que conecta con la rotura #1: el agente tampoco guarda el <code>tool_use</code> cortado en el historial, porque un <code>tool_use</code> guardado exige su <code>tool_result</code>: sería un huérfano.</p>
     <p>Fuente: la página de <em>stop reasons</em> recomienda, si <code>stop_reason</code> es <code>max_tokens</code> y el último bloque es un <code>tool_use</code>, reintentar con un <code>max_tokens</code> mayor (su ejemplo usa 4096; no fija un valor). La regla “no parsear ni ejecutar la llamada cortada” es decisión de diseño nuestra, consistente con la doc.</p>
-    <p class="warn">Los nombres del código (<code>resp</code>, <code>max_tokens</code>, <code>TOPE</code>) son ilustrativos: deben coincidir con <code>taller/agent.py</code>; revisa antes de presentar. Si el modelo no trunca como se espera, <code>romper</code> inyecta la llamada cortada y lo dice en pantalla: dilo igual.</p>
-    <p class="warn">Plan B sin API: <code>git checkout paso-3</code> ya trae la solución; muestra el código y corre el modo inyectado.</p>
+    <p class="warn">El código de la diapositiva es <code>taller/agent.py</code> abreviado (las líneas con … reemplazan el aviso por pantalla); revisa que siga coincidiendo antes de presentar. Si el modelo no trunca como se espera, <code>romper</code> inyecta la llamada cortada y lo dice en pantalla: dilo igual.</p>
+    <p class="warn">Plan B sin API: <code>git checkout paso-3</code> ya trae la solución; muestra el código y corre <code>uv run python -m taller.romper truncado --inyectado</code> (sin API).</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué haría tu agente hoy con un <code>tool_use</code> cortado?</p>
     <p><strong>Transición:</strong> “Ya no ejecutamos medias llamadas. Pero una llamada completa y válida también puede ser un problema.”</p>
   </aside>
