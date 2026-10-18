@@ -4,6 +4,7 @@ Claude Community CDMX · lunes 19 oct 2026 · bloque de 40 min · audiencia: ing
 Autor: Carlos Haro (@h1sort). Este archivo es la fuente de verdad para el enjambre de subagentes.
 
 > **Para cada subagente:** lee este archivo completo, después solo tu sección de tarea en §6.
+> Si escribes diapositivas, notas o revisas el deck, lee también `SPEAKER.md`.
 > Escribe **solo** en las rutas que tu tarea declara como tuyas. Si necesitas algo fuera de tu
 > carpeta, déjalo en `HANDOFF.md` bajo tu ID de tarea en lugar de editarlo.
 
