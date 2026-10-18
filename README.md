@@ -63,15 +63,15 @@ hasta el paso N y los `# TODO(paso-N+1)` pendientes.
 |---|---|---|---|---|
 | 0–5 | Las herramientas son texto | `paso-0` | `uv run python -m taller.plantilla` | Nada: lee la plantilla de chat de Qwen ya renderizada, con las herramientas como texto. |
 | 5–15 | El bucle a nivel cable | `paso-1` | `uv run python -m taller.agent` | En `taller/agent.py`, `# TODO(paso-1)`: ejecuta las llamadas del turno con `execute_calls` y devuelve **un** mensaje de usuario con todos los `tool_result`, primero y con su `tool_use_id`. Prueba con `¿cuántas tarjetas bloqueadas hay?` (26). |
-| 5–15 | Rotura #1: `tool_use` huérfano | `paso-2` | `uv run python -m taller.agent --reanudar` | En `sanitize_history`, `# TODO(paso-2)`: por cada `tool_use` sin resultado, inserta un `tool_result` con `is_error: true` al inicio del mensaje siguiente. Mata el proceso (Ctrl-C) entre `tool_use` y `tool_result`, reanuda y mira el 400 antes y después. |
-| 15–22 | Rotura #2: `max_tokens` | `paso-3` | `uv run python -m taller.romper truncado` | En `Agent.run`, `# TODO(paso-3)`: si `stop_reason == "max_tokens"` y hay un `tool_use`, la llamada puede venir cortada: no la parsees ni la ejecutes. |
-| 22–32 | Rotura #3: válido no es correcto | `paso-4` | `uv run python -m taller.romper drop` | En `taller/tools.py`, `# TODO(paso-4)`: llama a la compuerta antes de ejecutar (`motivo = _gate(sql)`); si rechaza, el motivo vuelve al modelo como `is_error` y se corrige. |
+| 5–15 | Rotura #1: `tool_use` huérfano | `paso-2` | `uv run python -m taller.romper huerfano` | En `sanitize_history` (el esqueleto ya está), `# TODO(paso-2)`, 3 líneas: para los `tool_use` sin resultado, inserta `tool_result` con `is_error: true` **al inicio** del mensaje siguiente. Antes: 400. Después: la conversación sigue. También puedes matar `taller.agent` con Ctrl-C y reanudar con `--reanudar`. |
+| 15–22 | Rotura #2: `max_tokens` | `paso-3` | `uv run python -m taller.romper truncado` | En `Agent.run`, `# TODO(paso-3)`, 4 líneas: si `stop_reason == "max_tokens"` y hay un `tool_use`, no lo ejecutes ni lo guardes; sube `max_tokens` y reintenta. Antes: el `tool_use` cortado se queda en el historial y la siguiente petición da 400. Después: 0 huérfanos. |
+| 22–32 | Rotura #3: válido no es correcto | `paso-4` | `uv run python -m taller.romper drop` | En `taller/tools.py`, `# TODO(paso-4)`, 1 línea: `motivo = _gate(sql)`. Antes: `SELECT clave, valor FROM secretos` devuelve las claves (falsas) y el `DROP` solo lo frena la conexión de solo lectura. Después: la compuerta rechaza ambos antes de ejecutar y el motivo vuelve como `is_error`. |
 | 32–38 | Medir | `paso-5` | `uv run python -m taller.medir` | Nada: corre las 20 tareas y lee la tabla de errores, tokens y costo. |
 
 **¿Te quedaste atrás?** Guarda tu intento y salta al branch del último paso que alcanzaste:
 
 ```bash
-git stash && git checkout paso-N
+git fetch && git stash && git checkout paso-N
 ```
 
 (`git checkout main` tiene la solución completa; `git stash pop` recupera tu intento.)

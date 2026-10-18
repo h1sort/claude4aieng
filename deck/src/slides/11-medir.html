@@ -42,7 +42,7 @@
 <span class="c"># opcional: comparar con otro modelo</span>
 <span class="a">$</span> uv run python -m taller.medir --vs claude-opus-5-5</div>
         <p class="lede" data-step="2">Tokens y costo <b style="color:var(--ink)">por tarea resuelta</b>, no por llamada: los intentos fallidos también cuestan.</p>
-        <p class="note-line" data-step="3">¿Atrás? <b style="color:var(--ink)">git checkout paso-5</b></p>
+        <p class="note-line" data-step="3">¿Atrás? <b style="color:var(--ink)">git stash &amp;&amp; git checkout paso-5</b></p>
       </div>
       <dl class="cats" data-step="1">
         <dt>wrong_tool</dt><dd>eligió otra herramienta, o una donde no hacía falta</dd>
@@ -60,14 +60,15 @@
       <li>0:00 · “Tres roturas, tres arreglos. ¿Cuántas veces falla su agente y de qué manera? Sin medir es una impresión.”</li>
       <li>0:15 · Todos corren <code>uv run python -m taller.medir</code>. La concurrencia está acotada para no pegarle al límite de peticiones; tarda.</li>
       <li><strong>Silencio planeado: ~1:30</strong> mientras corre. Camina; mira pantallas.</li>
-      <li>2:15 · <strong>Punto de control:</strong> “Levanten la mano si ya les salió la tabla.” Si menos de la mitad: <code>git checkout paso-5</code> y se sigue con los números de la pantalla.</li>
+      <li>2:15 · <strong>Punto de control:</strong> “Levanten la mano si ya les salió la tabla.” Si menos de la mitad: <code>git stash &amp;&amp; git checkout paso-5</code> y se sigue con los números de la pantalla.</li>
     </ol>
     <blockquote>Seis categorías. Tres son las roturas que acabamos de arreglar: huérfanos, truncado y compuerta. Las otras tres son las que uno tiende a no ver.</blockquote>
     <blockquote>Y el costo se mide por tarea resuelta. Si una corrida falla, igual se pagó.</blockquote>
     <p>Pasos con →: 1 las seis categorías; 2 la unidad de costo; 3 el comando de respaldo.</p>
     <p class="warn">Las definiciones de la diapositiva son las de <code>taller/contracts.py</code> (<code>ErrorCategory</code>); la clasificación exacta la hace <code>taller/medir.py</code>: si difieren, manda el código. Si la API no responde o no hay créditos: corre <code>--vs</code> solo en tu máquina y enseña la tabla de la siguiente diapositiva; el taller no depende de que todos terminen.</p>
-    <p class="warn">Recorte (plan): si vamos tarde, nunca se recorta Medir. Se recorta primero <code>--vs</code> (la comparación de dos modelos), después las llamadas paralelas, después el autómata de pila. Aquí: corre solo el primer comando.</p>
-    <p><strong>Pregunta para llevarse:</strong> ¿qué categoría domina en tu agente, y quién se entera cuando sube?</p>
+    <p class="warn">Recorte (plan): si vamos tarde, nunca se recorta Medir. Orden de recorte: 1) el momento en vivo de <code>romper paralelo</code> en el paso-1 (0:30; se decide antes, por eso ya no entra aquí), 2) <code>--vs</code> (la comparación de dos modelos), 3) el autómata de pila. Aquí: corre solo el primer comando.</p>
+    <p><strong>Pregunta para llevarse:</strong> ¿cuántas tareas resuelve tu agente (X de 20), cuánto te cuesta cada una resuelta, y quién se entera cuando baja?</p>
+    <p class="warn">No uses «la categoría de error más frecuente» como dato del cuarto: <code>gate_rejected</code> gana siempre, por construcción, porque los prompts adversariales a01 y a02 de <code>evals/prompts.jsonl</code> están hechos para chocar con la compuerta. El dato del cuarto es «tareas resueltas X/20» y el «costo por tarea resuelta».</p>
     <p><strong>Transición:</strong> “Veamos una tabla. Primero, la de ustedes.”</p>
   </aside>
 </section>
@@ -122,12 +123,12 @@
     </div>
   </div>
   <aside class="notes">
-    <p><strong>Propósito:</strong> leer la tabla propia, ver qué categoría domina y plantear, como hipótesis que la sala prueba, que el costo por tarea resuelta no sigue al precio por token. (3:30)</p>
+    <p><strong>Propósito:</strong> leer la tabla propia, ver cuántas tareas resolvió cada quien y a qué costo, y plantear, como hipótesis que la sala prueba, que el costo por tarea resuelta no sigue al precio por token. (3:30)</p>
     <ol>
-      <li>0:00 · Antes de mostrar nada: “Levanten la mano por la categoría que más les salió.” Cuenta manos por <code>wrong_tool</code>, <code>bad_args</code>, <code>gate_rejected</code>, <code>exec_error</code>, <code>truncated</code>, <code>orphaned</code>. Di en voz alta cuál ganó. Es el dato del cuarto: úsalo en el cierre.</li>
+      <li>0:00 · Antes de mostrar nada: “Digan en voz alta su número de tareas resueltas, X de 20.” Cuenta manos por rangos (por ejemplo 18–20, 15–17, menos de 15) y pregunta quién tiene el <strong>costo por tarea resuelta</strong> más bajo. Es el dato del cuarto: úsalo en el cierre. No uses «la categoría que más salió»: <code>gate_rejected</code> gana siempre por construcción (los prompts adversariales a01 y a02 chocan a propósito con la compuerta), así que no dice nada del agente de cada quien.</li>
       <li>1:30 · → muestra la tabla de la corrida de ejemplo (la reemplaza W2-C con números reales; hasta entonces es un marcador de posición “ilustrativo”: no leas cifras que no existan).</li>
       <li>2:15 · → precios. → hipótesis. Quien tenga <code>--vs</code> dice en voz alta si le salió más barato por tarea resuelta, y de qué modelo.</li>
-      <li>3:15 · Cierra con la categoría ganadora: “Esa es la que van a medir el lunes en su agente.”</li>
+      <li>3:15 · Cierra con el número del cuarto: “En este cuarto, el mejor costo por tarea resuelta fue ___. Ese es el número que van a medir el lunes en su agente.”</li>
     </ol>
     <blockquote>Precio por token no es costo por tarea. Si un modelo falla más, reintenta más y cada reintento se paga.</blockquote>
     <blockquote>Esto es una hipótesis, no un hecho. Lo decide su corrida, no mi diapositiva.</blockquote>
@@ -135,7 +136,7 @@
     <p>Fuente de precios: página de pricing de Anthropic, consultada el 2026-10-18 (<code>FACTS.md</code> §7): Sonnet 5.5 $2 / $10, Haiku 5.5 $0.10 / $0.50 (prompts hasta 100K tokens), Opus 5.5 $4 / $20, por MTok. La página no muestra fecha de vigencia y remite a claude.com/pricing. Usar herramientas añade 286 tokens de system prompt con <code>tool_choice</code> <code>auto</code>.</p>
     <p class="warn">La tabla es un marcador de posición (<code>data-placeholder="medicion"</code>); W2-C la reemplaza con la corrida real. No inventes números. Si W2-C no llegó, usa la pantalla de un asistente voluntario o tu propia corrida.</p>
     <p class="warn">La idea de “un modelo más caro puede salir más barato por tarea” se atribuye a la clase de CMU, pero no pude verificarla y no está en <code>FACTS.md</code>: preséntala solo como hipótesis. Si preguntan la fuente exacta: “no sé la diapositiva, lo verifico y lo publico en el repo”.</p>
-    <p class="warn">Recorte (plan): si vamos tarde, salta los pasos 2–3 y la comparación <code>--vs</code>; nunca recortes la tabla propia ni el punto de control de categorías. Orden de recorte del plan: 1) comparación de dos modelos, 2) llamadas paralelas, 3) detalle del autómata de pila.</p>
+    <p class="warn">Recorte (plan): si vamos tarde, salta los pasos 2–3 y la comparación <code>--vs</code>; nunca recortes la tabla propia ni el conteo de tareas resueltas. Orden de recorte: 1) el momento en vivo de <code>romper paralelo</code> (paso-1), 2) comparación de dos modelos, 3) detalle del autómata de pila.</p>
     <p><strong>Pregunta para llevarse:</strong> ¿cuánto te cuesta resolver una tarea, no una llamada?</p>
     <p><strong>Transición:</strong> “Con esto cerramos.”</p>
   </aside>

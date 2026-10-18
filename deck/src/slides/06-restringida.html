@@ -20,7 +20,7 @@
       <h2 class="reveal d1">El esquema se vuelve una <em>máscara</em> sobre los logits</h2>
     </div>
     <div class="figure fill reveal d2">
-      <svg class="dg" viewBox="0 0 1000 440" role="img" aria-label="Del JSON Schema se compila una gramática libre de contexto; un autómata de pila recuerda qué se abrió. En cada paso de generación, los tokens que la gramática no permite reciben logit menos infinito y las probabilidades se renormalizan entre los tokens válidos.">
+      <svg class="dg" viewBox="0 0 1000 440" role="img" aria-label="Del JSON Schema se compila una gramática libre de contexto (aquí, el campo monto es de tipo integer); un autómata de pila recuerda qué se abrió. En cada paso de generación, los tokens que la gramática no permite (comilla, true, null y llave de cierre, porque monto es un entero) reciben logit menos infinito y las probabilidades se renormalizan entre los tokens válidos.">
         <!-- fila 1: compilación (una vez) -->
         <g data-step="1">
           <rect class="node" x="10" y="14" width="220" height="92" rx="4"/>
@@ -48,10 +48,13 @@
 
         <!-- fila 2: una pasada del modelo -->
         <rect class="model" x="10" y="160" width="980" height="270" rx="28"/>
-        <text class="t-mono t-mod" x="38" y="194">Modelo · una pasada = un vector de logits</text>
-        <text class="t-sub" x="38" y="216">Ya se generó</text>
-        <text class="tok" x="146" y="216">{"monto":</text>
-        <text class="t-sub" x="260" y="216">· ¿qué token sigue?  (ejemplo ilustrativo)</text>
+        <text class="t-mono t-mod" x="38" y="184">Modelo · una pasada = un vector de logits</text>
+        <text class="t-sub" x="38" y="206">Ya se generó</text>
+        <text class="tok" x="146" y="206">{"monto":</text>
+        <text class="t-sub" x="260" y="206">· ¿qué token sigue?  (ejemplo ilustrativo)</text>
+        <text class="t-sub t-ev" x="38" y="230" font-weight="700">El esquema dice</text>
+        <text class="tok" x="168" y="230">"monto": {"type": "integer"}</text>
+        <text class="t-sub" x="440" y="230">→ un entero: ni <tspan class="tok">"</tspan> ni <tspan class="tok">true</tspan> ni <tspan class="tok">null</tspan> ni <tspan class="tok">}</tspan> lo son</text>
 
         <g data-step="3">
           <path class="exec big draw" pathLength="1" d="M640,108 V156" marker-end="url(#arr-ev)"/>
@@ -85,7 +88,7 @@
           <path class="refuse draw" pathLength="1" d="M500,350 L590,350"/>
           <path class="refuse draw" pathLength="1" d="M650,364 L740,364"/>
           <path class="refuse draw" pathLength="1" d="M800,370 L890,370"/>
-          <text class="t-sub t-act" x="38" y="246" font-weight="700">→ los inválidos quedan en −∞ y las probabilidades se renormalizan entre los válidos</text>
+          <text class="t-sub t-act" x="38" y="258" font-weight="700">→ los inválidos quedan en −∞ y las probabilidades se renormalizan entre los válidos</text>
         </g>
       </svg>
     </div>
@@ -94,8 +97,9 @@
     <p><strong>Propósito:</strong> que la sala entienda el mecanismo en una imagen: el esquema se compila a una gramática, la gramática (con una pila) decide qué sigue, y eso se aplica como máscara sobre los logits. (2:30)</p>
     <blockquote>Hasta ahora el modelo “escribía JSON” porque se lo pedimos bien. Con decodificación restringida no se lo pedimos: se lo exigimos token por token.</blockquote>
     <blockquote>Se compila el JSON Schema a una gramática libre de contexto. Como un objeto JSON anida llaves y corchetes, hace falta un autómata de pila que recuerde qué quedó abierto.</blockquote>
+    <blockquote>Fíjense en el fragmento: <code>monto</code> es un entero. Por eso, después de <code>"monto":</code>, la comilla, <code>true</code>, <code>null</code> y la llave de cierre son inválidos: no es capricho, es lo que dice el esquema. Un dígito sí cabe.</blockquote>
     <blockquote>En cada paso, los tokens que la gramática no permite reciben menos infinito antes del softmax. Lo que queda se renormaliza. El modelo solo puede elegir entre lo válido.</blockquote>
-    <p>Pasos con →: 1 esquema → gramática; 2 autómata de pila y precálculo; 3 los logits en bruto de un paso (el modelo prefería la comilla, que rompería el esquema); 4 la máscara: inválidos a −∞, el resto renormalizado.</p>
+    <p>Pasos con →: 1 esquema → gramática; 2 autómata de pila y precálculo; 3 el fragmento del esquema (<code>"monto": {"type": "integer"}</code>) y los logits en bruto de un paso (el modelo prefería la comilla, que rompería el esquema); 4 la máscara: inválidos a −∞, el resto renormalizado.</p>
     <p>Dato de la fuente (XGrammar, MLSys 2025, arXiv:2411.15100): separa los tokens independientes del contexto, que se precalculan, de los dependientes, que se revisan al ejecutar, con un autómata de pila a nivel de bytes. Los autores reportan hasta 100x menos latencia por token para gramáticas libres de contexto y hasta 80x de aceleración de servicio de extremo a extremo con Llama 3.1 en H100: son cifras de los autores, di “según los autores”. La clase de CMU (diap. 31–33) es de donde sale este recorrido.</p>
     <p class="warn">Las barras son ilustrativas, no medidas. No afirmes cómo implementa Anthropic <code>strict: true</code> por dentro: la documentación solo dice que el input sigue el <code>input_schema</code>. Lo que muestro es el mecanismo de la clase y de XGrammar.</p>
     <p class="warn">Si vamos tarde (recorte 3 del plan): no hables del paso 2; pasa → dos veces seguidas y explica solo la máscara de logits (paso 3 y 4). Ahorra ~1:00 para el truncado.</p>

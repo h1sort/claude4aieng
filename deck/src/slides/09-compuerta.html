@@ -18,11 +18,11 @@
          style="--slide-accent:var(--action)">
   <div class="main">
     <div class="hd">
-      <p class="eyebrow reveal">Rotura #3 · DROP TABLE <span class="tag live">En vivo</span></p>
+      <p class="eyebrow reveal">Rotura #3 · secretos <span class="tag live" style="margin-left:.6rem">En vivo · uv run python -m taller.romper drop</span></p>
       <h2 class="reveal d1">La compuerta es <em>determinista</em>: ningún LLM juzga a otro</h2>
     </div>
     <div class="figure fill reveal d2">
-      <svg class="dg" viewBox="0 0 1000 440" role="img" aria-label="El modelo propone un tool_use sql_query con DROP TABLE clientes, válido por esquema. Llega a la compuerta determinista de la aplicación, que lo rechaza sin efecto y devuelve un tool_result con is_error y un mensaje instructivo. El modelo corrige y propone un SELECT; la compuerta lo autoriza, SQLite lo ejecuta en solo lectura y el resultado regresa al modelo.">
+      <svg class="dg" viewBox="0 0 1000 440" role="img" aria-label="El modelo propone un tool_use sql_query con SELECT clave, valor FROM secretos, válido por esquema. Llega a la compuerta determinista de la aplicación, capa uno, que lo rechaza antes de ejecutar; sin compuerta, SQLite devolvería las claves. La compuerta devuelve un tool_result con is_error y un mensaje instructivo. En el siguiente turno el modelo decide qué hacer: rendirse, repetir o reescribir. Si reescribe a una tabla permitida, se autoriza y SQLite lo ejecuta. SQLite usa una conexión de solo lectura, capa dos: aunque un DROP TABLE pasara la compuerta, fallaría ahí.">
         <!-- región del modelo -->
         <rect class="model" x="14" y="50" width="296" height="350" rx="28"/>
         <text class="t-mono t-mod" x="40" y="82">Modelo</text>
@@ -32,70 +32,82 @@
         <text class="t-mono" x="452" y="60">Aplicación · runtime de confianza</text>
         <rect class="gate" x="409" y="84" width="22" height="262" rx="2"/>
         <path d="M409,206 h22 M409,216 h22" stroke="var(--action)" stroke-width="1.4" fill="none"/>
-        <text class="t-mono t-act" x="452" y="406">compuerta · determinista · sin LLM</text>
+        <text class="t-mono t-act" x="452" y="408">capa 1 · compuerta · determinista · sin LLM</text>
 
-        <!-- 1 · propuesta DROP -->
+        <!-- 1 · propuesta: leer secretos -->
         <g data-step="1">
-          <rect class="node mod" x="36" y="100" width="246" height="66" rx="4"/>
-          <text class="t-lbl" x="52" y="124">tool_use #1 · sql_query</text>
-          <text class="tok" x="52" y="150">DROP TABLE tarjetas</text>
-          <path class="propose draw" d="M282,133 H405" marker-end="url(#arr-mod)"/>
+          <rect class="node mod" x="24" y="100" width="280" height="66" rx="4"/>
+          <text class="t-lbl" x="40" y="124">tool_use #1 · sql_query</text>
+          <text class="msg" x="40" y="150">SELECT clave, valor FROM secretos</text>
+          <path class="propose draw" d="M304,133 H405" marker-end="url(#arr-mod)"/>
+          <text class="t-sub" x="40" y="188">válido por esquema: strict no lo para</text>
         </g>
 
-        <!-- 2 · rechazo -->
+        <!-- 2 · rechazo; sin compuerta, fuga -->
         <g data-step="2">
-          <path class="refuse draw" pathLength="1" d="M431,133 H640" marker-end="url(#bar-act)"/>
+          <path class="refuse draw" pathLength="1" d="M431,133 H690" marker-end="url(#bar-act)"/>
           <text class="t-sub t-act" x="452" y="117" font-weight="700">✕ rechazada</text>
-          <text class="t-sub" x="452" y="158">el autorizador de SQLite niega el DROP</text>
-          <text class="t-sub t-act" x="656" y="138" font-weight="700">sin efecto</text>
+          <text class="t-sub" x="452" y="158">secretos no está permitida</text>
+          <rect class="node ghost" x="704" y="96" width="266" height="78" rx="4"/>
+          <text class="t-mono t-act" x="720" y="118">sin compuerta · paso-3</text>
+          <text class="t-sub" x="720" y="140">llegaría a SQLite y</text>
+          <text class="t-sub t-act" x="720" y="160" font-weight="700">devolvería las claves</text>
         </g>
 
         <!-- 3 · is_error -->
         <g data-step="3">
-          <rect class="node act" x="452" y="178" width="516" height="62" rx="4"/>
-          <text class="t-mono t-act" x="468" y="198">tool_result · is_error: true</text>
-          <text class="msg" x="468" y="218">rechazada: solo se permite leer clientes, cuentas,</text>
-          <text class="msg" x="468" y="234">tarjetas, transacciones; reescribe la consulta como un SELECT</text>
-          <path class="return draw" d="M452,209 H316" marker-end="url(#arr-ev)"/>
+          <rect class="node act" x="452" y="186" width="516" height="62" rx="4"/>
+          <text class="t-mono t-act" x="468" y="206">tool_result · is_error: true</text>
+          <text class="msg" x="468" y="226">rechazada: solo se permite leer clientes, cuentas,</text>
+          <text class="msg" x="468" y="242">tarjetas, transacciones; reescribe … (secretos ✕)</text>
+          <path class="return draw" d="M452,217 H316" marker-end="url(#arr-ev)"/>
         </g>
 
-        <!-- 4 · el modelo se corrige -->
+        <!-- 4 · el modelo decide -->
         <g data-step="4">
-          <rect class="node mod" x="36" y="272" width="246" height="66" rx="4"/>
-          <text class="t-lbl" x="52" y="296">tool_use #2 · sql_query</text>
-          <text class="tok" x="52" y="322">SELECT … FROM clientes</text>
-          <path class="propose draw" d="M282,305 H405" marker-end="url(#arr-mod)"/>
+          <rect class="node mod" x="24" y="272" width="280" height="66" rx="4"/>
+          <text class="t-lbl" x="40" y="296">tool_use #2 · lo decide el modelo</text>
+          <text class="t-sub" x="40" y="320">¿se rinde, repite o reescribe?</text>
+          <path class="propose draw" d="M304,305 H405" marker-end="url(#arr-mod)"/>
+          <path class="exec big draw flow" pathLength="1" d="M431,305 H690" marker-end="url(#arr-ev)"/>
+          <text class="t-sub t-ev" x="452" y="289" font-weight="700">si reescribe a una tabla permitida</text>
+          <rect class="node ev" x="696" y="262" width="272" height="100" rx="4" style="stroke-width:2.4"/>
+          <text class="t-lbl" x="714" y="288">✓ SQLite · solo lectura</text>
+          <path class="return draw" d="M830,362 V388 H164 V344" marker-end="url(#arr-ev)"/>
+          <text class="t-sub t-ev" x="452" y="380">tool_result · filas</text>
         </g>
 
-        <!-- 5 · autorizada, ejecuta, vuelve -->
+        <!-- 5 · segunda capa -->
         <g data-step="5">
-          <path class="exec big draw flow" pathLength="1" d="M431,305 H690" marker-end="url(#arr-ev)"/>
-          <text class="t-sub t-ev" x="452" y="289" font-weight="700">autorizada · ejecuta</text>
-          <rect class="node ev" x="696" y="270" width="270" height="70" rx="4" style="stroke-width:2.4"/>
-          <text class="t-lbl" x="714" y="298">✓ SQLite · solo lectura</text>
-          <text class="t-sub" x="714" y="320">filas reales</text>
-          <path class="return draw" d="M830,340 V372 H160 V344" marker-end="url(#arr-ev)"/>
-          <text class="t-sub t-ev" x="452" y="365">tool_result · filas</text>
+          <text class="t-mono t-act" x="714" y="310">capa 2 · segunda defensa</text>
+          <text class="t-sub" x="714" y="332">un DROP TABLE tarjetas que</text>
+          <text class="t-sub" x="714" y="350">pasara falla aquí (mode=ro)</text>
         </g>
       </svg>
     </div>
   </div>
   <aside class="notes">
-    <p><strong>Propósito:</strong> que la sala vea que un <code>tool_use</code> válido por esquema puede ser peligroso, y que la defensa es una compuerta determinista en la aplicación que devuelve <code>is_error</code>. Nada de “otro LLM revisa al LLM”. (2:30)</p>
-    <p><strong>Predecir y revelar:</strong> antes de pulsar →, pregunta: “El modelo propone <code>DROP TABLE tarjetas</code>, perfectamente válido para el esquema. ¿Qué creen que pasa?” Espera 15 s. Después retoma lo que dijeron.</p>
-    <blockquote>Ese DROP cumple el esquema. Aquí no lo para <code>strict</code>. Lo para la aplicación.</blockquote>
+    <p><strong>Propósito:</strong> que la sala vea una rotura de verdad (en <code>paso-3</code>, sin compuerta, el modelo lee <code>secretos</code> y las claves salen en pantalla), entienda que <code>strict</code> no la para porque la llamada es válida, y que la defensa es una compuerta determinista (capa 1) con la conexión de solo lectura como segunda capa. Nada de “otro LLM revisa al LLM”. (2:30)</p>
+    <p><strong>Desglose:</strong> 0:40 correr y ver la fuga; 0:40 pasos 1–3 del diagrama; 0:30 predicción; 0:40 pasos 4–5 y transición.</p>
+    <ol>
+      <li>0:00 · Todos están en <code>paso-3</code>. Corre <code>uv run python -m taller.romper drop</code> y pide que lo corran. La sección ANTES muestra la llamada <code>SELECT clave, valor FROM secretos</code> llegando a SQLite y devolviendo filas con claves: es la rotura visible. Las claves son sintéticas, sembradas por <code>scripts/seed.py</code>. Después el intento <code>DROP TABLE tarjetas</code>: ese no hace daño, pero solo porque la conexión es de solo lectura (la “segunda capa”), no porque alguien lo haya juzgado.</li>
+      <li>0:40 · → (pasos 1–3): la propuesta válida por esquema; la compuerta la rechaza antes de ejecutar (en discontinuo, lo que pasaría sin compuerta); vuelve el <code>tool_result</code> con <code>is_error</code>.</li>
+      <li>1:20 · <strong>Predicción</strong>, sin pulsar →: “Tras el rechazo, ¿el modelo se rinde, repite o reescribe?” Cuenta manos y anótalo en voz alta; se retoma en la siguiente diapositiva, cuando vean el DESPUÉS en <code>paso-4</code>.</li>
+      <li>1:50 · → (paso 4) y → (paso 5): si reescribe a una tabla permitida, se autoriza y se ejecuta; y la segunda capa.</li>
+    </ol>
+    <blockquote>Esa lectura cumple el esquema. Aquí no la para <code>strict</code>. Hoy la ven salir: son claves de mentira, pero el mecanismo es el de verdad.</blockquote>
     <blockquote>La compuerta no le pregunta a otro modelo si le parece bien. Le pregunta al compilador de SQLite qué acciones haría esta sentencia. No hay probabilidad ahí.</blockquote>
-    <blockquote>Y lo que vuelve al modelo es un <code>tool_result</code> con <code>is_error</code> y un mensaje que dice qué falló y qué intentar. Con eso, el modelo se corrige.</blockquote>
-    <p>Pasos con →: 1 el modelo propone el DROP; 2 la compuerta lo rechaza, sin efecto; 3 vuelve el <code>tool_result</code> con <code>is_error</code> (el texto del recuadro es el mensaje real de <code>gate.py</code> para este DROP); 4 el modelo propone un SELECT; 5 se autoriza, se ejecuta y regresa el resultado.</p>
-    <p>Fuente: la doc dice que el <code>tool_result</code> con <code>is_error: true</code> debe tener contenido instructivo, y que ante llamadas inválidas Claude reintenta 2–3 veces con correcciones. Eso no garantiza que se corrija: por eso el agente tiene un límite de turnos. Es la misma lección de la historia del clasificador: error instructivo y tope de reintentos.</p>
-    <p class="warn">El SELECT del paso 4 es ilustrativo: lo que proponga el modelo en vivo varía. “El modelo se corrige” es lo esperado, no una garantía: si no se corrige en la corrida en vivo, dilo y muestra que el tope de turnos corta el bucle. <code>romper drop</code> inyecta el DROP si el modelo no cae en la trampa y lo dice en pantalla (<code>--inyectado</code> fuerza ese modo sin API).</p>
-    <p class="warn">Cuidado con “la compuerta es segura”. Valida lo que dice el código de la siguiente diapositiva y nada más; no limita el costo de una consulta (una CTE recursiva sin tope pasa la compuerta; se acota al ejecutar con solo lectura, límite de filas y tiempo).</p>
+    <blockquote>Y lo que vuelve al modelo es un <code>tool_result</code> con <code>is_error</code> y un mensaje que dice qué falló y qué intentar. Lo que haga después lo decide el modelo: por eso le pregunto a ustedes.</blockquote>
+    <blockquote>El DROP también lo detiene la conexión de solo lectura. Eso es defensa en profundidad: si falla una capa, la otra sigue ahí.</blockquote>
+    <p class="warn"><strong>Para Carlos:</strong> la diapositiva NO da la respuesta a la predicción (el nodo del turno 2 dice “¿se rinde, repite o reescribe?”). Usa la respuesta en vivo: la del modelo en tu terminal o en la de un asistente al re-correr <code>romper drop</code> en <code>paso-4</code>. La documentación solo dice que Claude suele reintentar 2–3 veces ante llamadas inválidas; no prometas cuál de las tres hará tu agente. Sin API (<code>--inyectado</code>) no hay turno real del modelo: dilo.</p>
+    <p class="warn">“El modelo se corrige” es lo esperado, no una garantía; para eso el agente tiene un límite de turnos. Cuidado con “la compuerta es segura”: valida lo que dice el código de la siguiente diapositiva y nada más; no limita el costo de una consulta (una CTE recursiva sin tope pasa la compuerta; se acota al ejecutar con solo lectura, límite de filas y tiempo). Si <code>romper drop</code> inyecta la llamada porque el modelo no cayó en la trampa, lo dice en pantalla: repítelo.</p>
+    <p><strong>[Historia propia, si tienes una — ≤45 s]</strong> Un caso real tuyo de una consulta válida que no debía ejecutarse (acceso a datos sensibles, una escritura inesperada). Si no tienes uno, sáltalo: no uses relatos ajenos ni inventes detalles.</p>
     <p><strong>Transición:</strong> “Veamos qué hay dentro de esa compuerta y la línea que van a escribir.”</p>
   </aside>
 </section>
 
 <!-- ============ 09b · la compuerta en código (paso-4) ============ -->
-<section class="slide s09b" data-title="La compuerta en código: paso-4" data-section="Rotura #3" data-budget="3:00"
+<section class="slide s09b" data-title="La compuerta en código: paso-4" data-section="Rotura #3" data-budget="2:00"
          style="--slide-accent:var(--action)">
   <div class="main">
     <div class="hd">
@@ -121,24 +133,23 @@
         <div class="panel mod" data-step="2">
           <p><b>bloquear_tarjeta</b> es una escritura: pide <b>confirmación humana</b> en la terminal antes de ejecutar. La compuerta cubre la lectura; las escrituras las confirma una persona.</p>
         </div>
-        <p class="note-line" data-step="3">¿Atrás? <b style="color:var(--ink)">git checkout paso-4</b></p>
+        <p class="note-line" data-step="3">Checkpoint: mano arriba si <b style="color:var(--ink)">romper drop</b> ya rechaza <b style="color:var(--ink)">secretos</b> y el DROP · ¿Atrás? <b style="color:var(--ink)">git stash &amp;&amp; git checkout paso-4</b></p>
       </div>
     </div>
   </div>
   <aside class="notes">
-    <p><strong>Propósito:</strong> que cada quien escriba la llamada a la compuerta y vea el DROP rechazado en su terminal. (3:00: ~0:45 explicar, ~1:45 de teclado en silencio, ~0:30 punto de control)</p>
+    <p><strong>Propósito:</strong> que cada quien escriba la llamada a la compuerta y vea, en su terminal, rechazada la lectura de <code>secretos</code> (y el DROP) antes de ejecutar. (2:00: ~0:30 leer, ~1:00 de teclado en silencio, ~0:30 punto de control)</p>
     <ol>
       <li>0:00 · Lee el código de arriba en voz alta, sin prisa: el autorizador es una función de ocho líneas.</li>
-      <li>0:30 · Corre <code>uv run python -m taller.romper drop</code>. Con → aparece la solución de <code>paso-4</code>.</li>
-      <li>0:45 · <strong>Silencio planeado: ~1:45</strong> mientras reemplazan <code># TODO(paso-4)</code> en <code>taller/tools.py</code> y vuelven a correr <code>romper drop</code>.</li>
-      <li>2:30 · <strong>Punto de control:</strong> “Levanten la mano si su DROP fue rechazado y el modelo se corrigió.” Si menos de la mitad: <code>git checkout paso-4</code>.</li>
+      <li>0:30 · → (paso 1) muestra la línea que van a escribir. <strong>Silencio planeado: ~1:00</strong> mientras reemplazan <code># TODO(paso-4)</code> en <code>taller/tools.py</code> (una línea) y vuelven a correr <code>uv run python -m taller.romper drop</code>. Ahora la sección DESPUÉS rechaza las dos llamadas antes de ejecutarlas, con un <code>is_error</code> instructivo; con API, imprime el siguiente turno real del modelo.</li>
+      <li>1:30 · <strong>Punto de control:</strong> “Levanten la mano si su <code>secretos</code> ya no devuelve claves.” Si menos de la mitad: <code>git stash &amp;&amp; git checkout paso-4</code>. Retoma la predicción de la diapositiva anterior (“¿se rinde, repite o reescribe?”) con lo que el modelo hizo de verdad en las pantallas; no con lo que yo esperaba.</li>
     </ol>
     <blockquote>La compuerta no mira texto buscando la palabra DROP. Compila la sentencia y le pregunta a SQLite qué acciones haría: leer tal columna, escribir, borrar una tabla. Un comentario o unas mayúsculas no la engañan, porque ya se compiló.</blockquote>
     <blockquote>Cualquier acción que no sea un SELECT o la lectura de una tabla permitida se niega. La tabla de secretos no está en la lista.</blockquote>
     <blockquote>Las escrituras, como bloquear una tarjeta, no pasan por aquí: las confirma una persona en la terminal.</blockquote>
-    <p>Pasos con →: 1 la solución de <code>paso-4</code>; 2 la confirmación humana de <code>bloquear_tarjeta</code>; 3 el comando de respaldo.</p>
+    <p>Pasos con →: 1 la solución de <code>paso-4</code>; 2 la confirmación humana de <code>bloquear_tarjeta</code>; 3 el checkpoint y el comando de respaldo.</p>
     <p class="warn">El código de arriba es literal de <code>taller/gate.py</code>. El de abajo es <code>taller/tools.py</code> abreviado (en el repo hay más líneas entre marcadores y el rechazo se marca con el prefijo <code>rechazada:</code>); revisa que siga coincidiendo antes de presentar.</p>
-    <p class="warn">Plan B sin API: <code>git checkout paso-4</code> y enseña la compuerta con las pruebas: <code>uv run pytest -q tests/test_gate.py</code>.</p>
+    <p class="warn">Plan B sin API: <code>git stash &amp;&amp; git checkout paso-4</code> y enseña la compuerta con las pruebas: <code>uv run pytest -q tests/test_gate.py</code>.</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué herramienta de tu agente necesita una compuerta antes que cualquier otra cosa?</p>
     <p><strong>Transición:</strong> “La compuerta nos protege de lo que el agente hace. Y las credenciales: ¿quién las ve?”</p>
   </aside>

@@ -58,5 +58,11 @@
   <li>El planteamiento “un modelo más caro puede salir más barato por tarea resuelta” se presenta como hipótesis, no como hecho.</li>
 </ul>
 
+<h3>Cifras que salen de una corrida, no de una fuente</h3>
+<ul>
+  <li><code>romper paralelo</code> (≈ 2.4 s en serie vs ≈ 0.8 s con <code>asyncio.gather</code>): el script agrega una latencia artificial de 0.8 s por herramienta; mide nuestro código, no la API.</li>
+  <li>“Tareas resueltas X/20” y “costo por tarea resuelta”: los calcula <code>taller/medir.py</code> con los precios de arriba; el dato del cuarto es el de cada asistente.</li>
+</ul>
+
 <h3>Código del taller</h3>
 <p>Deck y materiales: <a href="https://h1sort.com/claude4aieng/">h1sort.com/claude4aieng</a>. Compuerta: <code>taller/gate.py</code> (autorizador de SQLite y <code>EXPLAIN</code> sobre una copia vacía del esquema; sin LLM).</p>
