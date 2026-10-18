@@ -29,3 +29,4 @@ cover (slide 1) 1200×630 JPEG                    ──▶  h1sort-website/publ
 - 2026-10-18 · Branch deletion is blocked from Claude Code cloud sessions (API and git push both 403); delete merged branches from the GitHub UI.
 - 2026-10-18 · Refresh via PR #22 (`3aaff2f`) from claude4aieng `2d87bab` after the live dry run (measured table on slide 16). Deploy succeeded.
 - 2026-10-18 · To check the `paso-*` branches on GitHub, use `git ls-remote origin 'paso-*'` or fetch them explicitly (`git fetch origin '+refs/heads/paso-*:refs/remotes/origin/paso-*'`): a plain `git fetch` in this shallow clone only updates `main` and leaves stale `origin/paso-*` refs.
+- 2026-10-18 · Refresh via PR #23 (`403f357`) from claude4aieng `508bb0a`: Rotura #1b slide, 18 slides. Deploy succeeded.
