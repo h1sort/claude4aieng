@@ -1,0 +1,12 @@
+<!-- Shared SVG defs: arrowheads + refusal bar. Reference by id from any slide SVG. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs id="dg-defs">
+      <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#64766f"/></marker>
+      <marker id="arr-ev" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#257a68"/></marker>
+      <marker id="arr-mod" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9" fill="none" stroke="#7d5f1f" stroke-width="1.6"/></marker>
+      <marker id="arr-act" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#b75437"/></marker>
+      <marker id="bar-act" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="9" markerHeight="9" orient="auto"><path d="M5,0 V10" stroke="#b75437" stroke-width="2.4"/></marker>
+      <!-- the cover/close motif: a field of data points passing through a boundary. Use via <use href="#motif-gate"/> if helpful. -->
+      <symbol id="motif-gate" viewBox="0 0 40 120"><rect x="14" y="0" width="12" height="120" rx="2" fill="#f6f2e8" stroke="#b75437" stroke-width="2.4"/><path d="M14,52 h12 M14,68 h12" stroke="#b75437" stroke-width="1.6"/></symbol>
+    </defs>
+  </svg>

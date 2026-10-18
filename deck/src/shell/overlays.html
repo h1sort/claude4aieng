@@ -1,0 +1,20 @@
+<nav class="hud" aria-label="Controles de la presentación">
+    <button type="button" data-act="notes" title="Notas (N)">NOTAS</button>
+    <button type="button" data-act="sources" title="Fuentes (S)">FUENTES</button>
+    <button type="button" data-act="help" title="Ayuda (?)">?</button>
+    <button type="button" data-act="full" title="Pantalla completa (F)">⛶</button>
+  </nav>
+
+  <aside class="overlay" id="notesPanel" role="dialog" aria-label="Notas del presentador" tabindex="-1"></aside>
+  <aside class="overlay" id="helpPanel" role="dialog" aria-label="Ayuda" tabindex="-1">
+    <button class="close" type="button" data-act="help">CERRAR</button>
+    <h3 style="margin-top:0">Controles</h3>
+    <p><kbd>→</kbd> <kbd>Espacio</kbd> <kbd>AvPág</kbd> siguiente paso o diapositiva · <kbd>←</kbd> <kbd>RePág</kbd> anterior · <kbd>Inicio</kbd> / <kbd>Fin</kbd> primera / última</p>
+    <p><kbd>N</kbd> notas · <kbd>P</kbd> ventana del presentador · <kbd>S</kbd> fuentes y apéndice · <kbd>F</kbd> pantalla completa · <kbd>?</kbd> ayuda · <kbd>Esc</kbd> cerrar</p>
+    <p>Rueda del ratón y deslizar también navegan. Enlaces: <code>?slide=N</code> (1–<span id="slideCount"></span>), <code>?still=1</code> modo estático (con <code>&amp;slide=N</code> muestra solo esa diapositiva).</p>
+  </aside>
+  <aside class="overlay" id="sourcesPanel" role="dialog" aria-label="Fuentes y apéndice" tabindex="-1">
+    <button class="close" type="button" data-act="sources">CERRAR</button>
+<!--@SOURCES@-->
+  </aside>
+  <div id="presenter"></div>

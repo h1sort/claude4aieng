@@ -1,0 +1,13 @@
+{
+  "name": "tool-use-deck",
+  "private": true,
+  "type": "module",
+  "description": "Deck 'Tool use sin abstracciones' — ensamblado y capturas",
+  "scripts": {
+    "build": "node tools/assemble.mjs",
+    "shots": "node tools/shot.mjs tool-use.html"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  }
+}
