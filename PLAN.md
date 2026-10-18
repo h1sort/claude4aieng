@@ -38,7 +38,7 @@ ejecuta, y eso se mide.**
 
 | Min | Bloque | En pantalla | Lo que teclea la gente | Branch al terminar |
 |---|---|---|---|---|
-| 0–5 | **Las herramientas son texto** | Gancho OpenRouter: mismo modelo, ~15 % vs ~0.01 % de error de tool calls según quién lo sirve. Plantilla de chat de Qwen renderizada. | `uv run taller/plantilla.py` | `paso-0` |
+| 0–5 | **Las herramientas son texto** | Gancho OpenRouter: el error de tool calls de un mismo modelo depende de quién lo sirve (GLM-5: ~8 % → ~1 % al enrutar por calidad, `FACTS.md` §8; o captura con fecha de la pestaña Performance). **No** usar "15 % vs 0.01 %": no verificado. Plantilla de chat de Qwen renderizada. | `uv run taller/plantilla.py` | `paso-0` |
 | 5–15 | **El bucle a nivel cable** | `stop_reason`, `tool_use.id`, `tool_result` primero en el mensaje, paralelas con `asyncio.gather`. | Completan `taller/agent.py` (el loop). **Rotura #1**: matar el proceso entre `tool_use` y `tool_result`, reanudar → 400. Arreglo: sanear historial con `is_error`. | `paso-1`, `paso-2` |
 | 15–22 | **Decodificación restringida y su límite** | JSON Schema → gramática libre de contexto → autómata de pila → máscara de logits a −∞ (XGrammar). | **Rotura #2**: `max_tokens` bajo → tool call truncada. Arreglo: revisar `stop_reason`, nunca parsear una llamada cortada. | `paso-3` |
 | 22–32 | **Válido ≠ correcto** | `strict: true` garantiza forma, no significado. MCP: credenciales que el modelo nunca ve. | **Rotura #3**: `DROP TABLE` válido por esquema. Arreglo: compuerta (autorizador de SQLite) que devuelve `is_error` y el modelo se corrige. | `paso-4` |
@@ -69,8 +69,7 @@ Verificado contra la documentación el 2026-10-18:
 **Por verificar en W0-B** (§6): `disable_parallel_tool_use` (nombre exacto y dónde va), manejo
 documentado de `stop_reason: "max_tokens"` con un `tool_use` incompleto, si strict tool use es GA o
 beta (y header), API exacta del Tool Runner del SDK de Python, precios por MTok de los modelos que
-compararemos, y el estado actual del benchmark de OpenRouter (cifras y modelo; la clase de CMU
-citaba GLM 5.3). Todo hecho que llegue a una diapositiva debe estar en `FACTS.md` con URL.
+compararemos, y el estado actual del benchmark de OpenRouter. **Resuelto en `FACTS.md`** (2026-10-18). Todo hecho que llegue a una diapositiva debe estar en `FACTS.md` con URL.
 
 ## 5. Convenciones
 
