@@ -180,10 +180,11 @@ SIGUIENTE = {
         "Abre `taller/agent.py`, busca `# TODO(paso-1)` dentro de `Agent.run` y ejecuta las llamadas con `execute_calls`; "
         "contesta con UN mensaje de usuario con un `tool_result` por llamada.",
         "`uv run python -m taller.agent` y pregunta «¿cuántas tarjetas bloqueadas hay?» (respuesta: 26)."),
-    1: ("el paso 2, el saneo del historial huérfano",
+    1: ("el paso 2: cada `tool_use` con su `tool_result` (huérfano al reanudar y llamada paralela que no termina)",
         "Busca `# TODO(paso-2)` dentro de `sanitize_history` (`taller/agent.py`): el esqueleto ya encuentra los `orphans`; "
-        "tú inserta (3 líneas) un `tool_result` con `is_error` PRIMERO en el mensaje de usuario siguiente.",
-        "`uv run python -m taller.romper huerfano` (antes: el 400 y «sanitize_history todavía es un TODO»; después: el modelo continúa)."),
+        "tú inserta (3 líneas) un `tool_result` con `is_error` PRIMERO en el mensaje de usuario siguiente. "
+        "Luego `# TODO(paso-2b)` en `execute_calls` (4 líneas): un `tool_result` por cada llamada, y un timeout es `is_error`.",
+        "`uv run python -m taller.romper huerfano` y `uv run python -m taller.romper paralelo` (antes: el 400; después: el modelo continúa)."),
     2: ("el paso 3, la rama `max_tokens`",
         'Busca `# TODO(paso-3)` en el bucle de `taller/agent.py` (4 líneas): con `stop_reason == "max_tokens"` y algún '
         "`tool_use`, no lo ejecutes ni lo guardes: sube `max_tokens`, registra el turno y `continue` (repite la petición).",

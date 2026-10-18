@@ -356,6 +356,9 @@ async def paralelo(client, inyectado: bool) -> None:
         try:
             r2 = await client.messages.create(model=get_model_id(), max_tokens=512, tools=tools_payload(TOOLS), messages=historial)
             stage("MODELO", "respuesta real · " + resumen(r2))
+            for b in r2.content:
+                if b.type == "tool_use":
+                    stage("MODELO", f"reintenta {b.name} {dim(json.dumps(b.input, ensure_ascii=False))}")
             texto = " ".join(b.text for b in r2.content if b.type == "text").strip()
             if texto:
                 stage("MODELO", texto[:300])

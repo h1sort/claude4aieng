@@ -39,7 +39,7 @@ ejecuta, y eso se mide.**
 | Min | Bloque | En pantalla | Lo que teclea la gente | Branch al terminar |
 |---|---|---|---|---|
 | 0–5 | **Las herramientas son texto** | Gancho OpenRouter: el error de tool calls de un mismo modelo depende de quién lo sirve (GLM-5: ~8 % → ~1 % al enrutar por calidad, `FACTS.md` §8; o captura con fecha de la pestaña Performance). **No** usar "15 % vs 0.01 %": no verificado. Plantilla de chat de Qwen renderizada. | `uv run taller/plantilla.py` | `paso-0` |
-| 5–15 | **El bucle a nivel cable** | `stop_reason`, `tool_use.id`, `tool_result` primero en el mensaje, paralelas con `asyncio.gather`. | Completan `taller/agent.py` (el loop). **Rotura #1**: matar el proceso entre `tool_use` y `tool_result`, reanudar → 400. Arreglo: sanear historial con `is_error`. | `paso-1`, `paso-2` |
+| 5–15 | **El bucle a nivel cable** | `stop_reason`, `tool_use.id`, `tool_result` primero en el mensaje, paralelas con `asyncio.gather`. | Completan `taller/agent.py` (el loop). **Rotura #1**: matar el proceso entre `tool_use` y `tool_result`, reanudar → 400. Arreglo: sanear historial con `is_error`. **Rotura #1b**: tres llamadas en paralelo, una pasa el tope → solo 2 de 3 `tool_result` → 400. Arreglo `paso-2b`: un timeout también es `tool_result` con `is_error`. Ejercicio con plan B (mostrarlo resuelto en `paso-2`). | `paso-1`, `paso-2` |
 | 15–22 | **Decodificación restringida y su límite** | JSON Schema → gramática libre de contexto → autómata de pila → máscara de logits a −∞ (XGrammar). | **Rotura #2**: `max_tokens` bajo → tool call truncada. Arreglo: revisar `stop_reason`, nunca parsear una llamada cortada. | `paso-3` |
 | 22–32 | **Válido ≠ correcto** | `strict: true` garantiza forma, no significado. MCP: credenciales que el modelo nunca ve. | **Rotura #3**: `DROP TABLE` válido por esquema. Arreglo: compuerta (autorizador de SQLite) que devuelve `is_error` y el modelo se corrige. | `paso-4` |
 | 32–38 | **Medir** | Tabla de errores por categoría + tokens y costo por tarea; dos modelos lado a lado. | `uv run taller/medir.py` | `paso-5` |
@@ -224,7 +224,7 @@ Cada tarea es independiente dentro de su ola. Modelo: **Sonnet 5.5** salvo que s
 - **Créditos**: si el host no los da, el taller muere en el minuto 5. Pedir confirmación hoy;
   plan B: pares de trabajo, y `romper.py` funciona en modo "inyectado" sin gastar mucho.
 - **40 min es poco** para escribir código en vivo: el estudiante teclea el loop y
-  tres arreglos cortos (3, 4 y 1 líneas). Todo lo demás ya viene en el branch.
+  cuatro arreglos cortos (3 + 4, 4 y 1 líneas). Todo lo demás ya viene en el branch.
 - **Wifi del venue**: `uv sync` antes del evento (lo pide el bloque del host); nada se descarga en vivo.
 - **Plazo**: el taller es mañana. Si falta tiempo, prioridad: W1-A, W1-B, W1-C, W0-A, W1-F/G, W1-D;
   la comparación de modelos y la publicación en h1sort.com quedan opcionales.
