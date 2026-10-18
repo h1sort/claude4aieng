@@ -165,7 +165,7 @@ class Agent:
                                 + (f": la llamada a {', '.join(b.name for b in uses)} puede venir cortada" if uses else ""))
             # >>> paso-3
             if resp.stop_reason == "max_tokens" and uses:  # JSON cortado: ni se ejecuta ni se guarda en el historial
-                self.max_tokens = min(self.max_tokens * 2, MAX_TOKENS_TOPE)  # y se repite la petición con más margen
+                self.max_tokens = min(self.max_tokens * 4, MAX_TOKENS_TOPE)  # y se repite la petición con más margen
                 self._log(turn)
                 continue
             # <<< paso-3

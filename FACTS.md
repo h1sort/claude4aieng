@@ -159,3 +159,11 @@ URLs base (docs oficiales):
 3. Texto Jinja de `chat_template` de Mistral (§11); usar DeepSeek-V3 para el segundo formato.
 4. Que `disable_parallel_tool_use` con `auto` esté documentado específicamente para Sonnet 5.5 (inferido de Opus 5.5; ver §1).
 5. Texto completo oficial del 400 de huérfanos: la doc solo cita un fragmento; el resto viene de una fuente secundaria (§5).
+
+## Ensayo en vivo (2026-10-18, claude-sonnet-5-5 y claude-haiku-5-5)
+
+- Texto completo del 400 por `tool_use` huérfano, obtenido de la API en vivo: "messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: <id>. Each `tool_use` block must have a corresponding `tool_result` block in the next message." (type `invalid_request_error`) — fuente (corrida de `taller.romper huerfano` y `truncado`) — verificado 2026-10-18. Resuelve el NO VERIFICADO de §5.
+- Con un `tool_result` con `is_error`, Sonnet 5.5 explicó la interrupción y relanzó la consulta por su cuenta — fuente (corrida de `romper huerfano`) — verificado 2026-10-18
+- Ante el prompt adversarial de `romper drop`, Sonnet 5.5 respondió con `stop_reason=refusal` (dos veces); el arnés inyectó las llamadas y lo anunció — fuente (corrida de `romper drop`) — verificado 2026-10-18
+- Paralelas: el modelo emitió 3 `tool_use` en un solo turno; 2.40 s secuencial vs 0.80 s con `gather` (latencia artificial de 0.8 s) — fuente (corrida de `romper paralelo`) — verificado 2026-10-18
+- `medir --vs`: ambos modelos 20/20; costo por tarea resuelta $0.0097 (Sonnet 5.5) vs $0.0006 (Haiku 5.5); en a02 Haiku intentó leer `secretos` y la compuerta lo rechazó, Sonnet se negó; costo total de la corrida ~$0.19 + $0.01 — fuente (runs/medicion-*-20261018-151955.json, no versionados) — verificado 2026-10-18

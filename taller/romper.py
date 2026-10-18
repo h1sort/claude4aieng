@@ -239,7 +239,7 @@ async def truncado(client, inyectado: bool) -> None:
         stage("OBSERVACIÓN", corto(r))
     cortada = len(agente.turns[0].results) if agente.turns else len(ejecuciones)
     stage("RECHAZADA" if not cortada else "AVISO",
-          f"ejecuciones de sql_query: {cortada} (el agente no ejecuta una llamada cortada)")
+          "la llamada cortada (turno 0) " + ("NO se ejecutó" if not cortada else f"se ejecutó {cortada} vez/veces"))
     huerfano_ids = huerfanos(historial)
     add_user_text(historial, SEGUIMIENTO)
     stage("SOLICITUD", f"seguimiento del usuario sobre el mismo historial: {SEGUIMIENTO!r}")
@@ -261,7 +261,10 @@ async def truncado(client, inyectado: bool) -> None:
     maximos = [p["max_tokens"] for p in cliente.peticiones]
     stage("DESPUÉS", "el tool_use cortado no se ejecutó ni se guardó (tool_use sin tool_result: 0)")
     if len(maximos) > 1:
-        stage("DESPUÉS", f"el agente repitió la misma petición con más margen: max_tokens {maximos[0]} -> {maximos[1]}")
+        stage("DESPUÉS", "el agente repitió la misma petición con más margen: max_tokens "
+              + " -> ".join(str(m) for m in maximos))
+    if ejecuciones:
+        stage("DESPUÉS", f"llamadas completas que sí se ejecutaron tras el reintento: {len(ejecuciones)}")
     if inyectado:
         stage("AVISO", "--inyectado: sin API no hay respuesta al reintento ni al seguimiento; "
                        "el historial pasa la validación local (0 tool_use huérfanos)")

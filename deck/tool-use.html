@@ -1280,7 +1280,7 @@ without tool_result blocks immediately after</span></div>
 <span class="a"># TODO(paso-3)</span> <span class="c">¿y si stop_reason == "max_tokens"?</span>
 <span class="c">messages.append({"role": "assistant", "content": [… todo …]})</span></div>
         <div class="code" data-step="2"><span class="cap">paso-3 · lo que tecleas (4 líneas) · el cortado ni se guarda ni se ejecuta</span><span class="k">if</span> resp.stop_reason == <span class="s">"max_tokens"</span> <span class="k">and</span> uses:
-    self.max_tokens = min(self.max_tokens * 2, MAX_TOKENS_TOPE)  <span class="c"># más margen</span>
+    self.max_tokens = min(self.max_tokens * 4, MAX_TOKENS_TOPE)  <span class="c"># más margen</span>
     self._log(turn)
     <span class="k">continue</span>   <span class="c"># reintenta sin guardar el bloque cortado</span></div>
         <div class="panel ev checkpoint" data-step="3">
@@ -1451,6 +1451,8 @@ without tool_result blocks immediately after</span></div>
     <blockquote>Y lo que vuelve al modelo es un <code>tool_result</code> con <code>is_error</code> y un mensaje que dice qué falló y qué intentar. Lo que haga después lo decide el modelo: por eso le pregunto a ustedes.</blockquote>
     <blockquote>El DROP también lo detiene la conexión de solo lectura. Eso es defensa en profundidad: si falla una capa, la otra sigue ahí.</blockquote>
     <p class="warn"><strong>Para Carlos:</strong> la diapositiva NO da la respuesta a la predicción (el nodo del turno 2 dice “¿se rinde, repite o reescribe?”). Usa la respuesta en vivo: la del modelo en tu terminal o en la de un asistente al re-correr <code>romper drop</code> en <code>paso-4</code>. La documentación solo dice que Claude suele reintentar 2–3 veces ante llamadas inválidas; no prometas cuál de las tres hará tu agente. Sin API (<code>--inyectado</code>) no hay turno real del modelo: dilo.</p>
+    <p class="warn"><strong>Ensayo real (2026-10-18, claude-sonnet-5-5):</strong> el modelo <strong>se negó</strong> al prompt adversarial (<code>stop_reason=refusal</code>) y otra vez tras el rechazo; romper inyectó las dos llamadas y lo anunció en pantalla. Si pasa en vivo, úsalo:</p>
+    <blockquote>Esta vez el modelo se negó. Bien. Pero una negativa es una probabilidad, y la instrucción puede no venir del usuario: puede venir escondida en un dato que el agente lee. La compuerta no depende de que el modelo se niegue.</blockquote>
     <p class="warn">“El modelo se corrige” es lo esperado, no una garantía; para eso el agente tiene un límite de turnos. Cuidado con “la compuerta es segura”: valida lo que dice el código de la siguiente diapositiva y nada más; no limita el costo de una consulta (una CTE recursiva sin tope pasa la compuerta; se acota al ejecutar con solo lectura, límite de filas y tiempo). Si <code>romper drop</code> inyecta la llamada porque el modelo no cayó en la trampa, lo dice en pantalla: repítelo.</p>
     <p><strong>[Historia propia, si tienes una — ≤45 s]</strong> Un caso real tuyo de una consulta válida que no debía ejecutarse (acceso a datos sensibles, una escritura inesperada). Si no tienes uno, sáltalo: no uses relatos ajenos ni inventes detalles.</p>
     <p><strong>Transición:</strong> “Veamos qué hay dentro de esa compuerta y la línea que van a escribir.”</p>
@@ -1637,34 +1639,34 @@ without tool_result blocks immediately after</span></div>
   </aside>
 </section>
 
-<!-- ============ 11b · la tabla (W2-C la reemplaza con la corrida real) ============ -->
+<!-- ============ 11b · la tabla (corrida real del 2026-10-18) ============ -->
 <section class="slide s11b" data-title="Medir: tabla de errores y costo por tarea" data-section="Medir" data-budget="3:30" data-clock="34:30–38:00"
          style="--slide-accent:var(--evidence)">
   <div class="main">
     <div class="hd">
-      <p class="eyebrow reveal">Tu tabla <span class="tag illus">Ilustrativo · sin datos</span></p>
+      <p class="eyebrow reveal">Mi corrida · 18 oct 2026 <span class="tag live">Medido</span></p>
       <h2 class="reveal d1">Lo que cuesta no es la llamada, es la <em>tarea resuelta</em></h2>
     </div>
     <div class="split wide-left reveal d2">
       <div class="col">
         <div data-step="1">
-          <!-- W2-C: reemplazar solo este bloque (hasta el comentario de cierre) con la corrida real de medir.py --vs -->
-          <table class="med" data-placeholder="medicion">
-            <caption class="label">Marcador de posición · aún sin corrida real</caption>
-            <thead><tr><th>Métrica</th><th>Modelo A</th><th>Modelo B (--vs)</th></tr></thead>
+          <!-- corrida real: uv run python -m taller.medir --vs claude-haiku-5-5 (2026-10-18) -->
+          <table class="med" data-measured="2026-10-18">
+            <caption class="label">medir --vs · 20 tareas · runs/medicion-*-20261018-151955.json</caption>
+            <thead><tr><th>Métrica</th><th>sonnet-5-5</th><th>haiku-5-5</th></tr></thead>
             <tbody>
-              <tr><th>tareas resueltas</th><td>—</td><td>—</td></tr>
-              <tr><th>wrong_tool</th><td>—</td><td>—</td></tr>
-              <tr><th>bad_args</th><td>—</td><td>—</td></tr>
-              <tr><th>gate_rejected</th><td>—</td><td>—</td></tr>
-              <tr><th>exec_error</th><td>—</td><td>—</td></tr>
-              <tr><th>truncated</th><td>—</td><td>—</td></tr>
-              <tr><th>orphaned</th><td>—</td><td>—</td></tr>
-              <tr class="sum"><th>tokens (entrada / salida)</th><td>—</td><td>—</td></tr>
-              <tr><th>costo por tarea resuelta</th><td>—</td><td>—</td></tr>
+              <tr><th>tareas resueltas</th><td>20/20</td><td>20/20</td></tr>
+              <tr><th>wrong_tool</th><td>0</td><td>0</td></tr>
+              <tr><th>bad_args</th><td>0</td><td>0</td></tr>
+              <tr><th>gate_rejected</th><td>0</td><td><b>1</b> (a02)</td></tr>
+              <tr><th>exec_error</th><td>0</td><td>0</td></tr>
+              <tr><th>truncated</th><td>0</td><td>0</td></tr>
+              <tr><th>orphaned</th><td>0</td><td>0</td></tr>
+              <tr class="sum"><th>tokens (entrada / salida)</th><td>67.6K / 5.9K</td><td>83.5K / 8.1K</td></tr>
+              <tr><th>costo por tarea resuelta</th><td>$0.0097</td><td><b>$0.0006</b></td></tr>
             </tbody>
           </table>
-          <!-- /W2-C -->
+          
         </div>
       </div>
       <div class="col">
@@ -1680,8 +1682,8 @@ without tool_result blocks immediately after</span></div>
           <p class="small">Página de precios, consultada el 2026-10-18. Haiku: prompts de hasta 100K tokens.</p>
         </div>
         <div class="panel mod" data-step="3">
-          <p class="label" style="margin-bottom:.4rem">Hipótesis para la sala</p>
-          <p>Un modelo más caro por token puede salir <b>más barato por tarea resuelta</b> si falla y reintenta menos. No es un hecho: lo decide la columna de la derecha.</p>
+          <p class="label" style="margin-bottom:.4rem">Hipótesis vs. mi corrida</p>
+          <p><b>Aquí no:</b> Haiku resolvió igual por ~1/16 del costo. Pero intentó leer <code>secretos</code> (a02) y la compuerta lo frenó. Barato y seguro <b>porque</b> hay compuerta.</p>
         </div>
       </div>
     </div>
@@ -1690,7 +1692,7 @@ without tool_result blocks immediately after</span></div>
     <p><strong>Propósito:</strong> leer la tabla propia, ver cuántas tareas resolvió cada quien y a qué costo, y plantear, como hipótesis que la sala prueba, que el costo por tarea resuelta no sigue al precio por token. (3:30)</p>
     <ol>
       <li>0:00 · Antes de mostrar nada: “Digan en voz alta su número de tareas resueltas, X de 20.” Cuenta manos por rangos (por ejemplo 18–20, 15–17, menos de 15) y pregunta quién tiene el <strong>costo por tarea resuelta</strong> más bajo. Es el dato del cuarto: úsalo en el cierre. No uses «la categoría que más salió»: <code>gate_rejected</code> gana siempre por construcción (los prompts adversariales a01 y a02 chocan a propósito con la compuerta), así que no dice nada del agente de cada quien.</li>
-      <li>1:30 · → muestra la tabla de la corrida de ejemplo (la reemplaza W2-C con números reales; hasta entonces es un marcador de posición “ilustrativo”: no leas cifras que no existan).</li>
+      <li>1:30 · → muestra mi tabla real (18 oct) y pide que comparen con la suya.</li>
       <li>2:15 · → precios. → hipótesis. Quien tenga <code>--vs</code> dice en voz alta si le salió más barato por tarea resuelta, y de qué modelo.</li>
       <li>3:15 · Cierra con el número del cuarto: “En este cuarto, el mejor costo por tarea resuelta fue ___. Ese es el número que van a medir el lunes en su agente.”</li>
     </ol>
@@ -1698,7 +1700,7 @@ without tool_result blocks immediately after</span></div>
     <blockquote>Esto es una hipótesis, no un hecho. Lo decide su corrida, no mi diapositiva.</blockquote>
     <p>Pasos con →: 1 la tabla; 2 los precios por MTok; 3 la hipótesis.</p>
     <p>Fuente de precios: página de pricing de Anthropic, consultada el 2026-10-18 (<code>FACTS.md</code> §7): Sonnet 5.5 $2 / $10, Haiku 5.5 $0.10 / $0.50 (prompts hasta 100K tokens), Opus 5.5 $4 / $20, por MTok. La página no muestra fecha de vigencia y remite a claude.com/pricing. Usar herramientas añade 286 tokens de system prompt con <code>tool_choice</code> <code>auto</code>.</p>
-    <p class="warn">La tabla es un marcador de posición (<code>data-placeholder="medicion"</code>); W2-C la reemplaza con la corrida real. No inventes números. Si W2-C no llegó, usa la pantalla de un asistente voluntario o tu propia corrida.</p>
+    <p class="warn">Tabla medida el 2026-10-18 (claude-sonnet-5-5 vs claude-haiku-5-5, 20 tareas, ~$0.19 + $0.01). El conjunto es fácil: ambos 20/20. La hipótesis de la clase puede cumplirse en tareas más difíciles; aquí no. Lo de a02 es el remate: <em>el modelo barato intentó leer secretos y la compuerta lo frenó</em>. No inventes números. Si W2-C no llegó, usa la pantalla de un asistente voluntario o tu propia corrida.</p>
     <p class="warn">La idea de “un modelo más caro puede salir más barato por tarea” se atribuye a la clase de CMU, pero no pude verificarla y no está en <code>FACTS.md</code>: preséntala solo como hipótesis. Si preguntan la fuente exacta: “no sé la diapositiva, lo verifico y lo publico en el repo”.</p>
     <p class="warn">Recorte (plan): si vamos tarde, salta los pasos 2–3 y la comparación <code>--vs</code>; nunca recortes la tabla propia ni el conteo de tareas resueltas. Orden de recorte: 1) el momento en vivo de <code>romper paralelo</code> (paso-1), 2) comparación de dos modelos, 3) detalle del autómata de pila.</p>
     <p><strong>Pregunta para llevarse:</strong> ¿cuánto te cuesta resolver una tarea, no una llamada?</p>

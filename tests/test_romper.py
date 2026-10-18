@@ -38,8 +38,8 @@ def test_huerfano_con_sanitize_sin_escribir(capsys, monkeypatch):
 def test_truncado(capsys):
     out = correr("truncado", capsys)
     assert "max_tokens" in out and "toolu_01CORTADO" in out
-    assert "ejecuciones de sql_query: 0" in out
-    assert "max_tokens 24 -> 48" in out  # el agente reintentó la misma petición con más margen
+    assert "la llamada cortada (turno 0) NO se ejecutó" in out
+    assert "max_tokens 24 -> 96" in out  # el agente reintentó la misma petición con más margen
     assert "tool_use sin tool_result: 0" in out
     assert "DESPUÉS" in out and "LECCIÓN" in out
     assert "tool_use ids were found" not in out
@@ -52,7 +52,7 @@ def test_truncado_sin_arreglo_el_seguimiento_da_400(capsys, monkeypatch, modulo_
     assert "GUARDÓ el tool_use cortado" in out and "['toolu_01CORTADO']" in out
     assert "tool_use ids were found without tool_result blocks immediately after" in out
     assert "documentado" in out  # sin API: se dice que es el texto documentado, no una llamada en vivo
-    assert "DESPUÉS" not in out and "ejecuciones de sql_query: 0" in out
+    assert "DESPUÉS" not in out and "la llamada cortada (turno 0) NO se ejecutó" in out
     assert "TODO(paso-3)" in out
 
 

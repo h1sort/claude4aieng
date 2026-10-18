@@ -46,7 +46,7 @@ without tool_result blocks immediately after</span></div>
 <span class="a"># TODO(paso-3)</span> <span class="c">¿y si stop_reason == "max_tokens"?</span>
 <span class="c">messages.append({"role": "assistant", "content": [… todo …]})</span></div>
         <div class="code" data-step="2"><span class="cap">paso-3 · lo que tecleas (4 líneas) · el cortado ni se guarda ni se ejecuta</span><span class="k">if</span> resp.stop_reason == <span class="s">"max_tokens"</span> <span class="k">and</span> uses:
-    self.max_tokens = min(self.max_tokens * 2, MAX_TOKENS_TOPE)  <span class="c"># más margen</span>
+    self.max_tokens = min(self.max_tokens * 4, MAX_TOKENS_TOPE)  <span class="c"># más margen</span>
     self._log(turn)
     <span class="k">continue</span>   <span class="c"># reintenta sin guardar el bloque cortado</span></div>
         <div class="panel ev checkpoint" data-step="3">

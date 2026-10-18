@@ -126,7 +126,7 @@ def test_truncated_tool_use_is_not_executed_and_is_retried():
     messages = [{"role": "user", "content": "x"}]
     turns = run(make_agent(client, [spy], max_tokens=16), messages)
     assert called == []
-    assert [r["max_tokens"] for r in client.requests] == [16, 32]  # misma petición, el doble de margen
+    assert [r["max_tokens"] for r in client.requests] == [16, 64]  # misma petición, cuatro veces el margen
     assert client.requests[1]["messages"] == [{"role": "user", "content": "x"}]  # nada del turno cortado entró
     assert [t.stop_reason for t in turns] == ["max_tokens", "end_turn"]
     assert turns[0].results == [] and turn_categories(turns[0]) == [ErrorCategory.TRUNCATED]
