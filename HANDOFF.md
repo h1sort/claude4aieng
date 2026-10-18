@@ -110,3 +110,33 @@ Hechos en `FACTS.md`. Notas para otras tareas:
 - **Etiquetas fijas a revisar si cambia el orden**: eyebrows "Minuto 15" (s06) y "Minuto 22" (s08), y "Paso 4/Paso 5" (s09b, s11).
 - **Orden de recorte (en notas)**: s06 notas: saltar el paso 2 del diagrama (autómata de pila) y explicar solo la máscara (pasos 3–4); s11/s11b: nunca recortar Medir, quitar primero `--vs` y los pasos 2–3 de s11b.
 - **Pendiente para Carlos**: leer las notas de s08 (historia ≤45 s), ensayar en voz alta los puntos de control (mano levantada) de s07, s09b y s11, y confirmar los minutos exactos de la clase de CMU en el video antes de decir un minuto en voz alta (FACTS §9: solo verificados por capítulo).
+
+## W3-A (revisión)
+
+Revisión en frío de diapositivas, notas, `sources.html`, `taller/*.py` y `origin/paso-0…5`. `pytest`: 96 pasan. `--expect 40:00` ✓. 1280x720 sin desbordes. Los cuatro modos `--inyectado`, `medir --seco` y `--comparar` corren. Ninguna cifra contradice FACTS; "15 %" solo aparece en avisos.
+
+### P0
+1. **La rotura #3 no rompe en `paso-3`.** Sin compuerta, el DROP lo para `mode=ro` (`tools.py` L415): sale `exec_error`, también con `is_error`, y el checkpoint de `09-compuerta.html` L134 pasa sin teclear. Lo que solo para la compuerta es leer `secretos`: en `paso-3`, `SELECT * FROM secretos` filtra las claves. Arreglo: predicción y checkpoint de s09/s09b sobre `secretos`, y el DROP queda como "capa 2". `romper drop` debe intentar también esa lectura.
+2. **La rotura #2 no rompe en `paso-2`.** Sin el arreglo, el bucle ya sale y la salida dice "ejecuciones: 0". El daño real es que el `tool_use` cortado se guarda y el siguiente turno da 400. Arreglo: `romper truncado` continúa la conversación (400 antes, ok después), y el checkpoint de `07-truncado.html` L57 cambia a eso. Además, con API, `romper.py` L186 hace una llamada nueva en lugar de procesar la respuesta cortada que mostró: hay que pasarle `ClienteFalso(respuesta)`.
+3. **Tabla de s11b vacía** (`11-medir.html` L87–101; falta W2-C). Además, el QR apunta a `h1sort.com/claude4aieng`, que no se pudo comprobar y cuya publicación PLAN §8 deja fuera. Publicar la página o apuntar el QR a `github.com/h1sort/claude4aieng`.
+
+### P1
+4. **Teclear paso-2 en 1:45 no es realista** (`05b-huerfano.html` L76): el TODO vacía `sanitize_history` (~20 líneas). Dejar el esqueleto en la rama, o pasarle 1:00 de s09b (TODO de una línea con 1:45).
+5. **Teclear paso-3** (`07-truncado.html` L56) contradice PLAN §7. Que sea "lee y corre".
+6. **`git checkout paso-N` falla con cambios locales** (s05b L157, s05c L61, s07 L34, s09b L124, s11 L45 y notas). Usar `git stash && git checkout paso-N` como el README, y `git fetch` para quien clonó antes.
+7. **`romper huerfano` en `paso-1` con API:** dice "inserta…" sin haber insertado nada, imprime `"¿"` (L127), y el segundo `create` termina en un traceback sin capturar. Detectar que no hubo cambio y capturar el error.
+8. **MCP** (`10-mcp.html` L58/L66): "el modelo no ve las claves" vale para cualquier herramienta. El punto real es que el proceso del agente no tiene el token de abajo, así que una inyección de prompt no puede filtrarlo.
+9. **Máscara de logits** (`06-restringida.html` L52): `"`, `true` y `null` solo son inválidos si `monto` es número. Mostrar `{"type": "integer"}`.
+10. **Claude por dentro:** s04 L67 "La API parsea los tokens por ti" contradice su nota L84. Cambiar a "te entrega la llamada estructurada". La nota L84 está desactualizada (el panel ya usa `sql`). `romper.py` L181 ("input vacío… partial_json") no tiene fuente: verificarlo con la API.
+11. **El dato del cuarto está sesgado** (s11b L127, s12 L36): `gate_rejected` gana por construcción (a01, a02). Usar "resueltas X/20" o el costo por tarea resuelta.
+12. **Paralelas:** el bloque del host las promete, pero ninguna diapositiva corre `romper paralelo`. Agregar 30 s en s05b o quitarlas; el recorte #2 hoy no recorta nada.
+13. **Predicción decorativa en s09** (L85): la respuesta ya está en el título. Preguntar: "tras el rechazo, ¿se rinde, repite o reescribe?".
+14. **Una sola historia de terror** ("una que leí", s08); SPEAKER pide una por rotura.
+
+### P2
+- @h1sort y el empleador aparecen en las 17 diapositivas (el pie) además de s01 y s03: dejar los enlaces solo en s03 y s12.
+- Las cejas "Minuto 15/22" se ven en pantalla.
+- Colores: en s05, `tool_use`/`id` y "solicitud" en cobre (deberían ser cálidos); en s10, las claves en cobre; en s02, "−88 %" en verde.
+- El código de s04 queda en ~12 px a 1280x720.
+- s07, regla 3, dice "Reintenta", pero el código no reintenta.
+- s12: cinco preguntas antes de la frase final la diluyen.
