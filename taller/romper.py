@@ -294,7 +294,7 @@ MODOS = {"huerfano": huerfano, "truncado": truncado, "paralelo": paralelo, "drop
 
 async def ejecutar(modo: str, inyectado: bool) -> None:
     client = None if inyectado else anthropic.AsyncAnthropic()
-    stage("MODELO", f"modo {modo} · {get_model_id()} · " + ("inyectado (sin API)" if inyectado else "con API"))
+    print(dim(f"romper {modo} · {get_model_id()} · " + ("inyectado (sin API)" if inyectado else "con API")))
     await MODOS[modo](client, inyectado)
 
 
