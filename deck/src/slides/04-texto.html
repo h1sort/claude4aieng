@@ -9,7 +9,7 @@
   .s04 .keyline{font-family:var(--f-display);font-weight:360;font-size:clamp(1.05rem,1.8vw,1.9rem);line-height:1.2;color:var(--ink);max-width:none}
   .s04 .keyline em{font-style:italic;color:var(--action)}
   .s04 .ds{max-width:none;line-height:1.5;text-transform:none;letter-spacing:.03em}
-  .s04 .legend{display:flex;gap:1.4rem;flex-wrap:wrap}
+  .s04 .legend{display:flex;gap:.5rem 1.4rem;flex-wrap:wrap;text-transform:none;letter-spacing:.04em}
   .s04 .legend .a{color:var(--action)} .s04 .legend .k{color:var(--evidence)}
 </style>
 
@@ -23,7 +23,7 @@
     </div>
     <div class="split reveal d2">
       <div class="stack">
-        <div class="code"><span class="cap">Qwen3-8B · plantilla de chat renderizada (salida de taller.plantilla, recortada con ⋯)</span><span class="a">&lt;|im_start|&gt;</span>system
+        <div class="code"><span class="cap">Qwen3-8B · plantilla de chat renderizada (⋯ = recortado)</span><span class="a">&lt;|im_start|&gt;</span>system
 Eres un asistente del banco.
 # Tools ⋯ function signatures within <span class="k">&lt;tools&gt;</span>⋯<span class="k">&lt;/tools&gt;</span> XML tags:
 <span class="k">&lt;tools&gt;</span>{"type": "function", "function": {"name": "sql_query", ⋯}}<span class="k">&lt;/tools&gt;</span>
@@ -39,7 +39,7 @@ Eres un asistente del banco.
 [{"COUNT(*)": 26}]
 <span class="k">&lt;/tool_response&gt;</span><span class="a">&lt;|im_end|&gt;</span>
 <span class="a">&lt;|im_start|&gt;</span>assistant</div>
-        <p class="note-line legend"><span class="a">&lt;|im_start|&gt; &lt;|im_end|&gt;</span> <span>tokens especiales</span> <span class="k">&lt;tool_call&gt; &lt;tool_response&gt;</span> <span>tokens añadidos: una sola unidad</span></p>
+        <p class="note-line legend"><span class="a">&lt;|im_start|&gt; &lt;|im_end|&gt;</span> <span>= tokens especiales</span> <span class="k">&lt;tool_call&gt; &lt;tool_response&gt;</span> <span>= tokens añadidos (una sola unidad cada uno)</span></p>
       </div>
       <div class="right" data-step="1">
         <div class="code"><span class="cap">Claude · messages.create devuelve (ilustrativo)</span>{ "stop_reason": "tool_use",
@@ -56,7 +56,7 @@ Eres un asistente del banco.
     </div>
     <div class="stack" data-step="2">
       <p class="keyline">La API parsea los tokens por ti. <em>Tu aplicación sigue siendo dueña del bucle.</em></p>
-      <p class="note-line ds">Otra familia, otro formato: DeepSeek-V3 delimita con &lt;｜tool▁calls▁begin｜&gt; ⋯ &lt;｜tool▁call▁end｜&gt; y espera otro parser · uv run python -m taller.plantilla --comparar</p>
+      <p class="note-line ds">Otra familia, otro formato: DeepSeek-V3 delimita con &lt;｜tool▁calls▁begin｜&gt; ⋯ &lt;｜tool▁call▁end｜&gt; y espera otro parser · <span style="white-space:nowrap">--comparar</span> en la terminal</p>
     </div>
   </div>
   <aside class="notes">

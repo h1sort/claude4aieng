@@ -1,0 +1,173 @@
+<style>
+  .s05 .hd h2{max-width:none}
+  .s05 .strip{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(.6rem,1.6vw,1.4rem)}
+  .s05 .strip .panel{padding:clamp(.5rem,1.2vw,1rem) clamp(.7rem,1.4vw,1.2rem)}
+  .s05 .strip .label{display:block;margin-bottom:.35rem}
+  .s05 .strip p{font-size:clamp(.78rem,1.05vw,1rem);line-height:1.4;color:var(--ink-2);margin:0}
+  .s05 .strip code,.s05b code,.s05c code{font-family:var(--f-mono);font-size:.92em;color:var(--ink)}
+  .s05 .strip .err{display:block;margin-top:.4rem;font-family:var(--f-mono);font-size:clamp(.66rem,.9vw,.88rem);color:var(--action)}
+  .s05 .src{max-width:none;text-transform:none;letter-spacing:.03em;font-size:clamp(.62rem,.76vw,.76rem)}
+
+  .s05b .hd h2{max-width:none}
+  .s05b .split{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:stretch}
+  .s05b .code{font-size:clamp(.7rem,1vw,1rem)}
+  .s05b ol.todo{margin:.7rem 0 0;padding:0;list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:.55rem}
+  .s05b ol.todo li{counter-increment:t;position:relative;padding-left:2rem;font-size:var(--t-body);line-height:1.4;color:var(--ink-2)}
+  .s05b ol.todo li::before{content:counter(t);position:absolute;left:0;top:0;width:1.35rem;height:1.35rem;border:1.5px solid var(--evidence);transform:none;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-size:.75rem;color:var(--evidence)}
+  .s05b ol.todo b{color:var(--ink);font-weight:650}
+  .s05b .trap h3{font-family:var(--f-display);font-weight:360;font-size:clamp(1.15rem,1.9vw,2rem);letter-spacing:-.01em;line-height:1.15;margin:.2rem 0 .6rem}
+  .s05b .trap .body{margin:.5rem 0 0}
+  .s05b .ck{display:flex;flex-wrap:wrap;gap:.5rem 1.4rem;align-items:center}
+  .s05b .src{max-width:none;text-transform:none;letter-spacing:.03em;font-size:clamp(.62rem,.76vw,.76rem);margin-top:.5rem}
+</style>
+
+<!-- ============ 05 · el bucle a nivel cable ============ -->
+<section class="slide s05" data-title="El bucle a nivel cable" data-section="Cable" data-budget="2:30"
+         style="--slide-accent:var(--evidence)">
+  <div class="main">
+    <div class="hd">
+      <p class="eyebrow reveal">El bucle a nivel cable</p>
+      <h2 class="reveal d1">El modelo <em>propone</em>; tu aplicación ejecuta y contesta, en orden</h2>
+    </div>
+    <div class="figure fill reveal d2">
+      <svg class="dg" viewBox="0 0 1000 316" role="img" aria-label="Diagrama del bucle de herramientas. Tu aplicación llama a messages.create. El modelo responde con stop_reason tool_use y bloques tool_use, cada uno con un id: es una solicitud aún sin efecto. La aplicación ejecuta las herramientas, con asyncio.gather si son varias, y responde con UN mensaje de usuario que trae primero los bloques tool_result, emparejados por tool_use_id. Ese resultado entra en el siguiente messages.create, y el bucle sigue mientras stop_reason sea tool_use. Termina cuando stop_reason es end_turn.">
+        <!-- carriles -->
+        <rect class="model" x="10" y="6" width="980" height="124" rx="26"/>
+        <text class="t-mono t-mod" x="34" y="30">Modelo · propone</text>
+        <rect class="app" x="10" y="164" width="980" height="116" rx="6"/>
+        <text class="t-mono" x="34" y="188">Tu aplicación · ejecuta</text>
+
+        <!-- 1: messages.create -> stop_reason tool_use -->
+        <g data-step="1">
+          <rect class="node ev" x="30" y="198" width="190" height="72" rx="4"/>
+          <text class="t-mono" x="46" y="218">1 · envías</text>
+          <text class="t-lbl" x="46" y="240">messages.create</text>
+          <text class="t-sub" x="46" y="260">tools + messages</text>
+          <path class="exec draw" pathLength="1" d="M220,234 H245 V78 H270" marker-end="url(#arr-ev)"/>
+          <rect class="node mod" x="270" y="42" width="330" height="76" rx="4"/>
+          <text class="t-mono t-mod" x="286" y="62">2 · responde</text>
+          <text class="t-lbl" x="286" y="84">stop_reason: "tool_use"</text>
+        </g>
+        <!-- 2: bloques tool_use con id -->
+        <g data-step="2">
+          <text class="t-sub" x="286" y="106">bloques <tspan class="t-act" font-weight="700">tool_use</tspan> · cada uno con su <tspan class="t-act" font-weight="700">id</tspan></text>
+        </g>
+        <!-- 3: solicitud, ejecuta -->
+        <g data-step="3">
+          <path class="propose draw" d="M435,118 V198" marker-end="url(#arr-mod)"/>
+          <text class="t-sub t-act" x="445" y="152" font-weight="700">solicitud: aún sin efecto</text>
+          <rect class="node ev" x="270" y="198" width="210" height="72" rx="4"/>
+          <text class="t-mono" x="286" y="218">3 · ejecutas</text>
+          <text class="t-lbl" x="286" y="240">tus herramientas</text>
+          <text class="t-sub" x="286" y="260">asyncio.gather si son varias</text>
+        </g>
+        <!-- 4: UN mensaje de usuario -->
+        <g data-step="4">
+          <path class="exec big draw flow" pathLength="1" d="M480,234 H535" marker-end="url(#arr-ev)"/>
+          <rect class="node ev" x="540" y="198" width="300" height="72" rx="4" style="stroke-width:2.4"/>
+          <text class="t-mono" x="556" y="218">4 · contestas</text>
+          <text class="t-lbl" x="556" y="240">UN mensaje de usuario</text>
+          <text class="t-sub" x="556" y="260">tool_result primero · tool_use_id</text>
+        </g>
+        <!-- 5: el resultado vuelve -->
+        <g data-step="5">
+          <path class="return draw" d="M690,270 V298 H125 V274" marker-end="url(#arr-ev)"/>
+          <text class="t-sub t-ev" x="215" y="292" font-weight="700">vuelve en el siguiente messages.create, mientras stop_reason == "tool_use"</text>
+        </g>
+        <!-- 6: salida -->
+        <g data-step="6">
+          <path class="wire draw" pathLength="1" d="M600,80 H700" marker-end="url(#arr)"/>
+          <text class="t-sub" x="612" y="70">si no pide más</text>
+          <rect class="node ev" x="705" y="42" width="270" height="76" rx="4"/>
+          <rect class="stopsq" x="719" y="52" width="10" height="10"/>
+          <text class="t-mono t-ev" x="738" y="62">5 · sales</text>
+          <text class="t-lbl" x="721" y="84">stop_reason: "end_turn"</text>
+          <text class="t-sub" x="721" y="104">respuesta final al usuario</text>
+        </g>
+      </svg>
+    </div>
+    <div class="strip" data-step="4">
+      <div class="panel act">
+        <span class="label">Regla de orden</span>
+        <p>Los <code>tool_result</code> van en el mensaje de usuario inmediato, y <b>primero</b> en <code>content</code>. Texto antes de ellos: <b>400</b>.</p>
+        <span class="err">"tool_use ids were found without tool_result blocks immediately after"</span>
+      </div>
+      <div class="panel ev">
+        <span class="label">Se emparejan por id</span>
+        <p>Con llamadas paralelas la API no impone orden entre los resultados: manda el <code>tool_use_id</code> de cada uno.</p>
+      </div>
+    </div>
+    <p class="note-line src">Docs de Anthropic: handle-tool-calls y parallel-tool-use · verificado 2026-10-18 (FACTS §1 y §5)</p>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> que la sala pueda dibujar el bucle de memoria y sepa las dos reglas que lo rompen: orden de los <code>tool_result</code> y emparejado por id. Después de esto escriben ellos. (2:30)</p>
+    <p>Pasos con →: 1 <code>messages.create</code> y la respuesta con <code>stop_reason: "tool_use"</code>; 2 los bloques <code>tool_use</code> con su <code>id</code>; 3 la solicitud (discontinua: aún sin efecto) y la ejecución en tu aplicación; 4 UN mensaje de usuario con los <code>tool_result</code> primero, y aparece la regla de orden; 5 el resultado entra en el siguiente <code>messages.create</code>; 6 la salida con <code>end_turn</code>.</p>
+    <blockquote>Cuatro pasos y un bucle. Tú llamas a <code>messages.create</code>. Si el <code>stop_reason</code> es <code>tool_use</code>, el modelo no hizo nada: pidió algo. Esa línea discontinua es una solicitud, no un efecto.</blockquote>
+    <blockquote>Cada bloque trae un <code>id</code>. Tú ejecutas, si son varias en paralelo con <code>asyncio.gather</code>, y contestas en UN solo mensaje de usuario, con todos los <code>tool_result</code> primero, cada uno con el <code>tool_use_id</code> de su llamada.</blockquote>
+    <blockquote>Si pones texto antes de un <code>tool_result</code>, o si hay un mensaje en medio, la API responde 400: «tool_use ids were found without tool_result blocks immediately after». Ese fragmento lo cita la documentación; el mensaje completo lo vamos a ver en vivo en un momento.</blockquote>
+    <blockquote>Y el bucle termina solo cuando el <code>stop_reason</code> es <code>end_turn</code>. Mientras sea <code>tool_use</code>, otra vuelta.</blockquote>
+    <p>Datos si preguntan (FACTS §1, §5): la API no impone orden ni entre los resultados de un turno paralelo ni entre las ejecuciones; se emparejan por <code>tool_use_id</code>. Todas las respuestas de un turno van juntas en UN mensaje de usuario (mensajes separados reducen el uso paralelo). Para forzar una llamada por turno existe <code>disable_parallel_tool_use</code>, dentro de <code>tool_choice</code> (<code>{"type": "auto", "disable_parallel_tool_use": true}</code>); no lo usamos hoy.</p>
+    <p class="warn">No digas «nunca hay dos mensajes en medio»: di lo que dice la documentación (los resultados van inmediatamente después, y primero). El texto completo del 400 solo está en una fuente secundaria; la diapositiva usa el fragmento oficial y la demo imprime el texto real. Si el reloj va justo, recorta los pasos 5 y 6 a una frase cada uno.</p>
+    <p><strong>Transición:</strong> “Basta de dibujo. Abran taller/agent.py: el bucle está hecho a medias y la otra mitad la escriben ustedes.”</p>
+  </aside>
+</section>
+
+<!-- ============ 05b · tu turno: paso-1 ============ -->
+<section class="slide s05b" data-title="Tu turno: paso-1 (el bucle)" data-section="Cable" data-budget="4:00"
+         style="--slide-accent:var(--evidence)">
+  <div class="main">
+    <div class="hd">
+      <p class="eyebrow reveal">Tu turno · paso-1 <span class="tag live" style="margin-left:.6rem">teclean · silencio del orador</span></p>
+      <h2 class="reveal d1">Cierra el bucle en <code style="font-size:.7em">taller/agent.py</code></h2>
+    </div>
+    <div class="split reveal d2">
+      <div class="stack">
+        <div class="code"><span class="cap">terminal</span>$ git checkout paso-0
+<span class="c"># abre taller/agent.py y busca # TODO(paso-1)</span>
+$ uv run python -m taller.agent
+<span class="c">tú › ¿cuántas tarjetas bloqueadas hay?</span></div>
+        <div class="panel ev">
+          <span class="label">Lo que debe hacer el TODO</span>
+          <ol class="todo">
+            <li><b>Ejecuta</b> todas las llamadas del turno juntas con <code>execute_calls</code> (ya usa <code>asyncio.gather</code>).</li>
+            <li>Arma <b>UN</b> mensaje <code>{"role": "user", "content": […]}</code>.</li>
+            <li>Un <code>tool_result</code> por llamada, con su <code>tool_use_id</code>, <b>antes</b> que cualquier texto; <code>is_error</code> si falló.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="panel act trap">
+          <span class="label">Trampa antes de que la encuentres</span>
+          <h3>No fuerces la herramienta</h3>
+          <div class="code" style="padding:.5rem .8rem"><span class="c"># Opus 5.5, Sonnet 5.5, Fable 5.1, Mythos 5.1</span>
+tool_choice={"type": "<span class="a">any</span>"}   <span class="a"># 400</span>
+tool_choice={"type": "<span class="a">tool</span>", ⋯} <span class="a"># 400</span>
+tool_choice={"type": "<span class="k">auto</span>"}  <span class="c"># + strict: true</span></div>
+          <p class="body">Usa <code>auto</code> con <code>strict: true</code>: valida la forma del input, no su sentido.</p>
+        </div>
+        <div class="panel mod ck">
+          <span class="label">Checkpoint</span>
+          <span class="body">Mano arriba si el agente respondió 26 con una consulta real.</span>
+          <span class="body">Atrasado: <code>git checkout paso-1</code></span>
+        </div>
+      </div>
+    </div>
+    <p class="note-line src">Fuente de la trampa: docs de Anthropic, define-tools · verificado 2026-10-18 (FACTS §1)</p>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> que cada quien escriba el núcleo del bucle: ejecutar y contestar con <code>tool_result</code> bien armados. Es el primer paso de código que ellos teclean. (4:00)</p>
+    <p><strong>Tiempo de silencio planeado: 3 minutos de teclado.</strong> Orador callado; solo circular. Desglose: 0:30 instrucciones, 3:00 teclean, 0:30 checkpoint.</p>
+    <ol>
+      <li><code>git checkout paso-0</code>; abrir <code>taller/agent.py</code>; localizar <code># TODO(paso-1)</code> dentro de <code>Agent.run</code>.</li>
+      <li>Completar el TODO: ejecutar con <code>execute_calls(turn.calls, self.tools)</code> y agregar a <code>messages</code> UN mensaje de usuario con un <code>tool_result</code> por llamada (<code>tool_use_id</code>, <code>content</code>, y <code>is_error</code> si falló).</li>
+      <li>Correr <code>uv run python -m taller.agent</code> y preguntar «¿cuántas tarjetas bloqueadas hay?». La respuesta esperada es 26 (la base sintética tiene 26 tarjetas bloqueadas).</li>
+    </ol>
+    <blockquote>Tienen tres minutos. Yo no voy a hablar. El bucle ya está, falta lo de adentro del TODO: ejecutar y contestar en un solo mensaje, con los resultados primero.</blockquote>
+    <blockquote>Un aviso antes de que empiecen: no intenten forzar la herramienta con <code>tool_choice</code> <code>any</code> o <code>tool</code>. En Opus 5.5, Sonnet 5.5, Fable 5.1 y Mythos 5.1 la API responde 400. Se usa <code>auto</code> con <code>strict: true</code>, y eso ya viene en el repo.</blockquote>
+    <p><strong>Checkpoint (al terminar el silencio):</strong></p>
+    <blockquote>Mano arriba: ¿quién tiene la respuesta de las tarjetas bloqueadas? Si son menos de la mitad, todos hacen <code>git checkout paso-1</code> y seguimos; el que quiera terminar el suyo lo hace en el siguiente silencio.</blockquote>
+    <p>Qué buscar mientras circulas: <code>tool_result</code> con el texto de otro mensaje; olvidar <code>tool_use_id</code>; un mensaje de usuario por cada resultado en lugar de uno solo; texto antes de los <code>tool_result</code> (400). Para quien termine antes: dejar corridas con una pregunta que dispare dos llamadas y ver el orden en los logs de <code>runs/</code>.</p>
+    <p class="warn">No expliques el código mientras teclean. Si la API falla en la sala (créditos o red), plan B: <code>git checkout paso-1</code> y mostrar tú la corrida en pantalla. «Strict valida forma, no sentido» se retoma en el bloque «Válido ≠ correcto»; aquí solo se menciona. Cifras y modelos: FACTS §1.</p>
+    <p><strong>Transición:</strong> “Ya funciona con la API tal como la documentan. Ahora lo que importa de un taller: romperlo.”</p>
+  </aside>
+</section>
