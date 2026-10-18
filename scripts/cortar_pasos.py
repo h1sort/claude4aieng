@@ -267,6 +267,7 @@ def inventario(base: str) -> dict[int, list[str]]:
     """Marcadores del repo entero: N -> archivos que lo contienen. Valida que existan 1..4 exactamente una vez."""
     leer = leer_base(base)
     donde: dict[int, list[str]] = {n: [] for n in PASOS}
+    subs: dict[int, list[str]] = {}  # archivos con sub-bloques (paso-2b): no cuentan para "exactamente uno"
     for ruta in archivos_py(base):
         try:
             bloques = buscar_bloques(leer(ruta))
@@ -275,13 +276,17 @@ def inventario(base: str) -> dict[int, list[str]]:
         for b in bloques:
             if b.n not in donde:
                 raise SystemExit(f"{ruta}: paso-{b.n} no existe (solo 1..4)")
-            donde[b.n].append(ruta)
+            if b.sub and f"{b.n}{b.sub}" not in SUBREEMPLAZOS:
+                raise SystemExit(f"{ruta}: paso-{b.n}{b.sub} no tiene pista en SUBREEMPLAZOS")
+            (subs.setdefault(b.n, []) if b.sub else donde[b.n]).append(ruta)
     for n, rutas in donde.items():
         if len(rutas) != 1:
             raise SystemExit(f"paso-{n}: esperaba exactamente un bloque en el repo, encontré {len(rutas)}: {rutas}")
     for n, r in REEMPLAZOS.items():
         if r.requiere_despues and r.requiere_despues not in leer(donde[n][0]):
             raise SystemExit(f"paso-{n}: {donde[n][0]} ya no contiene {r.requiere_despues!r}; sin eso el TODO no falla con claridad")
+    for n, rutas in subs.items():  # planear() corta por archivo: el sub-bloque viaja con los archivos de su paso
+        donde[n] = sorted(set(donde[n]) | set(rutas))
     return donde
 
 
