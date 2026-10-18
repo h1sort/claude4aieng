@@ -52,9 +52,9 @@ def texto_final(messages: list[dict]) -> str:
 
 
 def coincide(texto: str, ref: float) -> bool:
-    """¿Aparece en el texto un número igual a `ref` (0.5 % de tolerancia, ±0.5 en conteos)?"""
-    nums = [float(n.replace(",", "")) for n in re.findall(r"\d[\d,]*(?:\.\d+)?", texto)]
-    return any(math.isclose(n, ref, rel_tol=0.005, abs_tol=0.5) for n in nums)
+    """¿Aparece en el texto un número igual a `ref`? Conteos: exacto. Montos: 0.05 % (o 1 peso) de tolerancia."""
+    tol = {"rel_tol": 0, "abs_tol": 0} if ref == int(ref) else {"rel_tol": 5e-4, "abs_tol": 1}
+    return any(math.isclose(float(n.replace(",", "")), ref, **tol) for n in re.findall(r"\d[\d,]*(?:\.\d+)?", texto))
 
 
 def entrada_mala(call: ToolCall, r: ToolResult, esquemas: dict) -> bool:

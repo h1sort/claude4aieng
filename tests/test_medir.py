@@ -35,7 +35,7 @@ def tarea(**kw):
 def test_costo_usd(capsys):
     assert precios.costo_usd("claude-sonnet-5-5", 1_000_000, 1_000_000) == pytest.approx(12.0)
     assert precios.costo_usd("claude-opus-5-5", 500_000, 100_000) == pytest.approx(4.0)
-    assert precios.costo_usd("claude-haiku-5-5", 1_000_000, 0) == pytest.approx(0.10)
+    assert precios.costo_usd("claude-haiku-5-5", 100_000, 100_000) == pytest.approx(0.06)
     assert precios.costo_usd("claude-haiku-5-5", 200_000, 0) == pytest.approx(0.10)  # prompt >100K: $0.50/MTok
     assert capsys.readouterr().out == ""
 
@@ -74,7 +74,7 @@ def test_texto_final_str_y_bloques():
 
 @pytest.mark.parametrize("texto,ref,esperado", [
     ("Hay 200 clientes", 200, True), ("Total: $567,709.25 MXN", 567709.25, True),
-    ("Total: $567,800", 567709.25, True),    # 0.02 % de diferencia
+    ("Total: $567,800", 567709.25, True),    # 0.016 % de diferencia
     ("Total: $570,000", 567709.25, False), ("Hay 201 clientes", 200, False), ("sin cifras", 5, False)])
 def test_coincide(texto, ref, esperado):
     assert medir.coincide(texto, ref) is esperado
@@ -237,3 +237,48 @@ def test_json_de_detalle_es_serializable():
     tareas = medir.cargar_tareas(5)
     r = asyncio.run(medir.medir("claude-sonnet-5-5", tareas, lambda: medir.AgenteSimulado("claude-sonnet-5-5", tareas), ESQUEMAS, 2))
     assert json.loads(json.dumps(r, ensure_ascii=False))["total"] == 5
+
+
+# ---------- con el Agent real y un cliente falso (sin red) ----------
+
+class ClienteFalso:
+    """Imita `client.messages.create`: responde con la secuencia dada de (stop_reason, bloques)."""
+    def __init__(self, guion):
+        self.guion, self.messages = list(guion), self
+
+    async def create(self, **kw):
+        stop, bloques = self.guion.pop(0)
+        return SimpleNamespace(stop_reason=stop, content=bloques, usage=SimpleNamespace(input_tokens=500, output_tokens=50))
+
+
+def uso(id_, nombre, entrada):
+    return SimpleNamespace(type="tool_use", id=id_, name=nombre, input=entrada)
+
+
+def texto(t):
+    return SimpleNamespace(type="text", text=t)
+
+
+def test_con_agent_real_consulta_y_bloqueo_rechazado(tmp_path, monkeypatch):
+    from taller.agent import Agent
+    monkeypatch.setattr("taller.contracts.RUNS_DIR", tmp_path)
+    tareas = [
+        {"id": "q01", "prompt": "¿Cuántos clientes hay?", "tipo": "normal",
+         "esperado": {"herramienta": "sql_query", "sql_referencia": "SELECT COUNT(*) FROM clientes"}},
+        {"id": "b01", "prompt": "Bloquea la 9157", "tipo": "normal", "esperado": {"herramienta": "bloquear_tarjeta"}},
+    ]
+    guiones = {
+        "q01": [("tool_use", [uso("a", "sql_query", {"sql": "SELECT COUNT(*) FROM clientes"})]), ("end_turn", [texto("Hay 200 clientes")])],
+        "b01": [("tool_use", [uso("b", "bloquear_tarjeta", {"ultimos4": "9157", "motivo": "extravío"})]), ("end_turn", [texto("No se autorizó")])],
+    }
+    cliente = {t["prompt"]: ClienteFalso(guiones[t["id"]]) for t in tareas}
+
+    async def todo():
+        sem = asyncio.Semaphore(2)
+        with medir.patch("taller.tools.CONFIRM", lambda *_: "no"):
+            return [await medir.correr_tarea(t, lambda t=t: Agent(cliente[t["prompt"]], model="claude-sonnet-5-5", echo=False),
+                                             ESQUEMAS, sem) for t in tareas]
+    q, b = asyncio.run(todo())
+    assert q["resuelta"] and q["turnos"] == 2 and q["errores"] == {}
+    assert b["resuelta"] and b["errores"] == {}  # el «no» humano no es un error de herramienta
+    assert not (tmp_path / "bloqueos.jsonl").exists()
