@@ -21,6 +21,7 @@ from types import SimpleNamespace
 
 import anthropic
 
+from taller import tools as tools_mod
 from taller.agent import Agent, execute_calls, sanitize_history, tools_payload
 from taller.contracts import ToolCall, ToolOutcome, get_model_id
 from taller.tools import TOOLS
@@ -229,6 +230,7 @@ async def paralelo(client, inyectado: bool) -> None:
         if inyectado:
             stage("AVISO", "--inyectado: 3 tool_use fabricados (las consultas sí se ejecutan contra data/banco.sqlite)")
     lentas = con_latencia(TOOLS, LATENCIA_S)
+    tools_mod.ECHO.set(False)  # silencia las etapas de execute_calls: aquí solo importan los tiempos
     stage("ANTES", f"{len(llamadas)} llamadas independientes, una tras otra")
     stage("AVISO", f"latencia artificial de {LATENCIA_S} s por llamada, para que se note incluso en una laptop rápida")
     t0 = time.perf_counter()
@@ -240,6 +242,7 @@ async def paralelo(client, inyectado: bool) -> None:
     t0 = time.perf_counter()
     resultados = await execute_calls(llamadas, lentas)
     paralelo_s = time.perf_counter() - t0
+    tools_mod.ECHO.set(True)
     for c, res in zip(llamadas, resultados):
         stage("OBSERVACIÓN", f"{c.id} → {res.content.splitlines()[-1] if res.content else ''}")
     print(f"  gather: {paralelo_s:.2f} s · {secuencial / paralelo_s:.1f}x más rápido")
@@ -271,9 +274,9 @@ async def drop(client, inyectado: bool) -> None:
     else:
         stage("AVISO", "--inyectado: la llamada DROP es nuestra, no del modelo")
     llamada = ToolCall("toolu_01INYECTADO", "sql_query", {"sql": SQL_DROP})
-    stage("SOLICITUD", f"sql_query (válida por esquema: sql es un string)\n{dim(SQL_DROP)}")
-    res = (await execute_calls([llamada], TOOLS))[0]
-    stage("RECHAZADA", f"outcome={res.outcome.value} · is_error={res.is_error}\n{res.content}")
+    stage("AVISO", "la llamada es válida por esquema (sql es un string); la compuerta decide:")
+    res = (await execute_calls([llamada], TOOLS))[0]  # imprime SOLICITUD y RECHAZADA
+    stage("RECHAZADA", f"outcome={res.outcome.value} · is_error={res.is_error}")
     stage("DESPUÉS", "el rechazo vuelve al modelo como tool_result con is_error: true")
     if inyectado:
         stage("AVISO", "sin API no hay turno corregido; no inventamos la respuesta del modelo")
