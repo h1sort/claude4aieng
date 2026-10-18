@@ -329,10 +329,16 @@ def crear_branch(base: str, k: int, cambios: dict[str, str], con_verificar: bool
 
 
 def subir(remoto: str) -> None:
+    """Sube SOLO paso-0…paso-5 (main nunca). Cada uno con un --force-with-lease explícito contra lo recién traído."""
     ramas = [f"paso-{k}" for k in BRANCHES]
-    git("fetch", "-q", remoto, f"+refs/heads/paso-*:refs/remotes/{remoto}/paso-*", check=False)
-    # Solo paso-*: main nunca se sube desde aquí. El lease usa lo recién traído con fetch.
-    print(git("push", "--force-with-lease", remoto, *[f"refs/heads/{r}:refs/heads/{r}" for r in ramas]) or f"subidos: {', '.join(ramas)}")
+    # El refspec de fetch por omisión solo trae main; sin esta línea el lease "desnudo" no ve los paso-* remotos.
+    git("fetch", "-q", remoto, f"+refs/heads/paso-*:refs/remotes/{remoto}/paso-*")
+    leases = []
+    for r in ramas:
+        visto = git("rev-parse", "--verify", "-q", f"refs/remotes/{remoto}/{r}", check=False).strip()
+        leases.append(f"--force-with-lease={r}:{visto}")  # vacío = el branch remoto no debe existir aún
+    git("push", *leases, remoto, *[f"refs/heads/{r}:refs/heads/{r}" for r in ramas])
+    print(f"subidos: {', '.join(ramas)}")
 
 
 def main(argv: list[str] | None = None) -> int:
