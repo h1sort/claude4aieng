@@ -1,0 +1,168 @@
+<style>
+  .s06 .tok{font-family:var(--f-mono);font-size:15px;fill:var(--ink)}
+  .s06 .tok.dim{fill:var(--ink-dim)}
+  .s06 .bar{fill:var(--paper-3);stroke:var(--ink);stroke-width:1.2}
+  .s06 .bar.ok{fill:var(--evidence-soft);stroke:var(--evidence);stroke-width:1.8}
+  .s06 .bar.bad{fill:var(--paper-2);stroke:var(--ink-dim);stroke-dasharray:3 4}
+
+  .s06b .main{justify-content:center}
+  .s06b .tok{font-family:var(--f-mono);font-size:15px;fill:var(--ink)}
+  .s06b .tok.ghost{fill:var(--ink-dim)}
+  .s06b .why{max-width:62ch}
+</style>
+
+<!-- ============ 06 · decodificación restringida: del esquema a la máscara ============ -->
+<section class="slide s06" data-title="Decodificación restringida: esquema → máscara" data-section="Decodificación" data-budget="2:30"
+         style="--slide-accent:var(--evidence)">
+  <div class="main">
+    <div class="hd">
+      <p class="eyebrow reveal">Minuto 15 · Decodificación restringida</p>
+      <h2 class="reveal d1">El esquema se vuelve una <em>máscara</em> sobre los logits</h2>
+    </div>
+    <div class="figure fill reveal d2">
+      <svg class="dg" viewBox="0 0 1000 440" role="img" aria-label="Del JSON Schema se compila una gramática libre de contexto; un autómata de pila recuerda qué se abrió. En cada paso de generación, los tokens que la gramática no permite reciben logit menos infinito y las probabilidades se renormalizan entre los tokens válidos.">
+        <!-- fila 1: compilación (una vez) -->
+        <g data-step="1">
+          <rect class="node" x="10" y="14" width="220" height="92" rx="4"/>
+          <text class="t-lbl" x="28" y="46">JSON Schema</text>
+          <text class="t-sub" x="28" y="70">el input_schema</text>
+          <text class="t-sub" x="28" y="90">de la herramienta</text>
+          <path class="exec draw" pathLength="1" d="M232,60 H268" marker-end="url(#arr-ev)"/>
+          <rect class="node" x="270" y="14" width="220" height="92" rx="4"/>
+          <text class="t-lbl" x="288" y="46">Gramática (CFG)</text>
+          <text class="t-sub" x="288" y="70">reglas: un objeto es</text>
+          <text class="t-sub" x="288" y="90">{ pares } con tipos fijos</text>
+        </g>
+        <g data-step="2">
+          <path class="exec draw" pathLength="1" d="M492,60 H528" marker-end="url(#arr-ev)"/>
+          <rect class="node ev" x="530" y="14" width="220" height="92" rx="4"/>
+          <text class="t-lbl" x="548" y="46">Autómata de pila</text>
+          <text class="t-sub" x="548" y="70">la pila recuerda qué</text>
+          <text class="t-sub" x="548" y="90">se abrió: { [ "</text>
+          <rect class="node ghost" x="780" y="14" width="210" height="92" rx="4"/>
+          <text class="t-mono" x="796" y="38">Precálculo</text>
+          <text class="t-sub" x="796" y="60">tokens que no dependen</text>
+          <text class="t-sub" x="796" y="80">del contexto: de antemano;</text>
+          <text class="t-sub" x="796" y="100">el resto, al vuelo</text>
+        </g>
+
+        <!-- fila 2: una pasada del modelo -->
+        <rect class="model" x="10" y="160" width="980" height="270" rx="28"/>
+        <text class="t-mono t-mod" x="38" y="194">Modelo · una pasada = un vector de logits</text>
+        <text class="t-sub" x="38" y="216">Ya se generó</text>
+        <text class="tok" x="146" y="216">{"monto":</text>
+        <text class="t-sub" x="260" y="216">· ¿qué token sigue?  (ejemplo ilustrativo)</text>
+
+        <g data-step="3">
+          <path class="exec big draw" pathLength="1" d="M640,108 V156" marker-end="url(#arr-ev)"/>
+          <text class="t-sub t-ev" x="652" y="140" font-weight="700">la pila dice qué bytes caben ahora</text>
+          <!-- barras de logits en bruto -->
+          <rect class="bar ok"  x="50"  y="302" width="90" height="84" rx="3"/>
+          <rect class="bar ok"  x="200" y="322" width="90" height="64" rx="3"/>
+          <rect class="bar bad" x="350" y="274" width="90" height="112" rx="3"/>
+          <rect class="bar bad" x="500" y="314" width="90" height="72" rx="3"/>
+          <rect class="bar bad" x="650" y="340" width="90" height="46" rx="3"/>
+          <rect class="bar bad" x="800" y="350" width="90" height="36" rx="3"/>
+          <line x1="40" y1="386" x2="960" y2="386" stroke="var(--ink-dim)" stroke-width="1"/>
+          <text class="tok" x="95"  y="410" text-anchor="middle">12</text>
+          <text class="tok" x="245" y="410" text-anchor="middle">7</text>
+          <text class="tok" x="395" y="410" text-anchor="middle">"</text>
+          <text class="tok" x="545" y="410" text-anchor="middle">}</text>
+          <text class="tok" x="695" y="410" text-anchor="middle">true</text>
+          <text class="tok" x="845" y="410" text-anchor="middle">null</text>
+        </g>
+
+        <g data-step="4">
+          <!-- válidos -->
+          <text class="t-sub t-ev" x="95"  y="286" text-anchor="middle" font-weight="700">✓ sigue</text>
+          <text class="t-sub t-ev" x="245" y="306" text-anchor="middle" font-weight="700">✓ sigue</text>
+          <!-- inválidos: −∞ -->
+          <text class="t-lbl t-act" x="395" y="262" text-anchor="middle">−∞</text>
+          <text class="t-lbl t-act" x="545" y="302" text-anchor="middle">−∞</text>
+          <text class="t-lbl t-act" x="695" y="328" text-anchor="middle">−∞</text>
+          <text class="t-lbl t-act" x="845" y="338" text-anchor="middle">−∞</text>
+          <path class="refuse draw" pathLength="1" d="M350,330 L440,330"/>
+          <path class="refuse draw" pathLength="1" d="M500,350 L590,350"/>
+          <path class="refuse draw" pathLength="1" d="M650,364 L740,364"/>
+          <path class="refuse draw" pathLength="1" d="M800,370 L890,370"/>
+          <text class="t-sub t-act" x="560" y="216" font-weight="700">→ los inválidos quedan en −∞ y las probabilidades se renormalizan</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> que la sala entienda el mecanismo en una imagen: el esquema se compila a una gramática, la gramática (con una pila) decide qué sigue, y eso se aplica como máscara sobre los logits. (2:30)</p>
+    <blockquote>Hasta ahora el modelo “escribía JSON” porque se lo pedimos bien. Con decodificación restringida no se lo pedimos: se lo exigimos token por token.</blockquote>
+    <blockquote>Se compila el JSON Schema a una gramática libre de contexto. Como un objeto JSON anida llaves y corchetes, hace falta un autómata de pila que recuerde qué quedó abierto.</blockquote>
+    <blockquote>En cada paso, los tokens que la gramática no permite reciben menos infinito antes del softmax. Lo que queda se renormaliza. El modelo solo puede elegir entre lo válido.</blockquote>
+    <p>Pasos con →: 1 esquema → gramática; 2 autómata de pila y precálculo; 3 los logits en bruto de un paso (el modelo prefería la comilla, que rompería el esquema); 4 la máscara: inválidos a −∞, el resto renormalizado.</p>
+    <p>Dato de la fuente (XGrammar, MLSys 2025, arXiv:2411.15100): separa los tokens independientes del contexto, que se precalculan, de los dependientes, que se revisan al ejecutar, con un autómata de pila a nivel de bytes. Los autores reportan hasta 100x menos latencia por token para gramáticas libres de contexto y hasta 80x de aceleración de servicio de extremo a extremo con Llama 3.1 en H100: son cifras de los autores, di “según los autores”. La clase de CMU (diap. 31–33) es de donde sale este recorrido.</p>
+    <p class="warn">Las barras son ilustrativas, no medidas. No afirmes cómo implementa Anthropic <code>strict: true</code> por dentro: la documentación solo dice que el input sigue el <code>input_schema</code>. Lo que muestro es el mecanismo de la clase y de XGrammar.</p>
+    <p class="warn">Si vamos tarde (recorte 3 del plan): no hables del paso 2; pasa → dos veces seguidas y explica solo la máscara de logits (paso 3 y 4). Ahorra ~1:00 para el truncado.</p>
+    <p><strong>Pregunta para llevarse:</strong> ¿qué parte de tu salida estructurada hoy depende de “pedirlo bien” y no de una restricción?</p>
+    <p><strong>Transición:</strong> “Con esto, cada paso es válido. Entonces, ¿dónde falla todavía?”</p>
+  </aside>
+</section>
+
+<!-- ============ 06b · el límite: predecir y revelar ============ -->
+<section class="slide s06b" data-title="El límite: la gramática no te salva del corte" data-section="Decodificación" data-budget="1:30"
+         style="--slide-accent:var(--action)">
+  <div class="main">
+    <div class="hd">
+      <p class="eyebrow reveal">Predice · el quiz de la clase</p>
+      <h2 class="reveal d1">¿Dónde falla <em>aun con gramática</em>?</h2>
+    </div>
+    <div class="figure fill reveal d2">
+      <svg class="dg" viewBox="0 0 1000 400" role="img" aria-label="Una secuencia de tokens que forma el comienzo de un objeto JSON, con cada token válido según la gramática. En el token 'clie' la generación se corta por max_tokens con stop_reason max_tokens. Los tokens que faltan para cerrar la cadena y el objeto no llegaron. La pila del autómata queda con la llave y la comilla abiertas, y el JSON no se puede parsear.">
+        <g data-step="1">
+          <text class="t-sub t-ev" x="20" y="40" font-weight="700">cada token cumple la gramática</text>
+          <path class="exec draw" pathLength="1" d="M20,60 H660" marker-end="url(#arr-ev)"/>
+          <rect class="node ev" x="20"  y="86" width="50"  height="52" rx="4"/><text class="tok" x="45"  y="118" text-anchor="middle">{</text>
+          <rect class="node ev" x="78"  y="86" width="96"  height="52" rx="4"/><text class="tok" x="126" y="118" text-anchor="middle">"sql"</text>
+          <rect class="node ev" x="182" y="86" width="50"  height="52" rx="4"/><text class="tok" x="207" y="118" text-anchor="middle">:</text>
+          <rect class="node ev" x="240" y="86" width="120" height="52" rx="4"/><text class="tok" x="300" y="118" text-anchor="middle">"SELECT</text>
+          <rect class="node ev" x="368" y="86" width="110" height="52" rx="4"/><text class="tok" x="423" y="118" text-anchor="middle"> nombre</text>
+          <rect class="node ev" x="486" y="86" width="90"  height="52" rx="4"/><text class="tok" x="531" y="118" text-anchor="middle"> FROM</text>
+          <rect class="node ev" x="584" y="86" width="90"  height="52" rx="4"/><text class="tok" x="629" y="118" text-anchor="middle"> clie</text>
+        </g>
+        <g data-step="2">
+          <path class="refuse draw" pathLength="1" d="M694,70 V156"/>
+          <text class="t-lbl t-act" x="708" y="92">stop_reason</text>
+          <text class="t-lbl t-act" x="708" y="114">"max_tokens"</text>
+          <text class="t-sub" x="708" y="138">se acabó el espacio</text>
+        </g>
+        <g data-step="3">
+          <text class="t-sub" x="20" y="196">lo que faltaba y no llegó:</text>
+          <rect class="node ghost" x="240" y="176" width="90" height="52" rx="4"/><text class="tok ghost" x="285" y="208" text-anchor="middle">ntes</text>
+          <rect class="node ghost" x="338" y="176" width="50" height="52" rx="4"/><text class="tok ghost" x="363" y="208" text-anchor="middle">"</text>
+          <rect class="node ghost" x="396" y="176" width="50" height="52" rx="4"/><text class="tok ghost" x="421" y="208" text-anchor="middle">}</text>
+
+          <text class="t-mono t-act" x="20" y="272">Pila del autómata al cortar</text>
+          <rect class="node act" x="20" y="288" width="110" height="34" rx="3"/><text class="tok" x="75" y="311" text-anchor="middle">"  abierta</text>
+          <rect class="node act" x="20" y="326" width="110" height="34" rx="3"/><text class="tok" x="75" y="349" text-anchor="middle">{  abierta</text>
+          <text class="t-sub t-act" x="146" y="321" font-weight="700">no está vacía</text>
+
+          <path class="refuse draw" pathLength="1" d="M340,324 H520" marker-end="url(#bar-act)"/>
+          <rect class="node act" x="530" y="294" width="450" height="62" rx="4" style="stroke-width:2.4"/>
+          <text class="t-lbl" x="550" y="320">✕ JSON incompleto</text>
+          <text class="t-sub" x="550" y="342">la gramática valida cada paso, no que lleguemos al final</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> que la sala se comprometa con una respuesta antes de verla, y que llegue a esta idea: la gramática garantiza que cada paso es válido, pero no que la generación termine. (1:30)</p>
+    <ol>
+      <li>Antes de pulsar →: “Acabo de decirles que el modelo solo puede elegir tokens válidos. ¿Dónde falla todavía? Griten o levanten la mano.” Espera 15–20 s. Anota en voz alta lo que digan.</li>
+      <li>Es probable que digan “valores incorrectos / semántica”: es cierto y es el siguiente bloque (minuto 22). Hoy la respuesta de este quiz es otra: el corte.</li>
+      <li>Pulsa → y revela.</li>
+    </ol>
+    <blockquote>La gramática me promete que cada prefijo es válido. No me promete que el modelo termine de escribir.</blockquote>
+    <blockquote>Si <code>max_tokens</code> corta la llamada a la mitad, la pila del autómata sigue abierta y lo que me llega no se puede parsear.</blockquote>
+    <p>Pasos con →: 1 los tokens, todos válidos; 2 el corte, <code>stop_reason: "max_tokens"</code>; 3 lo que faltaba, la pila abierta y el JSON incompleto.</p>
+    <p>Fuente: la documentación de salidas estructuradas dice que, si <code>stop_reason</code> es <code>max_tokens</code>, la salida puede quedar incompleta y no cumplir el esquema, y que se reintenta con más <code>max_tokens</code>. O sea: <code>strict</code> no protege contra la truncación. El quiz es de la clase de CMU 11-768 (Neubig).</p>
+    <p class="warn">La cadena <code>{"sql": "SELECT nombre FROM clie…</code> es un ejemplo ilustrativo, no una salida real. La salida real la imprime <code>romper truncado</code> en la siguiente diapositiva.</p>
+    <p><strong>Pregunta para llevarse:</strong> ¿tu código mira <code>stop_reason</code> antes de parsear?</p>
+    <p><strong>Transición:</strong> “Vamos a romperlo: pido poco espacio y vemos qué hace nuestro agente con media llamada.”</p>
+  </aside>
+</section>

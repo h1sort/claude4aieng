@@ -1,0 +1,62 @@
+<style>
+  .s08 .split{align-items:stretch}
+  .s08 .panel{display:flex;flex-direction:column;gap:clamp(.4rem,1.2vh,.9rem)}
+  .s08 .panel h3{font-size:clamp(1.05rem,1.7vw,1.7rem)}
+  .s08 .ticks{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:clamp(.3rem,1vh,.7rem)}
+  .s08 .ticks li{position:relative;padding-left:1.6em;font-size:var(--t-body);line-height:1.4;color:var(--ink-2)}
+  .s08 .ticks li::before{position:absolute;left:0;top:0;font-weight:700}
+  .s08 .ev .ticks li::before{content:'✓';color:var(--evidence)}
+  .s08 .act .ticks li::before{content:'✕';color:var(--action)}
+  .s08 .panel h3 code,.s08 .ticks code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
+  .s08 .code{margin:0}
+  .s08 .verdict{display:flex;flex-wrap:wrap;gap:.3rem 1.6rem;margin-top:.5rem;font-family:var(--f-mono);font-size:var(--t-label);letter-spacing:.08em}
+</style>
+
+<!-- ============ 08 · válido ≠ correcto ============ -->
+<section class="slide s08" data-title="Válido ≠ correcto: strict garantiza forma, no significado" data-section="Válido ≠ correcto" data-budget="2:30"
+         style="--slide-accent:var(--action)">
+  <div class="main">
+    <div class="hd">
+      <p class="eyebrow reveal">Minuto 22 · strict: true</p>
+      <h2 class="reveal d1">Válido no significa <em>correcto</em></h2>
+    </div>
+    <div class="split even reveal d2">
+      <div class="panel ev" data-step="1">
+        <h3>Lo que <code>strict: true</code> asegura</h3>
+        <ul class="ticks">
+          <li>El <code>input</code> sigue el <code>input_schema</code>.</li>
+          <li>El <code>name</code> es una de tus herramientas.</li>
+          <li>Los argumentos llegan con el tipo correcto.</li>
+        </ul>
+      </div>
+      <div class="panel act" data-step="2">
+        <h3>Lo que no puede asegurar</h3>
+        <ul class="ticks">
+          <li>Que la llamada sea sensata, autorizada o correcta.</li>
+          <li>Que sea la herramienta adecuada, ni que la tarea salga bien.</li>
+          <li>Reglas que el esquema no expresa: sin <code>minimum</code>/<code>maximum</code> ni <code>minLength</code>/<code>maxLength</code>.</li>
+        </ul>
+      </div>
+    </div>
+    <div data-step="3" class="reveal d3">
+      <div class="code"><span class="cap">input de sql_query · dos llamadas que cumplen el esquema</span>{"sql": <span class="s">"SELECT nombre FROM clientes LIMIT 5"</span>}      <span class="k">✓ forma válida</span>
+{"sql": <span class="s">"DROP TABLE clientes"</span>}                      <span class="a">✓ forma válida · ✕ no debería ejecutarse</span></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> separar dos preguntas que se confunden: “¿tiene la forma correcta?” (lo resuelve el esquema) y “¿debe ejecutarse?” (lo resuelve la aplicación). (2:30, de los cuales ~0:45 son la historia)</p>
+    <blockquote>La restricción asegura forma. No asegura verdad, ni permisos, ni que sea la herramienta correcta, ni que la tarea salga bien.</blockquote>
+    <blockquote>Un <code>DROP TABLE</code> es un SQL perfectamente bien formado.</blockquote>
+    <p>Pasos con →: 1 lo que sí asegura <code>strict</code>; 2 lo que no; 3 dos llamadas que cumplen el esquema y solo una debería ejecutarse.</p>
+    <p>Fuentes: la página de strict tool use (garantiza que el <code>input</code> sigue el <code>input_schema</code>, que el <code>name</code> es válido y que los tipos son correctos); la clase de CMU, diapositiva 28 (la restricción asegura forma, no verdad, permisos, elección de herramienta ni éxito de la tarea). Límites del esquema: <code>additionalProperties: false</code>, sin esquemas recursivos, sin <code>minimum</code>/<code>maximum</code>/<code>multipleOf</code>, sin <code>minLength</code>/<code>maxLength</code> (documentación de salidas estructuradas).</p>
+
+    <p><strong>Historia de terror (≤ 45 s, sin diapositiva):</strong></p>
+    <blockquote>Una historia que leí: un clasificador con un LLM devolvió <code>null</code>. El código tenía un <code>while null: retry</code>. Sin tope. Se reintentó y se reintentó, y se cuentan unos diez mil dólares de factura.</blockquote>
+    <blockquote>La lección no es “usa otro modelo”. Es: cuando algo falla, devuelve un error que diga qué falló y qué intentar, con <code>is_error</code>, y ponle un tope a los reintentos.</blockquote>
+    <p class="warn">Esta historia NO está en <code>FACTS.md</code> y no se puede verificar. Preséntala como un relato que leíste, no como un caso propio ni de tu empresa; no agregues nombres, fechas, cifras exactas ni detalles que no recuerdes. Si preguntan la fuente: “la leí, no la puedo verificar”. Mantén la cifra como “unos diez mil dólares, según el relato”.</p>
+
+    <p class="warn">No digas “strict nunca falla”. Di “garantiza forma”. Y recuerda la trampa: en Sonnet 5.5, Opus 5.5, Fable 5.1 y Mythos 5.1, <code>tool_choice</code> <code>any</code> y <code>tool</code> devuelven 400; usa <code>auto</code> con strict.</p>
+    <p><strong>Pregunta para llevarse:</strong> ¿qué reglas de tu negocio no caben en un JSON Schema?</p>
+    <p><strong>Transición:</strong> “Si el esquema no puede decidir, alguien tiene que decidir. Y no va a ser otro modelo.”</p>
+  </aside>
+</section>

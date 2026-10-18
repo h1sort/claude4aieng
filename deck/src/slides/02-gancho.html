@@ -1,0 +1,78 @@
+<style>
+  .s02 .split{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:stretch}
+  .s02 .left{display:flex;flex-direction:column;justify-content:center;gap:var(--gap)}
+  .s02 h2{font-size:clamp(1.6rem,3.5vw,3.6rem);max-width:16ch}
+  .s02 .ask h3{font-family:var(--f-display);font-weight:360;font-size:clamp(1.2rem,2vw,2.1rem);letter-spacing:-.01em;line-height:1.1}
+  .s02 .ask .label{margin-bottom:.5rem;display:block}
+  .s02 .cands{list-style:none;margin:.9rem 0 0;padding:0;display:flex;flex-direction:column;gap:.55rem}
+  .s02 .cands li{font-size:var(--t-body);line-height:1.4;color:var(--ink-2);padding-left:1.2rem;position:relative}
+  .s02 .cands li::before{content:'';position:absolute;left:0;top:.5em;width:.5em;height:.5em;border:1.5px solid var(--warm-ink);transform:rotate(45deg)}
+  .s02 .cands b{color:var(--ink);font-weight:650}
+  .s02 .cands-h{margin-top:.8rem}
+  .s02 .right{display:flex;flex-direction:column;gap:.6rem;min-height:0}
+  .s02 .src{max-width:none;line-height:1.5;letter-spacing:.04em;text-transform:none}
+</style>
+
+<!-- ============ 02 · gancho OpenRouter ============ -->
+<section class="slide s02" data-title="Gancho: el mismo modelo, otro ruteo" data-section="Apertura" data-budget="1:30"
+         style="--slide-accent:var(--action)">
+  <div class="main">
+    <div class="split">
+      <div class="left">
+        <p class="eyebrow reveal">Antes de teclear</p>
+        <h2 class="reveal d1">El mismo modelo falla <em>distinto</em> según quién lo sirve</h2>
+        <div class="panel mod ask reveal d3">
+          <span class="label">Predice antes de seguir</span>
+          <h3>¿Por qué cambiaría el mismo modelo?</h3>
+          <p class="label cands-h" data-step="1">Candidatos (hipótesis: OpenRouter no desglosa la causa)</p>
+          <ul class="cands">
+            <li data-step="1"><b>Cuantización.</b> Mismos pesos, menos bits: otra distribución de tokens.</li>
+            <li data-step="2"><b>Decodificación restringida, o no.</b> ¿El proveedor fuerza la gramática del JSON o confía en el modelo?</li>
+            <li data-step="3"><b>Fiabilidad del servicio.</b> Respuestas cortadas, timeouts, un parser distinto de tool calls.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="right reveal d2">
+        <div class="figure fill">
+          <svg class="dg" viewBox="0 0 560 410" role="img" aria-label="Gráfico de barras de la tasa de error de tool calls por petición en OpenRouter, antes y después de Auto Exacto. GLM-5: aproximadamente 8 por ciento antes y cerca de 1 por ciento después, una caída de 88 por ciento. gpt-oss-120b: 5,6 por ciento antes y 3,5 por ciento después. Son promedios de ruteo, no un rango entre proveedores.">
+            <text class="t-mono" x="0" y="18">Tasa de error de tool calls · por petición</text>
+            <path class="wire" d="M20,310 H540"/>
+            <!-- GLM-5: ~8 % -> ~1 % -->
+            <rect class="node act" x="50" y="70" width="64" height="240" rx="3" style="fill:var(--action-soft);stroke-width:2"/>
+            <text class="t-lbl t-act" x="82" y="60" text-anchor="middle">~8 %</text>
+            <rect class="node ev" x="140" y="280" width="64" height="30" rx="3" style="fill:var(--evidence-soft);stroke-width:2"/>
+            <text class="t-lbl t-ev" x="172" y="270" text-anchor="middle">~1 %</text>
+            <path class="wire" d="M100,50 C150,50 172,110 172,190" marker-end="url(#arr)" stroke-dasharray="3 4"/>
+            <text class="t-lbl t-ev" x="182" y="150">−88 %</text>
+            <text class="t-sub" x="82" y="332" text-anchor="middle">antes</text>
+            <text class="t-sub" x="172" y="332" text-anchor="middle">después</text>
+            <text class="t-lbl" x="127" y="356" text-anchor="middle">GLM-5</text>
+            <!-- gpt-oss-120b: 5.6 % -> 3.5 % -->
+            <rect class="node act" x="330" y="142" width="64" height="168" rx="3" style="fill:var(--action-soft);stroke-width:2"/>
+            <text class="t-lbl t-act" x="362" y="132" text-anchor="middle">5,6 %</text>
+            <rect class="node ev" x="420" y="205" width="64" height="105" rx="3" style="fill:var(--evidence-soft);stroke-width:2"/>
+            <text class="t-lbl t-ev" x="452" y="195" text-anchor="middle">3,5 %</text>
+            <text class="t-sub" x="362" y="332" text-anchor="middle">antes</text>
+            <text class="t-sub" x="452" y="332" text-anchor="middle">después</text>
+            <text class="t-lbl" x="407" y="356" text-anchor="middle">gpt-oss-120b</text>
+            <text class="t-sub" x="0" y="392">Antes y después de Auto Exacto: ruteo por calidad de tool calls.</text>
+            <text class="t-sub t-act" x="0" y="410" font-weight="700">Promedio de ruteo; no es un rango entre proveedores.</text>
+          </svg>
+        </div>
+        <p class="note-line src">Fuente: OpenRouter, «Auto Exacto» (blog, publicado 2026-03-12, actualizado 2026-06-24), openrouter.ai/blog/announcements/auto-exacto · consultado 2026-10-18. Métrica: peticiones con error de tool call ÷ peticiones con finish_reason «tool_calls».</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> que la sala vea que «el modelo» no es una sola cosa: el mismo modelo se equivoca distinto al llamar herramientas según cómo lo sirvan, y eso motiva mirar el mecanismo. Predecir primero, revelar después. (1:30)</p>
+    <blockquote>Esto es de OpenRouter. Para GLM-5, la tasa de error de tool calls pasó de cerca de 8 % a cerca de 1 % cuando enrutaron por calidad de tool calls.</blockquote>
+    <blockquote>Ojo con lo que es: es un promedio de ruteo, antes y después. No es «el proveedor A contra el proveedor B». Lo digo para que nadie se lleve una cifra que no existe.</blockquote>
+    <blockquote>Mismo modelo. Antes de mostrarles mi lista: ¿por qué creen que cambia? Dos o tres respuestas, a voz alta.</blockquote>
+    <p>Pasos con →: 1 aparecen los candidatos y la primera (cuantización); 2 decodificación restringida o no; 3 fiabilidad del servicio. Tomar 2–3 respuestas del público ANTES de pulsar →, y nombrar la que coincida con una de las tres.</p>
+    <blockquote>Estas tres son hipótesis razonables, no un diagnóstico: OpenRouter no desglosa la causa. Pero las dos primeras vamos a verlas por dentro en la próxima media hora: qué es el token que emite el modelo y qué hace la decodificación restringida.</blockquote>
+    <p><strong>Si quieres un dato más fresco (opcional):</strong> esta noche abre la pestaña Performance de un modelo en OpenRouter (donde viven «Tool Call Error Rate» por endpoint y por día), captura la pantalla con la fecha visible y cámbiala por el gráfico de barras de esta diapositiva. Si lo haces, di la fecha de captura en voz alta. Si no hay captura, esta diapositiva es suficiente.</p>
+    <p><strong>Cifras que puedes citar si preguntan (FACTS §8):</strong> GLM-5 de «approximately 8 %» a cerca de 1 % (−88 %); gpt-oss-120b de 5.6 % a 3.5 %; en el leaderboard τ²-Bench Airline, los modelos inscritos en Auto Exacto bajaron de 3.9 % a 1.7 % (corrida del 2026-10-18). La métrica es por petición, no por llamada.</p>
+    <p class="warn">Nunca escribas ni digas «15 % contra 0.01 %»: esa cifra de la clase de CMU NO está verificada. No digas «el proveedor X es peor»: no tenemos esa comparación. Si preguntan por la causa: «no lo sé; OpenRouter no la desglosa. Estas son hipótesis». Si piden más: «lo verifico y lo publico en el repo».</p>
+    <p><strong>Transición:</strong> “Para saber qué cambia entre proveedores hay que ver qué recibe el modelo. Treinta segundos de mí, y vamos al código.”</p>
+  </aside>
+</section>

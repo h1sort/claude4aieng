@@ -1,0 +1,78 @@
+<style>
+  .s04 .hd h2{max-width:24ch}
+  .s04 .split{grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);align-items:stretch;gap:clamp(.8rem,2.4vw,2.6rem)}
+  .s04 .code{font-size:clamp(.66rem,.92vw,.92rem);line-height:1.5;padding:clamp(.5rem,1.2vw,1rem) clamp(.6rem,1.4vw,1.2rem)}
+  .s04 .code .cap{margin-bottom:.4em}
+  .s04 .right{display:flex;flex-direction:column;gap:clamp(.5rem,1.4vh,1rem);min-width:0}
+  .s04 .right .code{border-left-color:var(--warm)}
+  .s04 .right .code.u{border-left-color:var(--evidence)}
+  .s04 .keyline{font-family:var(--f-display);font-weight:360;font-size:clamp(1.05rem,1.8vw,1.9rem);line-height:1.2;color:var(--ink);max-width:none}
+  .s04 .keyline em{font-style:italic;color:var(--action)}
+  .s04 .ds{max-width:none;line-height:1.5;text-transform:none;letter-spacing:.03em}
+  .s04 .legend{display:flex;gap:1.4rem;flex-wrap:wrap}
+  .s04 .legend .a{color:var(--action)} .s04 .legend .k{color:var(--evidence)}
+</style>
+
+<!-- ============ 04 · las herramientas son texto ============ -->
+<section class="slide s04" data-title="Las herramientas son texto" data-section="Apertura" data-budget="2:30"
+         style="--slide-accent:var(--evidence)">
+  <div class="main">
+    <div class="hd">
+      <p class="eyebrow reveal">Las herramientas son texto <span class="tag live" style="margin-left:.6rem">en vivo · uv run python -m taller.plantilla</span></p>
+      <h2 class="reveal d1">Para el modelo, una llamada a herramienta son <em>tokens</em></h2>
+    </div>
+    <div class="split reveal d2">
+      <div class="stack">
+        <div class="code"><span class="cap">Qwen3-8B · plantilla de chat renderizada (salida de taller.plantilla, recortada con ⋯)</span><span class="a">&lt;|im_start|&gt;</span>system
+Eres un asistente del banco.
+# Tools ⋯ function signatures within <span class="k">&lt;tools&gt;</span>⋯<span class="k">&lt;/tools&gt;</span> XML tags:
+<span class="k">&lt;tools&gt;</span>{"type": "function", "function": {"name": "sql_query", ⋯}}<span class="k">&lt;/tools&gt;</span>
+⋯ return a json object ⋯ within <span class="k">&lt;tool_call&gt;&lt;/tool_call&gt;</span> XML tags:⋯<span class="a">&lt;|im_end|&gt;</span>
+<span class="a">&lt;|im_start|&gt;</span>user
+¿cuántas tarjetas bloqueadas hay?<span class="a">&lt;|im_end|&gt;</span>
+<span class="a">&lt;|im_start|&gt;</span>assistant
+<span class="k">&lt;tool_call&gt;</span>
+{"name": "sql_query", "arguments": {"query": "SELECT COUNT(*) FROM ⋯"}}
+<span class="k">&lt;/tool_call&gt;</span><span class="a">&lt;|im_end|&gt;</span>
+<span class="a">&lt;|im_start|&gt;</span>user
+<span class="k">&lt;tool_response&gt;</span>
+[{"COUNT(*)": 26}]
+<span class="k">&lt;/tool_response&gt;</span><span class="a">&lt;|im_end|&gt;</span>
+<span class="a">&lt;|im_start|&gt;</span>assistant</div>
+        <p class="note-line legend"><span class="a">&lt;|im_start|&gt; &lt;|im_end|&gt;</span> <span>tokens especiales</span> <span class="k">&lt;tool_call&gt; &lt;tool_response&gt;</span> <span>tokens añadidos: una sola unidad</span></p>
+      </div>
+      <div class="right" data-step="1">
+        <div class="code"><span class="cap">Claude · messages.create devuelve (ilustrativo)</span>{ "stop_reason": "tool_use",
+  "content": [
+    { "type": "<span class="k">tool_use</span>",
+      "id": "toolu_01A⋯",
+      "name": "sql_query",
+      "input": {"query": "SELECT COUNT(*) FROM ⋯"} } ] }</div>
+        <div class="code u"><span class="cap">Tu respuesta en el siguiente mensaje (ilustrativo)</span>{ "role": "user", "content": [
+    { "type": "<span class="k">tool_result</span>",
+      "tool_use_id": "toolu_01A⋯",
+      "content": "[{\"COUNT(*)\": 26}]" } ] }</div>
+      </div>
+    </div>
+    <div class="stack" data-step="2">
+      <p class="keyline">La API parsea los tokens por ti. <em>Tu aplicación sigue siendo dueña del bucle.</em></p>
+      <p class="note-line ds">Otra familia, otro formato: DeepSeek-V3 delimita con &lt;｜tool▁calls▁begin｜&gt; ⋯ &lt;｜tool▁call▁end｜&gt; y espera otro parser · uv run python -m taller.plantilla --comparar</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> que la sala vea con sus ojos que una «llamada a herramienta» es texto con marcadores que un parser tiene que recoger, y que con la API de Claude ese parseo ya viene hecho, pero el bucle sigue siendo de la aplicación. Primer tecleo del taller, antes del minuto 5. (2:30)</p>
+    <ol>
+      <li>Decir la frase de abajo y correr <code>uv run python -m taller.plantilla</code> (sin red, sin pesos, sin API). Los marcadores salen resaltados en la terminal. (0:45)</li>
+      <li>Señalar en pantalla: las herramientas viajan dentro del prompt de sistema como JSON entre <code>&lt;tools&gt;</code>; el modelo contesta con JSON entre <code>&lt;tool_call&gt;</code>; el resultado vuelve como un turno de usuario envuelto en <code>&lt;tool_response&gt;</code>. (0:45)</li>
+      <li>→ (paso 1): la misma llamada como bloques de contenido de la API de Claude. (0:30)</li>
+      <li>→ (paso 2): frase clave y mención de DeepSeek-V3. Si hay tiempo, <code>--comparar</code> en la terminal. (0:30)</li>
+    </ol>
+    <blockquote>Esto es lo que recibe un modelo de pesos abiertos. Las herramientas son texto en el prompt; la llamada es texto en la respuesta, entre marcadores que el modelo aprendió a emitir.</blockquote>
+    <blockquote>Fíjense en que <code>&lt;tool_call&gt;</code> no son once caracteres: en el tokenizador de Qwen3 es un token añadido, una sola unidad. Y el parser, hasta que alguien lo escribe, no existe.</blockquote>
+    <blockquote>Con Claude no parseas tokens: recibes un bloque <code>tool_use</code> con un <code>id</code>, un <code>name</code> y un <code>input</code> ya estructurados. La API parsea los tokens por ti. Lo que no te quita es el bucle: tú ejecutas y tú contestas.</blockquote>
+    <blockquote>Y no es un estándar: DeepSeek-V3 usa otros delimitadores y otra forma de los argumentos. Un parser de una familia no parsea la otra.</blockquote>
+    <p>Datos para precisar si preguntan (FACTS §11): la plantilla es de Qwen3-8B (JSON dentro de <code>&lt;tool_call&gt;</code>); <code>&lt;|im_start|&gt;</code> y <code>&lt;|im_end|&gt;</code> son tokens especiales; <code>&lt;tool_call&gt;</code>, <code>&lt;tool_response&gt;</code> son tokens añadidos que el tokenizador reconoce como unidad pero no están marcados como especiales. La diapositiva 23 de la clase de CMU muestra una versión más nueva de Qwen con etiquetas <code>&lt;function=…&gt;</code>: no mezclar con la de Qwen3-8B.</p>
+    <p class="warn">No afirmes cómo emite tokens Claude por dentro: no es público y no está en FACTS. La nota de la terminal dice que «el modelo sigue emitiendo tokens en un formato entrenado» (cierto para modelos abiertos); di «la API los entrega ya estructurados». Si la terminal falla: <code>git checkout paso-0</code> y repite; plan B: esta misma diapositiva ya trae la salida. El campo del repo es <code>sql</code> (aquí es <code>query</code> porque la plantilla es un ejemplo); coméntalo solo si preguntan.</p>
+    <p><strong>Transición:</strong> “Entonces el parseo no es lo difícil. Lo difícil es el bucle: quién ejecuta, quién contesta, en qué orden. Eso lo escribimos ahora.”</p>
+  </aside>
+</section>
