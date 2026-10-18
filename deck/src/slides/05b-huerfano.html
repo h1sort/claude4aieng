@@ -1,0 +1,84 @@
+<style>
+  .s05c .hd h2{max-width:none}
+  .s05c .split{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);align-items:stretch;gap:clamp(.8rem,2.4vw,2.6rem)}
+  .s05c .code{font-size:clamp(.66rem,.94vw,.94rem);line-height:1.5;padding:clamp(.5rem,1.2vw,1rem) clamp(.6rem,1.4vw,1.2rem)}
+  .s05c .code .cap{margin-bottom:.4em}
+  .s05c .ask h3{font-family:var(--f-display);font-weight:360;font-size:clamp(1.15rem,1.9vw,2rem);letter-spacing:-.01em;line-height:1.15;margin:.2rem 0 .6rem}
+  .s05c .opts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45rem}
+  .s05c .opts li{font-size:var(--t-body);line-height:1.35;color:var(--ink-2);padding-left:1.9rem;position:relative}
+  .s05c .opts li b{position:absolute;left:0;top:0;font-family:var(--f-mono);font-weight:500;color:var(--warm-ink)}
+  .s05c .note{font-size:clamp(.78rem,1.05vw,1rem);line-height:1.4;color:var(--ink-2);margin:0}
+  .s05c code.i,.s05c .note code,.s05c .opts code{font-family:var(--f-mono);font-size:.92em;color:var(--ink)}
+  .s05c .ck{display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;align-items:center}
+  .s05c .src{max-width:none;text-transform:none;letter-spacing:.03em;font-size:clamp(.62rem,.76vw,.76rem)}
+
+  @media (max-width:760px){
+    .s05c .split{grid-template-columns:1fr}
+    
+    .s05c .code{white-space:pre-wrap;overflow-wrap:anywhere}
+  }
+</style>
+
+<!-- ============ 05c · rotura #1: huérfano ============ -->
+<section class="slide s05c" data-title="Rotura #1: el tool_use huérfano" data-section="Rotura #1" data-budget="3:30"
+         style="--slide-accent:var(--action)">
+  <div class="main">
+    <div class="hd">
+      <p class="eyebrow reveal">Rotura #1 · huérfano <span class="tag live" style="margin-left:.6rem">en vivo · uv run python -m taller.romper huerfano</span></p>
+      <h2 class="reveal d1">Un <em>tool_use</em> sin su <code style="font-size:.72em">tool_result</code></h2>
+    </div>
+    <div class="split reveal d2">
+      <div class="stack">
+        <div class="panel mod ask">
+          <span class="label">Predice antes de correr</span>
+          <h3>El proceso murió entre el <code class="i">tool_use</code> y el <code class="i">tool_result</code>. Reanudas. ¿Qué pasa?</h3>
+          <ul class="opts">
+            <li><b>A</b>El modelo nota el hueco y repite la llamada.</li>
+            <li><b>B</b>La API rechaza el historial.</li>
+            <li><b>C</b>El modelo responde inventando el resultado.</li>
+          </ul>
+        </div>
+        <div class="code" data-step="1"><span class="cap">taller.romper huerfano · fragmento de la doc</span>$ uv run python -m taller.romper huerfano
+<span class="a">RECHAZADA › 400 · ⋯ tool_use ids were found without</span>
+<span class="a">           tool_result blocks immediately after ⋯</span></div>
+      </div>
+      <div class="stack" data-step="2">
+        <div class="code"><span class="cap">taller/agent.py · sanitize_history · # TODO(paso-2)</span>orphans = [{"type": "<span class="k">tool_result</span>",
+            "tool_use_id": t,
+            "is_error": <span class="a">True</span>,
+            "content": <span class="s">"El proceso se interrumpió antes de
+                       ejecutar esta herramienta; no hay
+                       resultado. Si la información sigue
+                       siendo necesaria, vuelve a llamar
+                       a la herramienta."</span>}
+           for t in ids if t not in done]
+<span class="c"># los tool_result van PRIMERO en el mensaje de usuario</span>
+merged = {"role": "user", "content": orphans + content}</div>
+        <p class="note">No se borra nada: <code>is_error</code> y un texto que dice <b>qué pasó y qué intentar</b>. Después, <code>romper huerfano</code> muestra al modelo con el historial saneado.</p>
+        <div class="panel ev ck">
+          <span class="label">Checkpoint</span>
+          <span class="note">Mano arriba si el DESPUÉS de <code>romper huerfano</code> ya funciona.</span>
+          <span class="note">Atrasado: <code>git checkout paso-2</code></span>
+        </div>
+      </div>
+    </div>
+    <p class="note-line src">Fuente: docs de Anthropic, handle-tool-calls (fragmento del 400 e is_error) · verificado 2026-10-18 (FACTS §5)</p>
+  </div>
+  <aside class="notes">
+    <p><strong>Propósito:</strong> que la sala vea el 400 real del historial con un <code>tool_use</code> huérfano, entienda por qué ocurre (un crash o un Ctrl-C entre el <code>tool_use</code> y su resultado deja el historial inválido) y escriba el saneo. Primera rotura del taller. (3:30)</p>
+    <p><strong>Desglose:</strong> 0:30 predecir; 0:45 correr y ver el 400; 1:45 teclean el paso-2 (silencio del orador); 0:30 checkpoint.</p>
+    <p><strong>Predecir primero (0:30):</strong></p>
+    <blockquote>Imaginen que su proceso murió justo después de que el modelo pidió una herramienta y antes de guardar el resultado. Mañana reanudan la conversación. ¿Qué pasa? A, el modelo lo nota y repite; B, la API rechaza el historial; C, el modelo inventa el resultado. Manos arriba para cada una.</blockquote>
+    <p>Anotar el conteo en voz alta («la mayoría fue B / A»); se retoma después del 400.</p>
+    <p><strong>Revelar (0:45):</strong> →, y correr <code>uv run python -m taller.romper huerfano</code>. Sale el 400 real de la API; leer el fragmento que cita la documentación.</p>
+    <blockquote>400. «tool_use ids were found without tool_result blocks immediately after». La API no te deja improvisar: cada <code>tool_use</code> tiene que tener su <code>tool_result</code> en el mensaje siguiente.</blockquote>
+    <blockquote>Retomo su respuesta: [según el conteo]. Fíjense que el modelo ni siquiera llega a opinar: el historial inválido se rechaza antes.</blockquote>
+    <p><strong>Teclear (1:45, orador callado):</strong> → (paso 2). <code>git checkout paso-1</code> si no lo tienen; completar <code># TODO(paso-2)</code> dentro de <code>sanitize_history</code>: por cada <code>tool_use</code> sin <code>tool_result</code> inmediato, insertar un <code>tool_result</code> con <code>is_error: true</code> y un texto instructivo, <b>antes</b> de cualquier texto del mensaje de usuario. Volver a correr <code>uv run python -m taller.romper huerfano</code>: la sección DESPUÉS ya no debe dar 400. Lo mismo vale para <code>uv run python -m taller.agent --reanudar</code>, que sanea la sesión guardada en <code>runs/sesion.json</code> (también se puede reproducir matando el proceso con Ctrl-C entre el tool_use y el resultado).</p>
+    <p><strong>Checkpoint (0:30):</strong></p>
+    <blockquote>Mano arriba: ¿a quién ya le funciona el DESPUÉS? Si son menos de la mitad, todos <code>git checkout paso-2</code>.</blockquote>
+    <blockquote>La lección: no tires el historial ni le inventes un resultado. Dile al modelo la verdad, con <code>is_error</code>, y qué intentar. Es contenido instructivo, no un «error».</blockquote>
+    <p><strong>Historia de terror (opcional, ≤ 45 s, solo si hay tiempo y es un caso propio):</strong> un agente reanudado después de un crash. Cuenta únicamente un caso que realmente viviste; si no tienes uno, sáltatela. La historia de los reintentos que costaron $10 000 NO va aquí: está reservada para la diapositiva de <code>is_error</code> y reintentos.</p>
+    <p class="warn">Si la API no responde (créditos, red): <code>--inyectado</code>; <code>romper</code> lo activa solo si falta <code>ANTHROPIC_API_KEY</code> y lo dice en pantalla; el 400 que muestra es el fragmento documentado, no una respuesta de esta corrida. Di el texto completo del 400 solo como «lo que imprime la API»; en FACTS solo el fragmento es oficial. Claude reintenta 2–3 veces ante llamadas inválidas según la documentación: no prometas cuántas veces lo hace tu agente.</p>
+    <p><strong>Transición:</strong> “El historial ya sobrevive a un crash. Pero hay otra forma de que el tool_use llegue roto: que el modelo no termine de escribirlo. Para eso hay que mirar cómo se genera el JSON.”</p>
+  </aside>
+</section>

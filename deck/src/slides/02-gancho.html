@@ -11,6 +11,15 @@
   .s02 .cands-h{margin-top:.8rem}
   .s02 .right{display:flex;flex-direction:column;gap:.6rem;min-height:0}
   .s02 .src{max-width:none;line-height:1.5;letter-spacing:.04em;text-transform:none}
+  @media (max-width:760px){
+    .s02 .split{grid-template-columns:1fr}
+    
+    .s02 .left,.s02 .right{min-width:0}
+    .s02 h2{font-size:1.5rem}
+    .s02 .figure{max-height:230px}
+    .s02 .src{font-size:.58rem}
+    .s02 .ask{padding:.6rem}
+  }
 </style>
 
 <!-- ============ 02 · gancho OpenRouter ============ -->

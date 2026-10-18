@@ -19,6 +19,12 @@
   .s05b .trap .body{margin:.5rem 0 0}
   .s05b .ck{display:flex;flex-wrap:wrap;gap:.5rem 1.4rem;align-items:center}
   .s05b .src{max-width:none;text-transform:none;letter-spacing:.03em;font-size:clamp(.62rem,.76vw,.76rem);margin-top:.5rem}
+
+  @media (max-width:760px){
+    .s05b .split{grid-template-columns:1fr}
+    
+    .s05b .code{white-space:pre-wrap;overflow-wrap:anywhere}
+  }
 </style>
 
 <!-- ============ 05 · el bucle a nivel cable ============ -->
@@ -35,7 +41,7 @@
         <rect class="model" x="10" y="6" width="980" height="124" rx="26"/>
         <text class="t-mono t-mod" x="34" y="30">Modelo · propone</text>
         <rect class="app" x="10" y="164" width="980" height="116" rx="6"/>
-        <text class="t-mono" x="34" y="188">Tu aplicación · ejecuta</text>
+        <text class="t-mono" x="966" y="188" text-anchor="end">Tu aplicación · ejecuta</text>
 
         <!-- 1: messages.create -> stop_reason tool_use -->
         <g data-step="1">
@@ -71,7 +77,7 @@
         </g>
         <!-- 5: el resultado vuelve -->
         <g data-step="5">
-          <path class="return draw" d="M690,270 V298 H125 V274" marker-end="url(#arr-ev)"/>
+          <path class="return draw" d="M800,270 V298 H125 V274" marker-end="url(#arr-ev)"/>
           <text class="t-sub t-ev" x="215" y="292" font-weight="700">vuelve en el siguiente messages.create, mientras stop_reason == "tool_use"</text>
         </g>
         <!-- 6: salida -->

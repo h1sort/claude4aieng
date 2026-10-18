@@ -86,8 +86,8 @@ def main():
         print(f"\n== {fam}: texto crudo que recibe el modelo ==\n{resaltar(texto, fam, color)}")
     if a.comparar:
         comparar(textos)
-    print("\nNota: la API de Claude te devuelve `tool_use` como bloques de contenido estructurados, pero por debajo\n"
-          "el modelo sigue emitiendo tokens en un formato entrenado; la API los parsea por ti.")
+    print("\nNota: en modelos abiertos como estos ves el formato completo. La API de Claude te entrega\n"
+          "`tool_use` como bloques ya estructurados; su formato interno no es público. El bucle sigue siendo tuyo.")
 
 
 if __name__ == "__main__":
