@@ -13,8 +13,8 @@ VENDOR = Path(__file__).parent / "vendor"
 TOOL = {"type": "function", "function": {
     "name": "sql_query",
     "description": "Ejecuta un SELECT de solo lectura sobre la base del banco (clientes, cuentas, transacciones, tarjetas).",
-    "parameters": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}}}
-SQL = {"query": "SELECT COUNT(*) FROM tarjetas WHERE estado = 'bloqueada'"}
+    "parameters": {"type": "object", "properties": {"sql": {"type": "string"}}, "required": ["sql"]}}}
+SQL = {"sql": "SELECT COUNT(*) FROM tarjetas WHERE estado = 'bloqueada'"}
 SYS, PREGUNTA, RESULTADO, FINAL = ("Eres un asistente del banco.", "¿cuántas tarjetas bloqueadas hay?",
                                    '[{"COUNT(*)": 26}]', "Hay 26 tarjetas bloqueadas.")
 

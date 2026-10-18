@@ -14,7 +14,7 @@ def test_renderiza_familia(familia, marcador):
 
 def test_qwen_formato_json_en_tool_call():
     texto = plantilla.renderizar("qwen")
-    assert '<tool_call>\n{"name": "sql_query", "arguments": {"query":' in texto
+    assert '<tool_call>\n{"name": "sql_query", "arguments": {"sql":' in texto
     assert "<|im_start|>assistant" in texto and "<tool_response>" in texto
 
 
