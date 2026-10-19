@@ -62,12 +62,10 @@ def sanitize_history(messages: list) -> list:
         done = {b.get("tool_use_id") for b in content if b.get("type") == "tool_result"}
         orphans = [t for t in ids if t not in done]  # tool_use sin su tool_result
         hasta = i + 2 if nxt else i + 1  # el mensaje de usuario siguiente (si existe) se reemplaza por el unido
-        # >>> paso-2
-        # los tool_result van PRIMERO en el mensaje de usuario; texto antes de ellos -> 400
-        if orphans:
-            errores = [{"type": "tool_result", "tool_use_id": t, "is_error": True, "content": HUERFANO_MSG} for t in orphans]
-            fixed[i + 1:hasta] = [{"role": "user", "content": errores + content}]
-        # <<< paso-2
+        # TODO(paso-2): si hay `orphans`, mete un tool_result (is_error=True) por cada uno AL PRINCIPIO del mensaje de usuario siguiente
+        # Arma `errores`: un {type: tool_result, tool_use_id, is_error: True, content: HUERFANO_MSG} por huérfano.
+        # Luego reemplaza fixed[i + 1:hasta] por un mensaje de usuario con errores + content (resultados primero).
+        # Sin esto el historial se reenvía tal cual y la API responde 400.
     return fixed
 
 
@@ -98,12 +96,9 @@ async def execute_calls(calls: list[ToolCall], tools: list[ToolSpec], timeout_s:
     hechos = await asyncio.gather(*(asyncio.wait_for(one(c), tope) for c in calls), return_exceptions=True)
     # Versión ingenua: devuelve solo las que terminaron. La que pasó el tope se pierde y su tool_use queda huérfano.
     results = [r for r in hechos if isinstance(r, ToolResult)]
-    # >>> paso-2b
-    # Cada tool_use necesita su tool_result, también la llamada que no terminó: un timeout es un is_error.
-    results = [r if isinstance(r, ToolResult) else ToolResult(c.id, ToolOutcome.EXEC_ERROR,
-               f"{c.name} no terminó en {tope:g} s ({type(r).__name__}); reintenta con una consulta más simple o explica el problema.", True)
-               for c, r in zip(calls, hechos)]
-    # <<< paso-2b
+    # TODO(paso-2b): un tool_result POR CADA llamada, también la que no terminó: un timeout se devuelve como is_error
+    # Recorre zip(calls, hechos): si r es ToolResult úsalo; si no (timeout/excepción), arma
+    # ToolResult(c.id, ToolOutcome.EXEC_ERROR, "<qué pasó y qué intentar>", True). Mientras falte, `romper paralelo` da 400.
     return results
 
 
@@ -176,12 +171,9 @@ class Agent:
             if resp.stop_reason == "max_tokens":
                 stage("MODELO", f"stop_reason=max_tokens con max_tokens={self.max_tokens}"
                                 + (f": la llamada a {', '.join(b.name for b in uses)} puede venir cortada" if uses else ""))
-            # >>> paso-3
-            if resp.stop_reason == "max_tokens" and uses:  # JSON cortado: ni se ejecuta ni se guarda en el historial
-                self.max_tokens = min(self.max_tokens * 4, MAX_TOKENS_TOPE)  # y se repite la petición con más margen
-                self._log(turn)
-                continue
-            # <<< paso-3
+            # TODO(paso-3): con stop_reason == "max_tokens" y algún tool_use el JSON puede estar cortado: ni lo ejecutes ni lo guardes
+            # Sube self.max_tokens (min(.. * 4, MAX_TOKENS_TOPE)), registra el turno con self._log(turn) y `continue`:
+            # se repite la misma petición. Mientras falte, el tool_use cortado se guarda y el siguiente mensaje da 400.
             messages.append({"role": "assistant", "content": [block_to_dict(b) for b in resp.content]})
             self._save(messages)
             if resp.stop_reason != "tool_use":  # end_turn, refusal, max_tokens sin llamadas...

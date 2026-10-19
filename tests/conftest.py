@@ -46,3 +46,30 @@ def modulo_cortado():
         return mod
 
     return cargar
+
+
+# --- generado por scripts/cortar_pasos.py (solo en los branches paso-*) ---
+PASO_ACTUAL = 1  # estás en paso-1: tienes escritos los pasos 1..1
+REQUIERE_PASO = {
+    'tests/test_agent.py::test_sanitize_inserts_error_result_first': 2,
+    'tests/test_agent.py::test_sanitize_string_user_message_after_orphan': 2,
+    'tests/test_agent.py::test_sanitize_when_history_ends_at_tool_use_and_is_idempotent': 2,
+    'tests/test_agent.py::test_timeout_in_parallel_call_comes_back_as_is_error': 2,
+    'tests/test_agent.py::test_truncated_retry_is_capped': 3,
+    'tests/test_agent.py::test_truncated_tool_use_is_not_executed_and_is_retried': 3,
+    'tests/test_romper.py::test_detectar_compuerta_es_en_ejecucion': 4,
+    'tests/test_romper.py::test_drop': 4,
+    'tests/test_romper.py::test_huerfano': 2,
+    'tests/test_romper.py::test_paralelo': 2,
+    'tests/test_romper.py::test_truncado': 3,
+}
+
+
+def pytest_collection_modifyitems(config, items):
+    """Salta (con motivo) las pruebas de los pasos que todavía no escribes."""
+    for item in items:
+        archivo, _, prueba = item.nodeid.partition("::")
+        paso = REQUIERE_PASO.get(f"{archivo}::{prueba.split('[')[0]}", REQUIERE_PASO.get(archivo, 0))
+        if paso > PASO_ACTUAL:
+            item.add_marker(pytest.mark.skip(
+                reason=f"requiere el paso {paso}: aún no lo escribes (estás en paso-{PASO_ACTUAL})"))
