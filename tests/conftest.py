@@ -46,3 +46,21 @@ def modulo_cortado():
         return mod
 
     return cargar
+
+
+# --- generado por scripts/cortar_pasos.py (solo en los branches paso-*) ---
+PASO_ACTUAL = 3  # estás en paso-3: tienes escritos los pasos 1..3
+REQUIERE_PASO = {
+    'tests/test_romper.py::test_detectar_compuerta_es_en_ejecucion': 4,
+    'tests/test_romper.py::test_drop': 4,
+}
+
+
+def pytest_collection_modifyitems(config, items):
+    """Salta (con motivo) las pruebas de los pasos que todavía no escribes."""
+    for item in items:
+        archivo, _, prueba = item.nodeid.partition("::")
+        paso = REQUIERE_PASO.get(f"{archivo}::{prueba.split('[')[0]}", REQUIERE_PASO.get(archivo, 0))
+        if paso > PASO_ACTUAL:
+            item.add_marker(pytest.mark.skip(
+                reason=f"requiere el paso {paso}: aún no lo escribes (estás en paso-{PASO_ACTUAL})"))
