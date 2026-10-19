@@ -73,11 +73,8 @@ def _render(columns: list[str], rows: list[tuple]) -> str:
 def sql_query(sql: str) -> str:
     """Ejecuta un SELECT sobre la base del banco (conexión de solo lectura) y devuelve una tabla en texto."""
     motivo = None
-    # >>> paso-4
-    # Válido por esquema no es correcto: strict garantiza que `sql` sea un string, no que sea seguro.
-    # La compuerta decide qué SQL puede correr; si rechaza, el motivo vuelve al modelo como is_error.
-    motivo = _gate(sql)
-    # <<< paso-4
+    # TODO(paso-4): falta la compuerta: llama a _gate(sql) y deja el resultado en `motivo` (None = permitido)
+    stage("VALIDACIÓN", "SIN COMPUERTA (TODO paso-4): el SQL llega a SQLite sin validar")
     if motivo:
         motivo = motivo if motivo.startswith(RECHAZADA) else f"{RECHAZADA} {motivo}"
         stage("RECHAZADA", motivo)
