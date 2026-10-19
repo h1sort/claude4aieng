@@ -176,12 +176,9 @@ class Agent:
             if resp.stop_reason == "max_tokens":
                 stage("MODELO", f"stop_reason=max_tokens con max_tokens={self.max_tokens}"
                                 + (f": la llamada a {', '.join(b.name for b in uses)} puede venir cortada" if uses else ""))
-            # >>> paso-3
-            if resp.stop_reason == "max_tokens" and uses:  # JSON cortado: ni se ejecuta ni se guarda en el historial
-                self.max_tokens = min(self.max_tokens * 4, MAX_TOKENS_TOPE)  # y se repite la petición con más margen
-                self._log(turn)
-                continue
-            # <<< paso-3
+            # TODO(paso-3): con stop_reason == "max_tokens" y algún tool_use el JSON puede estar cortado: ni lo ejecutes ni lo guardes
+            # Sube self.max_tokens (min(.. * 4, MAX_TOKENS_TOPE)), registra el turno con self._log(turn) y `continue`:
+            # se repite la misma petición. Mientras falte, el tool_use cortado se guarda y el siguiente mensaje da 400.
             messages.append({"role": "assistant", "content": [block_to_dict(b) for b in resp.content]})
             self._save(messages)
             if resp.stop_reason != "tool_use":  # end_turn, refusal, max_tokens sin llamadas...
