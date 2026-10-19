@@ -7,6 +7,8 @@
   .s05c .opts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45rem}
   .s05c .opts li{font-size:var(--t-body);line-height:1.35;color:var(--ink-2);padding-left:1.9rem;position:relative}
   .s05c .opts li b{position:absolute;left:0;top:0;font-family:var(--f-mono);font-weight:500;color:var(--warm-ink)}
+  .s05c .hint .opts li{padding-left:4.8rem}
+  .s05c .hint .opts li b{font-size:.85em;letter-spacing:.04em}
   .s05c .note{font-size:clamp(.78rem,1.05vw,1rem);line-height:1.4;color:var(--ink-2);margin:0}
   .s05c code.i,.s05c .note code,.s05c .opts code{font-family:var(--f-mono);font-size:.92em;color:var(--ink)}
   .s05c .ck{display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;align-items:center}
@@ -42,7 +44,16 @@
 <span class="a">RECHAZADA › 400 · ⋯ tool_use ids were found without</span>
 <span class="a">           tool_result blocks immediately after ⋯</span></div>
       </div>
-      <div class="stack" data-step="2">
+      <div class="stack">
+        <div class="panel act hint" data-step="1">
+          <span class="label">Tu turno · paso-2 <span class="tag live" style="margin-left:.4rem">teclean · silencio del orador</span></span>
+          <ul class="opts">
+            <li><b>Dónde</b><code>taller/agent.py</code> · <code>sanitize_history</code> · <code># TODO(paso-2)</code></li>
+            <li><b>Qué</b>Por cada huérfano, un <code>tool_result</code> con <code>is_error</code>, <b>primero</b> en el mensaje siguiente.</li>
+            <li><b>Verifica</b><code>uv run python -m taller.romper huerfano</code>: el DESPUÉS ya no da 400.</li>
+          </ul>
+        </div>
+        <div class="stack" data-step="2">
         <div class="code"><span class="cap">taller/agent.py · sanitize_history · TODO(paso-2) · 3 líneas</span><span class="c"># el esqueleto ya encontró los tool_use sin resultado: orphans</span>
 <span class="k">if</span> orphans:
     errores = [{"type": "<span class="k">tool_result</span>", "tool_use_id": t,
@@ -53,11 +64,12 @@
         <div class="panel ev ck">
           <span class="label">Checkpoint</span>
           <span class="note">Mano arriba si el DESPUÉS de <code>romper huerfano</code> ya funciona.</span>
-          <span class="note">Atrasado: <code>git stash &amp;&amp; git checkout paso-2</code></span>
+          <span class="note">¿Atrasado? <code>git stash &amp;&amp; git checkout paso-2</code></span>
+        </div>
         </div>
       </div>
     </div>
-    <p class="note-line src">Fuente: docs de Anthropic, handle-tool-calls (fragmento del 400 e is_error) · verificado 2026-10-18 (FACTS §5)</p>
+    <p class="note-line src">Fuente: docs de Anthropic, handle-tool-calls (fragmento del 400 e is_error) · verificado 2026-10-18</p>
   </div>
   <aside class="notes">
     <p><strong>Propósito:</strong> que la sala vea el 400 real del historial con un <code>tool_use</code> huérfano, entienda por qué ocurre (un crash o un Ctrl-C entre el <code>tool_use</code> y su resultado deja el historial inválido) y escriba el saneo. Primera rotura del taller. (4:30)</p>
@@ -65,15 +77,16 @@
     <p><strong>Predecir primero (0:30):</strong></p>
     <blockquote>Imaginen que su proceso murió justo después de que el modelo pidió una herramienta y antes de guardar el resultado. Mañana reanudan la conversación. ¿Qué pasa? A, el modelo lo nota y repite; B, la API rechaza el historial; C, el modelo inventa el resultado. Manos arriba para cada una.</blockquote>
     <p>Anotar el conteo en voz alta («la mayoría fue B / A»); se retoma después del 400.</p>
-    <p><strong>Revelar (0:45):</strong> →, y correr <code>uv run python -m taller.romper huerfano</code>. Sale el 400 real de la API; leer el fragmento que cita la documentación.</p>
+    <p><strong>Revelar (0:45):</strong> → (paso 1), y correr <code>uv run python -m taller.romper huerfano</code>. Sale el 400 real de la API; leer el fragmento que cita la documentación.</p>
     <blockquote>400. «tool_use ids were found without tool_result blocks immediately after». La API no te deja improvisar: cada <code>tool_use</code> tiene que tener su <code>tool_result</code> en el mensaje siguiente.</blockquote>
     <blockquote>Retomo su respuesta: [según el conteo]. Fíjense que el modelo ni siquiera llega a opinar: el historial inválido se rechaza antes.</blockquote>
-    <p><strong>Teclear (2:45, orador callado):</strong> → (paso 2). <code>git stash &amp;&amp; git checkout paso-1</code> si no lo tienen (el branch <code>paso-1</code> ya trae el esqueleto de <code>sanitize_history</code>); completar <code># TODO(paso-2)</code> (solo la inserción central, 3 líneas) dentro de <code>sanitize_history</code>: por cada <code>tool_use</code> sin <code>tool_result</code> inmediato, insertar un <code>tool_result</code> con <code>is_error: true</code> y un texto instructivo, <b>antes</b> de cualquier texto del mensaje de usuario. Volver a correr <code>uv run python -m taller.romper huerfano</code>: la sección DESPUÉS ya no debe dar 400. Lo mismo vale para <code>uv run python -m taller.agent --reanudar</code>, que sanea la sesión guardada en <code>runs/sesion.json</code> (también se puede reproducir matando el proceso con Ctrl-C entre el tool_use y el resultado).</p>
-    <p><strong>Checkpoint (0:30):</strong></p>
+    <p><strong>Teclear (2:45, orador callado):</strong> en pantalla queda el 400 y el panel «Tu turno» (dónde, qué, cómo verificar); la solución NO se muestra todavía. <code>git stash &amp;&amp; git checkout paso-1</code> si no lo tienen (el branch <code>paso-1</code> ya trae el esqueleto de <code>sanitize_history</code>); completar <code># TODO(paso-2)</code> (solo la inserción central, 3 líneas) dentro de <code>sanitize_history</code>: por cada <code>tool_use</code> sin <code>tool_result</code> inmediato, insertar un <code>tool_result</code> con <code>is_error: true</code> y un texto instructivo, <b>antes</b> de cualquier texto del mensaje de usuario. Volver a correr <code>uv run python -m taller.romper huerfano</code>: la sección DESPUÉS ya no debe dar 400. Lo mismo vale para <code>uv run python -m taller.agent --reanudar</code>, que sanea la sesión guardada en <code>runs/sesion.json</code> (también se puede reproducir matando el proceso con Ctrl-C entre el tool_use y el resultado).</p>
+    <p>Pasos con →: 1 el 400 real del ANTES y el panel «Tu turno» (pista sin código); 2 la solución, el checkpoint y el «¿Atrasado?». <strong>El → al paso 2 se pulsa después de «2:45 teclean (silencio)», no antes.</strong></p>
+    <p><strong>Checkpoint (0:30):</strong> cuando termine el silencio, →: solución y checkpoint.</p>
     <blockquote>Mano arriba: ¿a quién ya le funciona el DESPUÉS? Si son menos de la mitad, todos <code>git stash &amp;&amp; git checkout paso-2</code>.</blockquote>
     <blockquote>La lección: no tires el historial ni le inventes un resultado. Dile al modelo la verdad, con <code>is_error</code>, y qué intentar. Es contenido instructivo, no un «error».</blockquote>
     <p><strong>Historia de terror (opcional, ≤ 45 s, solo si hay tiempo y es un caso propio):</strong> un agente reanudado después de un crash. Cuenta únicamente un caso que realmente viviste; si no tienes uno, sáltatela. La historia de los reintentos que costaron $10 000 NO va aquí: está reservada para la diapositiva de <code>is_error</code> y reintentos.</p>
-    <p class="warn">Si la API no responde (créditos, red): <code>--inyectado</code>; <code>romper</code> lo activa solo si falta <code>ANTHROPIC_API_KEY</code> y lo dice en pantalla; el 400 que muestra es el fragmento documentado, no una respuesta de esta corrida. Di el texto completo del 400 solo como «lo que imprime la API»; en FACTS solo el fragmento es oficial. Claude reintenta 2–3 veces ante llamadas inválidas según la documentación: no prometas cuántas veces lo hace tu agente.</p>
+    <p class="warn">Si la API no responde (créditos, red): <code>--inyectado</code>; <code>romper</code> lo activa solo si falta <code>ANTHROPIC_API_KEY</code> y lo dice en pantalla; el 400 que muestra es el fragmento documentado, no una respuesta de esta corrida. Di el texto completo del 400 solo como «lo que imprime la API»; solo el fragmento es oficial. Claude reintenta 2–3 veces ante llamadas inválidas según la documentación: no prometas cuántas veces lo hace tu agente.</p>
     <p><strong>Transición:</strong> “El historial ya sobrevive a un crash. Pero el mismo 400 aparece sin que nada se caiga: basta con que una de varias llamadas en paralelo no termine. Esa también la vamos a romper y reparar.”</p>
   </aside>
 </section>
