@@ -140,6 +140,11 @@ $ uv run python -m taller.agent
             <li>Un <code>tool_result</code> por llamada, con su <code>tool_use_id</code>, <b>antes</b> que cualquier texto; <code>is_error</code> si falló.</li>
           </ol>
         </div>
+        <div class="panel mod ck" data-step="1">
+          <span class="label">Checkpoint</span>
+          <span class="body">Mano arriba si el agente respondió 26 con una consulta real.</span>
+          <span class="body">¿Atrasado? <code>git stash &amp;&amp; git checkout paso-1</code></span>
+        </div>
       </div>
       <div class="stack">
         <div class="panel act trap">
@@ -151,19 +156,12 @@ tool_choice={"type": "<span class="a">tool</span>", ⋯} <span class="a"># 400</
 tool_choice={"type": "<span class="k">auto</span>"}  <span class="c"># + strict: true</span></div>
           <p class="body">Usa <code>auto</code> con <code>strict: true</code>: valida la forma del input, no su sentido.</p>
         </div>
-        <div class="stack" data-step="1">
-          <div class="code" style="padding:.5rem .8rem"><span class="cap">taller/agent.py · lo que va en el TODO</span><span class="c"># &gt;&gt;&gt; paso-1</span>
+        <div class="code" data-step="1"><span class="cap">taller/agent.py · lo que va en el TODO</span><span class="c"># &gt;&gt;&gt; paso-1</span>
 results = <span class="k">await</span> execute_calls(turn.calls, self.tools)
 messages.append({"role": "user", "content": [
     {"type": "tool_result", "tool_use_id": r.tool_use_id,
      "content": r.content, ⋯} <span class="k">for</span> r <span class="k">in</span> results]})
 <span class="c"># &lt;&lt;&lt; paso-1</span></div>
-          <div class="panel mod ck">
-            <span class="label">Checkpoint</span>
-            <span class="body">Mano arriba si el agente respondió 26 con una consulta real.</span>
-            <span class="body">¿Atrasado? <code>git stash &amp;&amp; git checkout paso-1</code></span>
-          </div>
-        </div>
       </div>
     </div>
     <p class="note-line src">Fuente de la trampa: docs de Anthropic, define-tools · verificado 2026-10-18</p>

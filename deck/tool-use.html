@@ -30,7 +30,7 @@
   /* ============================================================
      TOOL USE SIN ABSTRACCIONES — "institutional daylight" visual system (extraído de ai-en-la-banca.html)
      Ivory paper, deep green ink, copper for consequence,
-     green for evidence/authorized paths. Guía de autor: deck/SYSTEM.md.
+     green for evidence/authorized paths.
      ============================================================ */
   :root{
     /* --- paper & ink --- */
@@ -275,7 +275,7 @@
   html[data-public] .hud{display:none}   /* live site copy: no controls, notes stripped at publish */
 
 /* ============================================================
-   AUTHORING HELPERS (promovidos desde las reglas por-diapositiva de GBM)
+   AUTHORING HELPERS (compartidos entre diapositivas)
    ============================================================ */
 .hd{display:flex;flex-direction:column;gap:clamp(.4rem,1.2vh,.9rem)}            /* bloque de encabezado: eyebrow + h2 + lede */
 .hd h2{font-size:clamp(1.6rem,3.6vw,3.8rem);max-width:none}
@@ -294,7 +294,7 @@
 .ln.l1{padding-left:4ch;text-indent:0}
 
 /* ============================================================
-   PORTADA — <section class="slide cover bare"> (de s01 en GBM)
+   PORTADA — <section class="slide cover bare">
    .motif = ilustración SVG a la derecha; sus hijos directos de <g> entran escalonados.
    ============================================================ */
 .cover .motif{position:absolute;z-index:0;right:0;top:0;bottom:0;width:64%;display:flex;align-items:center;justify-content:center;pointer-events:none}
@@ -399,11 +399,11 @@ html[data-still] .cover .motif *{animation:none!important}
 
 /* --- 03-quien.html --- */
 .s03 .who-name{font-size:clamp(2.6rem,7vw,7rem);max-width:none}
-  .s03 .facts{display:flex;flex-direction:column;gap:clamp(.8rem,2.4vh,1.6rem)}
-  .s03 .facts .row{display:grid;grid-template-columns:minmax(7rem,9rem) 1fr;gap:1rem;align-items:baseline;padding-bottom:clamp(.6rem,1.6vh,1.1rem);border-bottom:1px solid var(--ink-faint)}
-  .s03 .facts .row:last-child{border-bottom:0}
-  .s03 .facts .val{font-family:var(--f-display);font-weight:360;font-size:clamp(1.1rem,2vw,2.1rem);line-height:1.2;color:var(--ink)}
-  .s03 .facts .val small{display:block;font-family:var(--f-body);font-size:var(--t-body);color:var(--ink-dim);margin-top:.25em}
+  .s03 .datos{display:flex;flex-direction:column;gap:clamp(.8rem,2.4vh,1.6rem)}
+  .s03 .datos .row{display:grid;grid-template-columns:minmax(7rem,9rem) 1fr;gap:1rem;align-items:baseline;padding-bottom:clamp(.6rem,1.6vh,1.1rem);border-bottom:1px solid var(--ink-faint)}
+  .s03 .datos .row:last-child{border-bottom:0}
+  .s03 .datos .val{font-family:var(--f-display);font-weight:360;font-size:clamp(1.1rem,2vw,2.1rem);line-height:1.2;color:var(--ink)}
+  .s03 .datos .val small{display:block;font-family:var(--f-body);font-size:var(--t-body);color:var(--ink-dim);margin-top:.25em}
 
 /* --- 04-texto.html --- */
 .s04 .hd h2{max-width:24ch}
@@ -465,6 +465,10 @@ html[data-still] .cover .motif *{animation:none!important}
   .s05c .opts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45rem}
   .s05c .opts li{font-size:var(--t-body);line-height:1.35;color:var(--ink-2);padding-left:1.9rem;position:relative}
   .s05c .opts li b{position:absolute;left:0;top:0;font-family:var(--f-mono);font-weight:500;color:var(--warm-ink)}
+  .s05c .hint .opts{gap:.25rem;margin-top:.5rem}
+  .s05c .hint .opts li{padding-left:4.8rem}
+  .s05c .code{flex-shrink:0}
+  .s05c .hint .opts li b{font-size:.85em;letter-spacing:.04em}
   .s05c .note{font-size:clamp(.78rem,1.05vw,1rem);line-height:1.4;color:var(--ink-2);margin:0}
   .s05c code.i,.s05c .note code,.s05c .opts code{font-family:var(--f-mono);font-size:.92em;color:var(--ink)}
   .s05c .ck{display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;align-items:center}
@@ -474,6 +478,15 @@ html[data-still] .cover .motif *{animation:none!important}
     .s05c .split{grid-template-columns:1fr}
     
     .s05c .code{white-space:pre-wrap;overflow-wrap:anywhere}
+    .s05c p.note{display:none}
+    .s05c .hint{padding:.5rem .7rem}
+    .s05c .hint .opts li{font-size:.72rem;line-height:1.3;padding-left:3.6rem}
+    .s05c .hint .tag{display:none}
+    .s05c .ask{padding:.5rem .7rem}
+    .s05c .ask h3{font-size:.95rem;margin-bottom:.3rem}
+    .s05c .ask .opts{display:none}
+    .s05c .code{font-size:.58rem;line-height:1.4}
+    .s05c .ck{padding:.5rem .7rem}
   }
 
 /* --- 05c-paralelo.html --- */
@@ -500,6 +513,11 @@ html[data-still] .cover .motif *{animation:none!important}
     .s05d .split{grid-template-columns:1fr}
     .s05d .code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.6rem}
     .s05d .code.ctx{display:none}
+    .s05d .note{font-size:.7rem;line-height:1.3}
+    .s05d p.note[data-step="2"]{display:none}
+    .s05d .ask h3{font-size:.9rem}
+    .s05d .key{font-size:1rem}
+    .s05d .code.after{display:none}
   }
 
 /* --- 06-restringida.html --- */
@@ -524,7 +542,13 @@ html[data-still] .cover .motif *{animation:none!important}
   .s07 .rules code,.s07 .lede code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
   .s07 .code{margin:0;font-size:clamp(.7rem,.98vw,1.05rem)}
   .s07 .split > *{min-width:0}
-  @media (max-width:760px){.s07 .code.ctx{display:none}.s07 .code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.6rem;padding:.45rem .6rem}.s07 .rules li{font-size:.82rem}}
+  @media (max-width:760px){.s07 .hint p{font-size:.72rem;line-height:1.3}.s07 .hint{padding:.5rem .7rem}.s07 .hint p:last-child{display:none}.s07 .checkpoint{padding:.5rem .7rem}.s07 .col .code{padding:.4rem .6rem}.s07 .col .ask h3{font-size:.95rem;margin-bottom:.3rem}.s07 .code.ctx{display:none}.s07 .code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.6rem;padding:.45rem .6rem}.s07 .rules li{font-size:.82rem}}
+  @media (min-width:761px){.s07 .col .code{flex-shrink:0}}
+  .s07 .col .hint,.s07 .col .checkpoint{padding:.55rem 1rem}
+  .s07 .hint p{margin:0;font-size:calc(var(--t-body)*.92);line-height:1.35;color:var(--ink-2);max-width:none}
+  .s07 .hint p + p{margin-top:.2rem}
+  .s07 .hint code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
+  .s07 .hint b{color:var(--ink);font-weight:650}
   .s07 .checkpoint{display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center}
   .s07 .ask h3{font-family:var(--f-display);font-weight:360;font-size:clamp(1.05rem,1.7vw,1.7rem);letter-spacing:-.01em;line-height:1.15;margin:.2rem 0 .5rem}
   .s07 .opts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.3rem}
@@ -555,11 +579,16 @@ html[data-still] .cover .motif *{animation:none!important}
   .s09b .split > *{min-width:0}
   .s09b .col{display:flex;flex-direction:column;gap:var(--gap);justify-content:center;min-height:0}
   .s09b .code{margin:0;font-size:clamp(.78rem,1.12vw,1.08rem)}
+  .s09b .main > .code{font-size:clamp(.66rem,.92vw,.98rem);line-height:1.35;padding-top:.6rem;padding-bottom:.6rem}
+  .s09b .col .hint{padding:.55rem 1rem}
+  .s09b .col .hint p{font-size:calc(var(--t-body)*.92);line-height:1.35}
+  @media (min-width:761px){.s09b .col .code{flex-shrink:0}}
   .s09b .code .sol{display:block;margin-top:.5em}
+  .s09b .hint p + p,.s09b .ck p + p{margin-top:.3rem}
   .s09b .panel p{font-size:var(--t-body);line-height:1.45;color:var(--ink-2);max-width:none}
   .s09b .panel code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
   .s09b .panel b{color:var(--ink);font-weight:650}
-  @media (max-width:760px){.s09b .code{white-space:pre-wrap;overflow-wrap:anywhere}}
+  @media (max-width:760px){.s09b .code{white-space:pre-wrap;overflow-wrap:anywhere}.s09b .panel{padding:.5rem .7rem}.s09b .panel p{font-size:.72rem;line-height:1.3}.s09b .hint p + p,.s09b .ck p + p{margin-top:.15rem}}
 
 /* --- 11-medir.html --- */
 .s11 .split{align-items:stretch}
@@ -798,7 +827,7 @@ html[data-still] .cover .motif *{animation:none!important}
     <p>Pasos con →: 1 aparecen los candidatos y la primera (cuantización); 2 decodificación restringida o no; 3 fiabilidad del servicio. Tomar 2–3 respuestas del público ANTES de pulsar →, y nombrar la que coincida con una de las tres.</p>
     <blockquote>Estas tres son hipótesis razonables, no un diagnóstico: OpenRouter no desglosa la causa. Pero las dos primeras vamos a verlas por dentro en la próxima media hora: qué es el token que emite el modelo y qué hace la decodificación restringida.</blockquote>
     <p><strong>Si quieres un dato más fresco (opcional):</strong> esta noche abre la pestaña Performance de un modelo en OpenRouter (donde viven «Tool Call Error Rate» por endpoint y por día), captura la pantalla con la fecha visible y cámbiala por el gráfico de barras de esta diapositiva. Si lo haces, di la fecha de captura en voz alta. Si no hay captura, esta diapositiva es suficiente.</p>
-    <p><strong>Cifras que puedes citar si preguntan (FACTS §8):</strong> GLM-5 de «approximately 8 %» a cerca de 1 % (−88 %); gpt-oss-120b de 5.6 % a 3.5 %; en el leaderboard τ²-Bench Airline, los modelos inscritos en Auto Exacto bajaron de 3.9 % a 1.7 % (corrida del 2026-10-18). La métrica es por petición, no por llamada.</p>
+    <p><strong>Cifras que puedes citar si preguntan:</strong> GLM-5 de «approximately 8 %» a cerca de 1 % (−88 %); gpt-oss-120b de 5.6 % a 3.5 %; en el leaderboard τ²-Bench Airline, los modelos inscritos en Auto Exacto bajaron de 3.9 % a 1.7 % (corrida del 2026-10-18). La métrica es por petición, no por llamada.</p>
     <p class="warn">Nunca escribas ni digas «15 % contra 0.01 %»: esa cifra de la clase de CMU NO está verificada. No digas «el proveedor X es peor»: no tenemos esa comparación. Si preguntan por la causa: «no lo sé; OpenRouter no la desglosa. Estas son hipótesis». Si piden más: «lo verifico y lo publico en el repo».</p>
     <p><strong>Transición:</strong> “Para saber qué cambia entre proveedores hay que ver qué recibe el modelo. Treinta segundos de mí, y vamos al código.”</p>
   </aside>
@@ -814,7 +843,7 @@ html[data-still] .cover .motif *{animation:none!important}
         <p class="eyebrow reveal">Quién habla</p>
         <h2 class="who-name reveal d1">Carlos <em>Haro</em></h2>
       </div>
-      <div class="facts reveal d2">
+      <div class="datos reveal d2">
         <div class="row"><span class="label">Trabajo</span><span class="val">Sr. AI Engineer en Santander México<small>Data &amp; AI</small></span></div>
         <div class="row"><span class="label">Construyo</span><span class="val">Agentes que consultan datos<small>con herramientas, compuertas y medición</small></span></div>
         <div class="row"><span class="label">Escribo y enseño</span><span class="val">h1sort.com<small>y el curso «IA para Datos» en Código Facilito</small></span></div>
@@ -890,8 +919,8 @@ Eres un asistente del banco.
     <blockquote>Fíjense en que <code>&lt;tool_call&gt;</code> no son once caracteres: en el tokenizador de Qwen3 es un token añadido, una sola unidad. Y el parser, hasta que alguien lo escribe, no existe.</blockquote>
     <blockquote>Con Claude no parseas tokens: recibes un bloque <code>tool_use</code> con un <code>id</code>, un <code>name</code> y un <code>input</code> ya estructurados. La API te entrega la llamada ya estructurada; cómo la produce por dentro no lo sé ni lo afirmo. Lo que no te quita es el bucle: tú ejecutas y tú contestas.</blockquote>
     <blockquote>Y no es un estándar: DeepSeek-V3 usa otros delimitadores y otra forma de los argumentos. Un parser de una familia no parsea la otra.</blockquote>
-    <p>Datos para precisar si preguntan (FACTS §11): la plantilla es de Qwen3-8B (JSON dentro de <code>&lt;tool_call&gt;</code>); <code>&lt;|im_start|&gt;</code> y <code>&lt;|im_end|&gt;</code> son tokens especiales; <code>&lt;tool_call&gt;</code>, <code>&lt;tool_response&gt;</code> son tokens añadidos que el tokenizador reconoce como unidad pero no están marcados como especiales. La diapositiva 23 de la clase de CMU muestra una versión más nueva de Qwen con etiquetas <code>&lt;function=…&gt;</code>: no mezclar con la de Qwen3-8B.</p>
-    <p class="warn">No afirmes cómo emite tokens Claude por dentro: no es público y no está en FACTS. La nota de la terminal dice que «el modelo sigue emitiendo tokens en un formato entrenado» (cierto para modelos abiertos); di «la API los entrega ya estructurados». Si la terminal falla: <code>git stash &amp;&amp; git checkout paso-0</code> y repite; plan B: esta misma diapositiva ya trae la salida. El argumento se llama <code>sql</code> en el panel de Qwen, en los bloques de la API y en el repo: no hay discrepancia que comentar.</p>
+    <p>Datos para precisar si preguntan: la plantilla es de Qwen3-8B (JSON dentro de <code>&lt;tool_call&gt;</code>); <code>&lt;|im_start|&gt;</code> y <code>&lt;|im_end|&gt;</code> son tokens especiales; <code>&lt;tool_call&gt;</code>, <code>&lt;tool_response&gt;</code> son tokens añadidos que el tokenizador reconoce como unidad pero no están marcados como especiales. La diapositiva 23 de la clase de CMU muestra una versión más nueva de Qwen con etiquetas <code>&lt;function=…&gt;</code>: no mezclar con la de Qwen3-8B.</p>
+    <p class="warn">No afirmes cómo emite tokens Claude por dentro: no es público ni está verificado. La nota de la terminal dice que «el modelo sigue emitiendo tokens en un formato entrenado» (cierto para modelos abiertos); di «la API los entrega ya estructurados». Si la terminal falla: <code>git stash &amp;&amp; git checkout paso-0</code> y repite; plan B: esta misma diapositiva ya trae la salida. El argumento se llama <code>sql</code> en el panel de Qwen, en los bloques de la API y en el repo: no hay discrepancia que comentar.</p>
     <p><strong>Transición:</strong> “Entonces el parseo no es lo difícil. Lo difícil es el bucle: quién ejecuta, quién contesta, en qué orden. Eso lo escribimos ahora.”</p>
   </aside>
 </section>
@@ -973,7 +1002,7 @@ Eres un asistente del banco.
         <p>Con llamadas paralelas la API no impone orden entre los resultados: manda el <code>tool_use_id</code> de cada uno.</p>
       </div>
     </div>
-    <p class="note-line src">Docs de Anthropic: handle-tool-calls y parallel-tool-use · verificado 2026-10-18 (FACTS §1 y §5)</p>
+    <p class="note-line src">Docs de Anthropic: handle-tool-calls y parallel-tool-use · verificado 2026-10-18</p>
   </div>
   <aside class="notes">
     <p><strong>Propósito:</strong> que la sala pueda dibujar el bucle de memoria y sepa las dos reglas que lo rompen: orden de los <code>tool_result</code> y emparejado por id. Después de esto escriben ellos. (2:30)</p>
@@ -982,7 +1011,7 @@ Eres un asistente del banco.
     <blockquote>Cada bloque trae un <code>id</code>. Tú ejecutas, si son varias en paralelo con <code>asyncio.gather</code>, y contestas en UN solo mensaje de usuario, con todos los <code>tool_result</code> primero, cada uno con el <code>tool_use_id</code> de su llamada.</blockquote>
     <blockquote>Si pones texto antes de un <code>tool_result</code>, o si hay un mensaje en medio, la API responde 400: «tool_use ids were found without tool_result blocks immediately after». Ese fragmento lo cita la documentación; el mensaje completo lo vamos a ver en vivo en un momento.</blockquote>
     <blockquote>Y el bucle termina solo cuando el <code>stop_reason</code> es <code>end_turn</code>. Mientras sea <code>tool_use</code>, otra vuelta.</blockquote>
-    <p>Datos si preguntan (FACTS §1, §5): la API no impone orden ni entre los resultados de un turno paralelo ni entre las ejecuciones; se emparejan por <code>tool_use_id</code>. Todas las respuestas de un turno van juntas en UN mensaje de usuario (mensajes separados reducen el uso paralelo). Para forzar una llamada por turno existe <code>disable_parallel_tool_use</code>, dentro de <code>tool_choice</code> (<code>{"type": "auto", "disable_parallel_tool_use": true}</code>); no lo usamos hoy.</p>
+    <p>Datos si preguntan: la API no impone orden ni entre los resultados de un turno paralelo ni entre las ejecuciones; se emparejan por <code>tool_use_id</code>. Todas las respuestas de un turno van juntas en UN mensaje de usuario (mensajes separados reducen el uso paralelo). Para forzar una llamada por turno existe <code>disable_parallel_tool_use</code>, dentro de <code>tool_choice</code> (<code>{"type": "auto", "disable_parallel_tool_use": true}</code>); no lo usamos hoy.</p>
     <p class="warn">No digas «nunca hay dos mensajes en medio»: di lo que dice la documentación (los resultados van inmediatamente después, y primero). El texto completo del 400 solo está en una fuente secundaria; la diapositiva usa el fragmento oficial y la demo imprime el texto real. Si el reloj va justo, recorta los pasos 5 y 6 a una frase cada uno.</p>
     <p><strong>Transición:</strong> “Basta de dibujo. Abran taller/agent.py: el bucle está hecho a medias y la otra mitad la escriben ustedes.”</p>
   </aside>
@@ -999,7 +1028,7 @@ Eres un asistente del banco.
     <div class="split reveal d2">
       <div class="stack">
         <div class="code"><span class="cap">terminal</span>$ git stash &amp;&amp; git checkout paso-0
-<span class="c"># abre taller/agent.py y busca # TODO(paso-1)</span>
+<span class="c"># abre taller/agent.py: Agent.run · # TODO(paso-1)</span>
 $ uv run python -m taller.agent
 <span class="c">tú › ¿cuántas tarjetas bloqueadas hay?</span></div>
         <div class="panel ev">
@@ -1009,6 +1038,11 @@ $ uv run python -m taller.agent
             <li>Arma <b>UN</b> mensaje <code>{"role": "user", "content": […]}</code>.</li>
             <li>Un <code>tool_result</code> por llamada, con su <code>tool_use_id</code>, <b>antes</b> que cualquier texto; <code>is_error</code> si falló.</li>
           </ol>
+        </div>
+        <div class="panel mod ck" data-step="1">
+          <span class="label">Checkpoint</span>
+          <span class="body">Mano arriba si el agente respondió 26 con una consulta real.</span>
+          <span class="body">¿Atrasado? <code>git stash &amp;&amp; git checkout paso-1</code></span>
         </div>
       </div>
       <div class="stack">
@@ -1021,18 +1055,19 @@ tool_choice={"type": "<span class="a">tool</span>", ⋯} <span class="a"># 400</
 tool_choice={"type": "<span class="k">auto</span>"}  <span class="c"># + strict: true</span></div>
           <p class="body">Usa <code>auto</code> con <code>strict: true</code>: valida la forma del input, no su sentido.</p>
         </div>
-        <div class="panel mod ck">
-          <span class="label">Checkpoint</span>
-          <span class="body">Mano arriba si el agente respondió 26 con una consulta real.</span>
-          <span class="body">Atrasado: <code>git stash &amp;&amp; git checkout paso-1</code></span>
-        </div>
+        <div class="code" data-step="1"><span class="cap">taller/agent.py · lo que va en el TODO</span><span class="c"># &gt;&gt;&gt; paso-1</span>
+results = <span class="k">await</span> execute_calls(turn.calls, self.tools)
+messages.append({"role": "user", "content": [
+    {"type": "tool_result", "tool_use_id": r.tool_use_id,
+     "content": r.content, ⋯} <span class="k">for</span> r <span class="k">in</span> results]})
+<span class="c"># &lt;&lt;&lt; paso-1</span></div>
       </div>
     </div>
-    <p class="note-line src">Fuente de la trampa: docs de Anthropic, define-tools · verificado 2026-10-18 (FACTS §1)</p>
+    <p class="note-line src">Fuente de la trampa: docs de Anthropic, define-tools · verificado 2026-10-18</p>
   </div>
   <aside class="notes">
     <p><strong>Propósito:</strong> que cada quien escriba el núcleo del bucle: ejecutar y contestar con <code>tool_result</code> bien armados. Es el primer paso de código que ellos teclean. (3:30)</p>
-    <p><strong>Tiempo de silencio planeado: 2:30 de teclado.</strong> Orador callado; solo circular. Desglose (3:30): 0:30 instrucciones, 2:30 teclean, 0:30 checkpoint. Las llamadas paralelas ya no se miden aquí: se rompen y se reparan en la Rotura #1b.</p>
+    <p><strong>Tiempo de silencio planeado: 2:30 de teclado.</strong> Orador callado; solo circular. Desglose (3:30): 0:30 instrucciones, 2:30 teclean, 0:30 checkpoint. Mientras teclean solo está a la vista el dónde, el qué en palabras y el comando; la solución, el checkpoint y la línea de «¿Atrasado?» están detrás de un → (paso 1) que se pulsa <strong>después</strong> del silencio. Las llamadas paralelas ya no se miden aquí: se rompen y se reparan en la Rotura #1b.</p>
     <ol>
       <li><code>git stash &amp;&amp; git checkout paso-0</code>; abrir <code>taller/agent.py</code>; localizar <code># TODO(paso-1)</code> dentro de <code>Agent.run</code>.</li>
       <li>Completar el TODO: ejecutar con <code>execute_calls(turn.calls, self.tools)</code> y agregar a <code>messages</code> UN mensaje de usuario con un <code>tool_result</code> por llamada (<code>tool_use_id</code>, <code>content</code>, y <code>is_error</code> si falló).</li>
@@ -1040,11 +1075,11 @@ tool_choice={"type": "<span class="k">auto</span>"}  <span class="c"># + strict:
     </ol>
     <blockquote>Tienen dos minutos y medio. Yo no voy a hablar. El bucle ya está, falta lo de adentro del TODO: ejecutar y contestar en un solo mensaje, con los resultados primero.</blockquote>
     <blockquote>Un aviso antes de que empiecen: no intenten forzar la herramienta con <code>tool_choice</code> <code>any</code> o <code>tool</code>. En Opus 5.5, Sonnet 5.5, Fable 5.1 y Mythos 5.1 la API responde 400. Se usa <code>auto</code> con <code>strict: true</code>, y eso ya viene en el repo.</blockquote>
-    <p><strong>Checkpoint (al terminar el silencio):</strong></p>
+    <p><strong>Checkpoint (al terminar el silencio):</strong> cuando termine el silencio, →: aparecen la solución, el checkpoint y el «¿Atrasado?».</p>
     <blockquote>Mano arriba: ¿quién tiene la respuesta de las tarjetas bloqueadas? Si son menos de la mitad, todos hacen <code>git stash &amp;&amp; git checkout paso-1</code> y seguimos; el que quiera terminar el suyo lo hace en el siguiente silencio.</blockquote>
     <p><strong>Primer checkpoint, una línea más:</strong> quien clonó el repo antes de que existieran las ramas <code>paso-N</code> corre <code>git fetch</code> primero (si no, <code>git stash &amp;&amp; git checkout paso-1</code> dice que la rama no existe).</p>
     <p>Qué buscar mientras circulas: <code>tool_result</code> con el texto de otro mensaje; olvidar <code>tool_use_id</code>; un mensaje de usuario por cada resultado en lugar de uno solo; texto antes de los <code>tool_result</code> (400). Para quien termine antes: dejar corridas con una pregunta que dispare dos llamadas y ver el orden en los logs de <code>runs/</code>.</p>
-    <p class="warn">No expliques el código mientras teclean. Si la API falla en la sala (créditos o red), plan B: <code>git stash &amp;&amp; git checkout paso-1</code> y mostrar tú la corrida en pantalla. «Strict valida forma, no sentido» se retoma en el bloque «Válido ≠ correcto»; aquí solo se menciona. Cifras y modelos: FACTS §1.</p>
+    <p class="warn">No expliques el código mientras teclean. Si la API falla en la sala (créditos o red), plan B: <code>git stash &amp;&amp; git checkout paso-1</code> y mostrar tú la corrida en pantalla. «Strict valida forma, no sentido» se retoma en el bloque «Válido ≠ correcto»; aquí solo se menciona.</p>
     <p><strong>Transición:</strong> “Ya funciona con la API tal como la documentan. Ahora lo que importa de un taller: romperlo.”</p>
   </aside>
 </section>
@@ -1073,7 +1108,16 @@ tool_choice={"type": "<span class="k">auto</span>"}  <span class="c"># + strict:
 <span class="a">RECHAZADA › 400 · ⋯ tool_use ids were found without</span>
 <span class="a">           tool_result blocks immediately after ⋯</span></div>
       </div>
-      <div class="stack" data-step="2">
+      <div class="stack">
+        <div class="panel act hint" data-step="1">
+          <span class="label">Tu turno · paso-2 <span class="tag live" style="margin-left:.4rem">teclean · silencio del orador</span></span>
+          <ul class="opts">
+            <li><b>Dónde</b><code>taller/agent.py</code> · <code>sanitize_history</code> · <code># TODO(paso-2)</code></li>
+            <li><b>Qué</b>Por cada huérfano, un <code>tool_result</code> con <code>is_error</code>, <strong>primero</strong> en el mensaje siguiente.</li>
+            <li><b>Verifica</b><code>uv run python -m taller.romper huerfano</code></li>
+          </ul>
+        </div>
+        <div class="stack" data-step="2">
         <div class="code"><span class="cap">taller/agent.py · sanitize_history · TODO(paso-2) · 3 líneas</span><span class="c"># el esqueleto ya encontró los tool_use sin resultado: orphans</span>
 <span class="k">if</span> orphans:
     errores = [{"type": "<span class="k">tool_result</span>", "tool_use_id": t,
@@ -1084,11 +1128,12 @@ tool_choice={"type": "<span class="k">auto</span>"}  <span class="c"># + strict:
         <div class="panel ev ck">
           <span class="label">Checkpoint</span>
           <span class="note">Mano arriba si el DESPUÉS de <code>romper huerfano</code> ya funciona.</span>
-          <span class="note">Atrasado: <code>git stash &amp;&amp; git checkout paso-2</code></span>
+          <span class="note">¿Atrasado? <code>git stash &amp;&amp; git checkout paso-2</code></span>
+        </div>
         </div>
       </div>
     </div>
-    <p class="note-line src">Fuente: docs de Anthropic, handle-tool-calls (fragmento del 400 e is_error) · verificado 2026-10-18 (FACTS §5)</p>
+    <p class="note-line src">Fuente: docs de Anthropic, handle-tool-calls (fragmento del 400 e is_error) · verificado 2026-10-18</p>
   </div>
   <aside class="notes">
     <p><strong>Propósito:</strong> que la sala vea el 400 real del historial con un <code>tool_use</code> huérfano, entienda por qué ocurre (un crash o un Ctrl-C entre el <code>tool_use</code> y su resultado deja el historial inválido) y escriba el saneo. Primera rotura del taller. (4:30)</p>
@@ -1096,15 +1141,16 @@ tool_choice={"type": "<span class="k">auto</span>"}  <span class="c"># + strict:
     <p><strong>Predecir primero (0:30):</strong></p>
     <blockquote>Imaginen que su proceso murió justo después de que el modelo pidió una herramienta y antes de guardar el resultado. Mañana reanudan la conversación. ¿Qué pasa? A, el modelo lo nota y repite; B, la API rechaza el historial; C, el modelo inventa el resultado. Manos arriba para cada una.</blockquote>
     <p>Anotar el conteo en voz alta («la mayoría fue B / A»); se retoma después del 400.</p>
-    <p><strong>Revelar (0:45):</strong> →, y correr <code>uv run python -m taller.romper huerfano</code>. Sale el 400 real de la API; leer el fragmento que cita la documentación.</p>
+    <p><strong>Revelar (0:45):</strong> → (paso 1), y correr <code>uv run python -m taller.romper huerfano</code>. Sale el 400 real de la API; leer el fragmento que cita la documentación.</p>
     <blockquote>400. «tool_use ids were found without tool_result blocks immediately after». La API no te deja improvisar: cada <code>tool_use</code> tiene que tener su <code>tool_result</code> en el mensaje siguiente.</blockquote>
     <blockquote>Retomo su respuesta: [según el conteo]. Fíjense que el modelo ni siquiera llega a opinar: el historial inválido se rechaza antes.</blockquote>
-    <p><strong>Teclear (2:45, orador callado):</strong> → (paso 2). <code>git stash &amp;&amp; git checkout paso-1</code> si no lo tienen (el branch <code>paso-1</code> ya trae el esqueleto de <code>sanitize_history</code>); completar <code># TODO(paso-2)</code> (solo la inserción central, 3 líneas) dentro de <code>sanitize_history</code>: por cada <code>tool_use</code> sin <code>tool_result</code> inmediato, insertar un <code>tool_result</code> con <code>is_error: true</code> y un texto instructivo, <b>antes</b> de cualquier texto del mensaje de usuario. Volver a correr <code>uv run python -m taller.romper huerfano</code>: la sección DESPUÉS ya no debe dar 400. Lo mismo vale para <code>uv run python -m taller.agent --reanudar</code>, que sanea la sesión guardada en <code>runs/sesion.json</code> (también se puede reproducir matando el proceso con Ctrl-C entre el tool_use y el resultado).</p>
-    <p><strong>Checkpoint (0:30):</strong></p>
+    <p><strong>Teclear (2:45, orador callado):</strong> en pantalla queda el 400 y el panel «Tu turno» (dónde, qué, cómo verificar); la solución NO se muestra todavía. <code>git stash &amp;&amp; git checkout paso-1</code> si no lo tienen (el branch <code>paso-1</code> ya trae el esqueleto de <code>sanitize_history</code>); completar <code># TODO(paso-2)</code> (solo la inserción central, 3 líneas) dentro de <code>sanitize_history</code>: por cada <code>tool_use</code> sin <code>tool_result</code> inmediato, insertar un <code>tool_result</code> con <code>is_error: true</code> y un texto instructivo, <b>antes</b> de cualquier texto del mensaje de usuario. Volver a correr <code>uv run python -m taller.romper huerfano</code>: la sección DESPUÉS ya no debe dar 400. Lo mismo vale para <code>uv run python -m taller.agent --reanudar</code>, que sanea la sesión guardada en <code>runs/sesion.json</code> (también se puede reproducir matando el proceso con Ctrl-C entre el tool_use y el resultado).</p>
+    <p>Pasos con →: 1 el 400 real del ANTES y el panel «Tu turno» (pista sin código); 2 la solución, el checkpoint y el «¿Atrasado?». <strong>El → al paso 2 se pulsa después de «2:45 teclean (silencio)», no antes.</strong></p>
+    <p><strong>Checkpoint (0:30):</strong> cuando termine el silencio, →: solución y checkpoint.</p>
     <blockquote>Mano arriba: ¿a quién ya le funciona el DESPUÉS? Si son menos de la mitad, todos <code>git stash &amp;&amp; git checkout paso-2</code>.</blockquote>
     <blockquote>La lección: no tires el historial ni le inventes un resultado. Dile al modelo la verdad, con <code>is_error</code>, y qué intentar. Es contenido instructivo, no un «error».</blockquote>
     <p><strong>Historia de terror (opcional, ≤ 45 s, solo si hay tiempo y es un caso propio):</strong> un agente reanudado después de un crash. Cuenta únicamente un caso que realmente viviste; si no tienes uno, sáltatela. La historia de los reintentos que costaron $10 000 NO va aquí: está reservada para la diapositiva de <code>is_error</code> y reintentos.</p>
-    <p class="warn">Si la API no responde (créditos, red): <code>--inyectado</code>; <code>romper</code> lo activa solo si falta <code>ANTHROPIC_API_KEY</code> y lo dice en pantalla; el 400 que muestra es el fragmento documentado, no una respuesta de esta corrida. Di el texto completo del 400 solo como «lo que imprime la API»; en FACTS solo el fragmento es oficial. Claude reintenta 2–3 veces ante llamadas inválidas según la documentación: no prometas cuántas veces lo hace tu agente.</p>
+    <p class="warn">Si la API no responde (créditos, red): <code>--inyectado</code>; <code>romper</code> lo activa solo si falta <code>ANTHROPIC_API_KEY</code> y lo dice en pantalla; el 400 que muestra es el fragmento documentado, no una respuesta de esta corrida. Di el texto completo del 400 solo como «lo que imprime la API»; solo el fragmento es oficial. Claude reintenta 2–3 veces ante llamadas inválidas según la documentación: no prometas cuántas veces lo hace tu agente.</p>
     <p><strong>Transición:</strong> “El historial ya sobrevive a un crash. Pero el mismo 400 aparece sin que nada se caiga: basta con que una de varias llamadas en paralelo no termine. Esa también la vamos a romper y reparar.”</p>
   </aside>
 </section>
@@ -1144,36 +1190,37 @@ gather: 1.50 s · una tras otra serían ≥ 4.6 s</span></div>
                              return_exceptions=<span class="k">True</span>)
 <span class="c"># Versión ingenua: solo las que terminaron</span>
 results = [r <span class="k">for</span> r <span class="k">in</span> hechos <span class="k">if</span> isinstance(r, ToolResult)]
-<span class="a"># TODO(paso-2b)</span> <span class="c">un tool_result POR CADA llamada, también la que no terminó</span></div>
+<span class="a"># TODO(paso-2b)</span> <span class="c">un tool_result POR CADA llamada; el timeout vuelve como is_error</span></div>
+        <p class="note" data-step="1"><b>Dónde:</b> <code>taller/agent.py</code> · <code>execute_calls</code> · <code># TODO(paso-2b)</code>. <b>Qué:</b> un <code>tool_result</code> por cada llamada; el timeout vuelve como <code>is_error</code>. <b>Verifica:</b> <code>uv run python -m taller.romper paralelo</code> y busca <b>3 de 3</b>.</p>
         <div class="code" data-step="2"><span class="cap">paso-2b · lo que tecleas (4 líneas) · resuelto en paso-2</span><span class="c"># un timeout es un is_error, no un hueco</span>
 results = [r <span class="k">if</span> isinstance(r, ToolResult) <span class="k">else</span> ToolResult(c.id, ToolOutcome.EXEC_ERROR,
     f<span class="s">"{c.name} no terminó en {tope:g} s ({type(r).__name__}); reintenta …"</span>, <span class="a">True</span>)
     <span class="k">for</span> c, r <span class="k">in</span> zip(calls, hechos)]</div>
-        <div class="code" data-step="2"><span class="cap">DESPUÉS · con tu arreglo</span>toolu_…h → <span class="k">is_error</span> · sql_query no terminó en 1.5 s (TimeoutError)
+        <div class="code after" data-step="2"><span class="cap">DESPUÉS · con tu arreglo</span>toolu_…h → <span class="k">is_error</span> · sql_query no terminó en 1.5 s (TimeoutError)
 <span class="k">DESPUÉS › 3 de 3 tool_result en un solo mensaje</span>
 <span class="k">MODELO › reintenta sql_query</span></div>
         <div class="panel ev ck" data-step="2">
           <span class="label">Checkpoint</span>
           <span class="note">Mano arriba si ya ves <b>3 de 3</b>.</span>
-          <span class="note">Atrasado o con prisa: <code>git stash &amp;&amp; git checkout paso-2</code></span>
+          <span class="note">¿Atrasado o con prisa? <code>git stash &amp;&amp; git checkout paso-2</code></span>
         </div>
       </div>
     </div>
-    <p class="note-line src">Corrida en vivo 2026-10-18 · claude-sonnet-5-5 · la latencia es artificial y la anuncia el script (FACTS: ensayo en vivo y §5)</p>
+    <p class="note-line src">Corrida en vivo 2026-10-18 · claude-sonnet-5-5 · la latencia es artificial y la anuncia el script</p>
   </div>
   <aside class="notes">
     <p><strong>Propósito:</strong> que la sala rompa y repare una llamada paralela que no termina, y vea que es la misma regla de la Rotura #1: cada <code>tool_use</code> necesita su <code>tool_result</code>, también la que no terminó. Es lo que prometió el bloque de arriba (“rompen y reparan”). (2:30)</p>
     <p><strong>Plan A, ejercicio (2:30):</strong> 0:20 predecir; 0:30 correr y ver el 400; 1:30 teclean (silencio del orador; 4 líneas dentro de <code>execute_calls</code>, marcador <code>paso-2b</code>); 0:10 checkpoint.</p>
-    <p><strong>Plan B, si vas tarde (~1:00):</strong> no pidas teclear. → → revela la solución; todos <code>git stash &amp;&amp; git checkout paso-2</code>; corren <code>uv run python -m taller.romper paralelo</code> y ven el DESPUÉS, 3 de 3; seguir. <strong>Cuándo elegir B:</strong> al terminar la diapositiva anterior (Rotura #1) el reloj del plan marca 15:30; si ya pasa de ~16:30 (más de 1:00 de retraso), elige B. Es el primer recorte del plan: ahorra ~1:30 y no cambia lo que sigue. (Orden de recorte: 1 este Plan B, 2 <code>--vs</code> en Medir, 3 el detalle del autómata de pila.)</p>
-    <p>Pasos con →: 1 la salida real del ANTES (el 400) y el código ingenuo con el <code>TODO(paso-2b)</code>; 2 la solución, el DESPUÉS y el checkpoint. <strong>En Plan A no pulses el segundo → hasta que termine el silencio</strong>; en Plan B pulsa los dos seguidos.</p>
+    <p><strong>Plan B, si vas tarde (~1:00):</strong> no pidas teclear. → → revela la solución; todos <code>git stash &amp;&amp; git checkout paso-2</code>; corren <code>uv run python -m taller.romper paralelo</code> y ven el DESPUÉS, 3 de 3; seguir. <strong>Cuándo elegir B:</strong> al terminar la diapositiva anterior (Rotura #1) el reloj del plan marca 15:30; si ya pasa de ~16:30 (más de 1:00 de retraso), elige B. Es el primer recorte: ahorra ~1:30 y no cambia lo que sigue. (Orden de recorte: 1 este Plan B, 2 <code>--vs</code> en Medir, 3 el detalle del autómata de pila.)</p>
+    <p>Pasos con →: 1 la salida real del ANTES (el 400), el código ingenuo con el <code>TODO(paso-2b)</code> y la pista (dónde, qué, cómo verificar; sin código de la solución); 2 la solución, el DESPUÉS, el checkpoint y el «¿Atrasado o con prisa?». <strong>En Plan A no pulses el segundo → hasta que termine el silencio</strong> («cuando termine el silencio, →: solución y checkpoint»); en Plan B pulsa los dos seguidos.</p>
     <p><strong>Predecir (0:20), sin pulsar →:</strong></p>
     <blockquote>Piden tres consultas en paralelo. Dos tardan lo normal; una tarda 3 segundos y nuestro tope es 1.5. Ya les pasó algo parecido con el huérfano. ¿Qué responde la API en la petición siguiente? A, espera a la lenta; B, 400; C, el modelo inventa el dato. Manos arriba.</blockquote>
     <p><strong>Correr (0:30):</strong> todos corren <code>uv run python -m taller.romper paralelo</code>. La latencia es artificial y el script la anuncia en pantalla (0.8 s por llamada y 3 s la última, con tope de 1.5 s): se agrega para que se note incluso en una laptop rápida. Lo que mido es nuestro código, no la API. → (paso 1).</p>
     <blockquote>La lenta pasó el tope y se perdió. Devolvimos 2 de 3. Resultado: 400, «tool_use ids were found without tool_result blocks immediately after». Es el mismo 400 de hace un momento. Cambia el origen: antes el proceso murió; ahora la lenta no terminó.</blockquote>
     <p>Retoma lo que dijo la sala en la predicción.</p>
-    <p><strong>Teclear (1:30, orador callado), solo Plan A:</strong> reemplazar <code># TODO(paso-2b)</code> en <code>execute_calls</code> (<code>taller/agent.py</code>, branch <code>paso-1</code>): un <code>tool_result</code> por cada llamada, con <code>zip(calls, hechos)</code>; si el resultado es una excepción (aquí <code>TimeoutError</code>), un <code>ToolResult</code> con <code>is_error</code> y un texto que diga qué pasó y qué intentar. Luego repetir <code>romper paralelo</code>: el DESPUÉS debe mostrar 3 de 3. → (paso 2) al terminar, para comparar.</p>
+    <p><strong>Teclear (1:30, orador callado), solo Plan A:</strong> reemplazar <code># TODO(paso-2b)</code> en <code>execute_calls</code> (<code>taller/agent.py</code>, branch <code>paso-1</code>): un <code>tool_result</code> por cada llamada, con <code>zip(calls, hechos)</code>; si el resultado es una excepción (aquí <code>TimeoutError</code>), un <code>ToolResult</code> con <code>is_error</code> y un texto que diga qué pasó y qué intentar. Luego repetir <code>romper paralelo</code>: el DESPUÉS debe mostrar 3 de 3. Mientras teclean no se ve la solución ni la línea de <code>git checkout</code>.</p>
     <blockquote>La que no termina también regresa. Sin resultado es un hueco; con <code>is_error</code> es información: le decimos al modelo qué pasó y qué intentar.</blockquote>
-    <p><strong>Checkpoint (0:10):</strong></p>
+    <p><strong>Checkpoint (0:10):</strong> cuando termine el silencio, →: solución y checkpoint.</p>
     <blockquote>Mano arriba si ya ves 3 de 3. Si son menos de la mitad, todos <code>git stash &amp;&amp; git checkout paso-2</code>.</blockquote>
     <p><strong>Dato de la corrida real</strong> (en vivo el 2026-10-18 con claude-sonnet-5-5): en <code>paso-2</code>, después del <code>is_error</code>, el modelo reintentó la consulta por su cuenta (<code>MODELO › reintenta sql_query</code>). Cuéntalo como lo que pasó en esa corrida, no como garantía.</p>
     <p class="warn">No digas que las APIs reales pierden resultados por sí solas. El bug es nuestro: código que solo devuelve las llamadas que terminaron. La latencia y el tope son artificiales y están anunciados en pantalla. Lo que imprime la corrida del sitio puede variar unas décimas (el 1.50 s sale del tope); lee la pantalla, no la memoria. Si no hay API: <code>--inyectado</code> (el 400 que muestra es el fragmento documentado, no una respuesta de esa corrida; <code>romper</code> lo dice en pantalla).</p>
@@ -1369,35 +1416,42 @@ without tool_result blocks immediately after</span></div>
       </div>
       <div class="col">
         <div class="code ctx"><span class="cap">taller/agent.py · el bucle · paso-2</span><span class="c">turn.calls = [ToolCall(b.id, b.name, b.input) for b in uses]</span>
-<span class="a"># TODO(paso-3)</span> <span class="c">¿y si stop_reason == "max_tokens"?</span>
+<span class="a"># TODO(paso-3)</span> <span class="c">¿y si stop_reason == "max_tokens" y hay tool_use?</span>
 <span class="c">messages.append({"role": "assistant", "content": [… todo …]})</span></div>
-        <div class="code" data-step="2"><span class="cap">paso-3 · lo que tecleas (4 líneas) · el cortado ni se guarda ni se ejecuta</span><span class="k">if</span> resp.stop_reason == <span class="s">"max_tokens"</span> <span class="k">and</span> uses:
+        <div class="panel act hint" data-step="1">
+          <p><b>Dónde:</b> <code>taller/agent.py</code> · el bucle de <code>Agent.run</code> · <code># TODO(paso-3)</code>.</p>
+          <p><b>Qué:</b> si <code>stop_reason == "max_tokens"</code> y hay <code>tool_use</code>, no lo ejecutes ni lo guardes; sube <code>max_tokens</code> y repite.</p>
+          <p><b>Verifica:</b> <code>uv run python -m taller.romper truncado</code></p>
+        </div>
+        <div class="col" data-step="2">
+        <div class="code"><span class="cap">paso-3 · lo que tecleas (4 líneas) · el cortado ni se guarda ni se ejecuta</span><span class="k">if</span> resp.stop_reason == <span class="s">"max_tokens"</span> <span class="k">and</span> uses:
     self.max_tokens = min(self.max_tokens * 4, MAX_TOKENS_TOPE)  <span class="c"># más margen</span>
     self._log(turn)
     <span class="k">continue</span>   <span class="c"># reintenta sin guardar el bloque cortado</span></div>
-        <div class="panel ev checkpoint" data-step="3">
+        <div class="panel ev checkpoint">
           <span class="label">Checkpoint</span>
           <span class="body">Mano arriba si el mensaje siguiente ya no da 400.</span>
-          <span class="body">Atrasado: <code>git stash &amp;&amp; git checkout paso-3</code></span>
+          <span class="body">¿Atrasado? <code>git stash &amp;&amp; git checkout paso-3</code></span>
+        </div>
         </div>
       </div>
     </div>
   </div>
   <aside class="notes">
     <p><strong>Propósito:</strong> que la sala vea que la llamada cortada no solo es inútil: si se guarda, rompe la conversación en el siguiente mensaje. Escriben un arreglo de ≤ 4 líneas. (3:00)</p>
-    <p><strong>Desglose:</strong> 0:30 predecir (retoma lo que dijo la sala en «¿dónde falla aun con gramática?»); 0:30 correr y ver el 400; 0:20 → mostrar la solución; 1:00 teclean (silencio del orador, ≤ 4 líneas); 0:40 volver a correr y checkpoint.</p>
+    <p><strong>Desglose:</strong> 0:30 predecir (retoma lo que dijo la sala en «¿dónde falla aun con gramática?»); 0:30 correr y ver el 400; 0:20 explicar la pista (dónde y qué, sin código); 1:00 teclean (silencio del orador, ≤ 4 líneas); 0:40 volver a correr y checkpoint (con → a la solución al terminar el silencio).</p>
     <ol>
       <li>0:00 · Predecir, sin pulsar →: “La llamada se cortó, el agente no la ejecutó, la dejó en el historial y salió. El usuario escribe otra pregunta. ¿Qué responde la API? A, B o C.” Cuenta manos en voz alta.</li>
       <li>0:30 · Corre <code>uv run python -m taller.romper truncado</code> y pide que todos lo corran. En <code>paso-2</code> la sección ANTES muestra el bloque cortado y, en la petición siguiente, el 400 de la API. Lo que se imprima es lo real; no leas de memoria. Retoma su respuesta: “la mayoría dijo ___”.</li>
-      <li>1:00 · → (paso 1) deja a la vista la salida de arriba. → (paso 2) muestra las ≤ 4 líneas de <code>paso-3</code> (para quien se atore, no para leerlas).</li>
+      <li>1:00 · → (paso 1) deja a la vista la salida de arriba y la pista (dónde, qué en palabras, cómo verificar). La solución NO se muestra todavía.</li>
       <li>1:20 · <strong>Silencio planeado: ~1:00</strong> mientras reemplazan <code># TODO(paso-3)</code> en <code>taller/agent.py</code>. No hables; camina por la sala. Después vuelven a correr <code>romper truncado</code>: el DESPUÉS ya no ejecuta ni guarda la llamada cortada, el seguimiento funciona y se reintenta con más <code>max_tokens</code>.</li>
-      <li>2:20 · → (paso 3) <strong>Punto de control:</strong> “Levanten la mano si su segundo mensaje ya no da 400.” Si menos de la mitad: todos <code>git stash &amp;&amp; git checkout paso-3</code> y seguimos.</li>
+      <li>2:20 · Cuando termine el silencio, → (paso 2): solución (≤ 4 líneas de <code>paso-3</code>), checkpoint y «¿Atrasado?». <strong>Punto de control:</strong> “Levanten la mano si su segundo mensaje ya no da 400.” Si menos de la mitad: todos <code>git stash &amp;&amp; git checkout paso-3</code> y seguimos.</li>
     </ol>
     <blockquote>Una llamada cortada no es una llamada: es un fragmento. Y si la guardas en el historial, el daño no ocurre ahora, ocurre en el siguiente mensaje.</blockquote>
     <blockquote>Se descarta, no se guarda, no se ejecuta, y se pide de nuevo con más espacio, una vez. Un bucle que reintenta sin límite es una factura, no un arreglo.</blockquote>
     <p>Conecta con la rotura #1: un <code>tool_use</code> guardado exige su <code>tool_result</code>; si no, es un huérfano y la API responde 400. Aquí el huérfano lo fabricamos nosotros al guardar el bloque cortado.</p>
     <p><strong>[Historia propia, si tienes una — ≤45 s]</strong> Un caso real tuyo de salida cortada o de reintentos sin tope. Si no tienes uno, sáltalo: no uses relatos ajenos ni inventes cifras.</p>
-    <p>Fuente: la página de <em>stop reasons</em> recomienda, si <code>stop_reason</code> es <code>max_tokens</code> y el último bloque es un <code>tool_use</code>, reintentar con un <code>max_tokens</code> mayor (su ejemplo usa 4096; no fija un valor). La regla “no parsear, ejecutar ni guardar la llamada cortada” es decisión de diseño nuestra, consistente con la doc. El 400 del seguimiento es el mismo de la rotura #1 (FACTS §5).</p>
+    <p>Fuente: la página de <em>stop reasons</em> recomienda, si <code>stop_reason</code> es <code>max_tokens</code> y el último bloque es un <code>tool_use</code>, reintentar con un <code>max_tokens</code> mayor (su ejemplo usa 4096; no fija un valor). La regla “no parsear, ejecutar ni guardar la llamada cortada” es decisión de diseño nuestra, consistente con la doc. El 400 del seguimiento es el mismo de la rotura #1.</p>
     <p class="warn">El código de la diapositiva es <code>taller/agent.py</code> abreviado y escrito contra el diseño del branch; compáralo con el <code>paso-3</code> real antes de presentar. Si el modelo no trunca como se espera, <code>romper</code> inyecta la llamada cortada y lo dice en pantalla (y el 400 de esa corrida puede ser el fragmento documentado, no uno de esta corrida): dilo igual.</p>
     <p class="warn">Plan B sin API: <code>git stash &amp;&amp; git checkout paso-3</code> ya trae la solución; muestra el código y corre <code>uv run python -m taller.romper truncado --inyectado</code> (sin API).</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué haría tu agente hoy con un <code>tool_use</code> cortado, y qué guardaría en el historial?</p>
@@ -1447,7 +1501,7 @@ without tool_result blocks immediately after</span></div>
     <p><strong>Historia de terror (≤ 30 s en este bloque, sin diapositiva):</strong></p>
     <blockquote>Una historia que leí: un clasificador con un LLM devolvió <code>null</code>. El código tenía un <code>while null: retry</code>. Sin tope. Se reintentó y se reintentó, y se cuentan unos diez mil dólares de factura.</blockquote>
     <blockquote>La lección no es “usa otro modelo”. Es: cuando algo falla, devuelve un error que diga qué falló y qué intentar, con <code>is_error</code>, y ponle un tope a los reintentos.</blockquote>
-    <p class="warn">Esta historia NO está en <code>FACTS.md</code> y no se puede verificar. Preséntala como un relato que leíste, no como un caso propio ni de tu empresa; no agregues nombres, fechas, cifras exactas ni detalles que no recuerdes. Si preguntan la fuente: “la leí, no la puedo verificar”. Mantén la cifra como “unos diez mil dólares, según el relato”.</p>
+    <p class="warn">Esta historia NO está verificada: no hay fuente que la respalde. Preséntala como un relato que leíste, no como un caso propio ni de tu empresa; no agregues nombres, fechas, cifras exactas ni detalles que no recuerdes. Si preguntan la fuente: “la leí, no la puedo verificar”. Mantén la cifra como “unos diez mil dólares, según el relato”.</p>
 
     <p class="warn">No digas “strict nunca falla”. Di “garantiza forma”. Y recuerda la trampa: en Sonnet 5.5, Opus 5.5, Fable 5.1 y Mythos 5.1, <code>tool_choice</code> <code>any</code> y <code>tool</code> devuelven 400; usa <code>auto</code> con strict.</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué reglas de tu negocio no caben en un JSON Schema?</p>
@@ -1571,14 +1625,23 @@ without tool_result blocks immediately after</span></div>
       <div class="col">
         <div class="code"><span class="cap">taller/tools.py · sql_query (abreviado)</span><span class="k">def</span> sql_query(sql: str) -&gt; str:
     motivo = <span class="k">None</span>
-    <span class="a"># TODO(paso-4)</span> <span class="c">validar antes de ejecutar</span><span class="sol" data-step="1">    motivo = _gate(sql)  <span class="c"># None = permitido</span></span>    <span class="k">if</span> motivo:            <span class="c"># rechazada: no se ejecuta</span>
+    <span class="a"># TODO(paso-4)</span> <span class="c">validar antes de ejecutar</span><span class="sol" data-step="2">    motivo = _gate(sql)  <span class="c"># None = permitido</span></span>    <span class="k">if</span> motivo:            <span class="c"># rechazada: no se ejecuta</span>
         <span class="k">return</span> motivo     <span class="c"># → is_error: true</span></div>
+        <div class="panel act hint">
+          <p><b>Dónde:</b> <code>taller/tools.py</code> · <code>sql_query</code> · <code># TODO(paso-4)</code>.</p>
+          <p><b>Qué:</b> llama a la compuerta y deja el resultado en <code>motivo</code> (<code>None</code> = permitido).</p>
+          <p><b>Verifica:</b> <code>uv run python -m taller.romper drop</code></p>
+        </div>
       </div>
       <div class="col">
-        <div class="panel mod" data-step="2">
+        <div class="panel mod" data-step="1">
           <p><b>bloquear_tarjeta</b> es una escritura: pide <b>confirmación humana</b> en la terminal antes de ejecutar. La compuerta cubre la lectura; las escrituras las confirma una persona.</p>
         </div>
-        <p class="note-line" data-step="3">Checkpoint: mano arriba si <b style="color:var(--ink)">romper drop</b> ya rechaza <b style="color:var(--ink)">secretos</b> y el DROP · ¿Atrás? <b style="color:var(--ink)">git stash &amp;&amp; git checkout paso-4</b></p>
+        <div class="panel ev ck" data-step="2">
+          <span class="label">Checkpoint</span>
+          <p>Mano arriba si <code>romper drop</code> ya rechaza <code>secretos</code> y el DROP.</p>
+          <p>¿Atrasado? <code>git stash &amp;&amp; git checkout paso-4</code></p>
+        </div>
       </div>
     </div>
   </div>
@@ -1586,13 +1649,13 @@ without tool_result blocks immediately after</span></div>
     <p><strong>Propósito:</strong> que cada quien escriba la llamada a la compuerta y vea, en su terminal, rechazada la lectura de <code>secretos</code> (y el DROP) antes de ejecutar. (2:00: ~0:30 leer, ~1:00 de teclado en silencio, ~0:30 punto de control)</p>
     <ol>
       <li>0:00 · Lee el código de arriba en voz alta, sin prisa: el autorizador es una función de ocho líneas.</li>
-      <li>0:30 · → (paso 1) muestra la línea que van a escribir. <strong>Silencio planeado: ~1:00</strong> mientras reemplazan <code># TODO(paso-4)</code> en <code>taller/tools.py</code> (una línea) y vuelven a correr <code>uv run python -m taller.romper drop</code>. Ahora la sección DESPUÉS rechaza las dos llamadas antes de ejecutarlas, con un <code>is_error</code> instructivo; con API, imprime el siguiente turno real del modelo.</li>
-      <li>1:30 · <strong>Punto de control:</strong> “Levanten la mano si su <code>secretos</code> ya no devuelve claves.” Si menos de la mitad: <code>git stash &amp;&amp; git checkout paso-4</code>. Retoma la predicción de la diapositiva anterior (“¿se rinde, repite o reescribe?”) con lo que el modelo hizo de verdad en las pantallas; no con lo que yo esperaba.</li>
+      <li>0:30 · → (paso 1): la confirmación humana de <code>bloquear_tarjeta</code> (lo dices antes del silencio). En pantalla ya está la pista (dónde, qué en palabras, cómo verificar) y el código con el <code># TODO(paso-4)</code>; la línea de la solución NO se muestra. <strong>Silencio planeado: ~1:00</strong> mientras reemplazan <code># TODO(paso-4)</code> en <code>taller/tools.py</code> (una línea) y vuelven a correr <code>uv run python -m taller.romper drop</code>. Ahora la sección DESPUÉS rechaza las dos llamadas antes de ejecutarlas, con un <code>is_error</code> instructivo; con API, imprime el siguiente turno real del modelo.</li>
+      <li>1:30 · Cuando termine el silencio, → (paso 2): la línea de la solución, el checkpoint y el «¿Atrasado?». <strong>Punto de control:</strong> “Levanten la mano si su <code>secretos</code> ya no devuelve claves.” Si menos de la mitad: <code>git stash &amp;&amp; git checkout paso-4</code>. Retoma la predicción de la diapositiva anterior (“¿se rinde, repite o reescribe?”) con lo que el modelo hizo de verdad en las pantallas; no con lo que yo esperaba.</li>
     </ol>
     <blockquote>La compuerta no mira texto buscando la palabra DROP. Compila la sentencia y le pregunta a SQLite qué acciones haría: leer tal columna, escribir, borrar una tabla. Un comentario o unas mayúsculas no la engañan, porque ya se compiló.</blockquote>
     <blockquote>Cualquier acción que no sea un SELECT o la lectura de una tabla permitida se niega. La tabla de secretos no está en la lista.</blockquote>
     <blockquote>Las escrituras, como bloquear una tarjeta, no pasan por aquí: las confirma una persona en la terminal.</blockquote>
-    <p>Pasos con →: 1 la solución de <code>paso-4</code>; 2 la confirmación humana de <code>bloquear_tarjeta</code>; 3 el checkpoint y el comando de respaldo.</p>
+    <p>Pasos con →: 1 la confirmación humana de <code>bloquear_tarjeta</code>; 2 (después del silencio) la solución de <code>paso-4</code>, el checkpoint y el comando de respaldo.</p>
     <p class="warn">El código de arriba es literal de <code>taller/gate.py</code>. El de abajo es <code>taller/tools.py</code> abreviado (en el repo hay más líneas entre marcadores y el rechazo se marca con el prefijo <code>rechazada:</code>); revisa que siga coincidiendo antes de presentar.</p>
     <p class="warn">Plan B sin API: <code>git stash &amp;&amp; git checkout paso-4</code> y enseña la compuerta con las pruebas: <code>uv run pytest -q tests/test_gate.py</code>.</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué herramienta de tu agente necesita una compuerta antes que cualquier otra cosa?</p>
@@ -1700,7 +1763,7 @@ without tool_result blocks immediately after</span></div>
 <span class="c"># opcional: comparar con otro modelo</span>
 <span class="a">$</span> uv run python -m taller.medir --vs claude-opus-5-5</div>
         <p class="lede" data-step="2">Tokens y costo <b style="color:var(--ink)">por tarea resuelta</b>, no por llamada: los intentos fallidos también cuestan.</p>
-        <p class="note-line" data-step="3">¿Atrás? <b style="color:var(--ink)">git stash &amp;&amp; git checkout paso-5</b></p>
+        <p class="note-line" data-step="3">¿Atrasado? <b style="color:var(--ink)">git stash &amp;&amp; git checkout paso-5</b></p>
       </div>
       <dl class="cats" data-step="1">
         <dt>wrong_tool</dt><dd>eligió otra herramienta, o una donde no hacía falta</dd>
@@ -1791,9 +1854,9 @@ without tool_result blocks immediately after</span></div>
     <blockquote>Precio por token no es costo por tarea. Si un modelo falla más, reintenta más y cada reintento se paga.</blockquote>
     <blockquote>Esto es una hipótesis, no un hecho. Lo decide su corrida, no mi diapositiva.</blockquote>
     <p>Pasos con →: 1 la tabla; 2 los precios por MTok; 3 la hipótesis.</p>
-    <p>Fuente de precios: página de pricing de Anthropic, consultada el 2026-10-18 (<code>FACTS.md</code> §7): Sonnet 5.5 $2 / $10, Haiku 5.5 $0.10 / $0.50 (prompts hasta 100K tokens), Opus 5.5 $4 / $20, por MTok. La página no muestra fecha de vigencia y remite a claude.com/pricing. Usar herramientas añade 286 tokens de system prompt con <code>tool_choice</code> <code>auto</code>.</p>
-    <p class="warn">Tabla medida el 2026-10-18 (claude-sonnet-5-5 vs claude-haiku-5-5, 20 tareas, ~$0.19 + $0.01). El conjunto es fácil: ambos 20/20. La hipótesis de la clase puede cumplirse en tareas más difíciles; aquí no. Lo de a02 es el remate: <em>el modelo barato intentó leer secretos y la compuerta lo frenó</em>. No inventes números. Si W2-C no llegó, usa la pantalla de un asistente voluntario o tu propia corrida.</p>
-    <p class="warn">La idea de “un modelo más caro puede salir más barato por tarea” se atribuye a la clase de CMU, pero no pude verificarla y no está en <code>FACTS.md</code>: preséntala solo como hipótesis. Si preguntan la fuente exacta: “no sé la diapositiva, lo verifico y lo publico en el repo”.</p>
+    <p>Fuente de precios: página de pricing de Anthropic, consultada el 2026-10-18: Sonnet 5.5 $2 / $10, Haiku 5.5 $0.10 / $0.50 (prompts hasta 100K tokens), Opus 5.5 $4 / $20, por MTok. La página no muestra fecha de vigencia y remite a claude.com/pricing. Usar herramientas añade 286 tokens de system prompt con <code>tool_choice</code> <code>auto</code>.</p>
+    <p class="warn">Tabla medida el 2026-10-18 (claude-sonnet-5-5 vs claude-haiku-5-5, 20 tareas, ~$0.19 + $0.01). El conjunto es fácil: ambos 20/20. La hipótesis de la clase puede cumplirse en tareas más difíciles; aquí no. Lo de a02 es el remate: <em>el modelo barato intentó leer secretos y la compuerta lo frenó</em>. No inventes números. Si la tabla no se ve en pantalla, usa la pantalla de un asistente voluntario o tu propia corrida.</p>
+    <p class="warn">La idea de “un modelo más caro puede salir más barato por tarea” se atribuye a la clase de CMU, pero no pude verificarla y no está verificada: preséntala solo como hipótesis. Si preguntan la fuente exacta: “no sé la diapositiva, lo verifico y lo publico en el repo”.</p>
     <p class="warn">Recorte (plan): si vamos tarde, salta los pasos 2–3 y la comparación <code>--vs</code>; nunca recortes la tabla propia ni el conteo de tareas resueltas. Orden de recorte: 1) Plan B en la Rotura #1b, 2) comparación de dos modelos (<code>--vs</code>), 3) detalle del autómata de pila.</p>
     <p><strong>Pregunta para llevarse:</strong> ¿cuánto te cuesta resolver una tarea, no una llamada?</p>
     <p><strong>Transición:</strong> “Con esto cerramos.”</p>
@@ -1856,7 +1919,7 @@ without tool_result blocks immediately after</span></div>
   <aside class="overlay" id="sourcesPanel" role="dialog" aria-label="Fuentes y apéndice" tabindex="-1">
     <button class="close" type="button" data-act="sources">CERRAR</button>
 <!-- Fuentes y apéndice del deck (overlay #sourcesPanel, tecla S).
-     Cada hecho del deck se rastrea a FACTS.md (verificado 2026-10-18). Lo marcado NO VERIFICADO no entra al deck. -->
+     Cada hecho del deck se rastrea a una fuente (verificado 2026-10-18). Lo marcado NO VERIFICADO no entra al deck. -->
 <h3>La clase</h3>
 <ul>
   <li><strong>CMU 11-768 “AI Agents”, Fall 2026</strong> (Language Technologies Institute): profesores Graham Neubig y Daniel Fried. Lección 2, <em>Tool Use for Language Model Agents</em>, a cargo de Neubig; video subido el 2026-09-08: <a href="https://youtu.be/jXChFB4JSyw">youtu.be/jXChFB4JSyw</a>. Curso: <a href="https://www.cmu-agents.com/">cmu-agents.com</a>.</li>

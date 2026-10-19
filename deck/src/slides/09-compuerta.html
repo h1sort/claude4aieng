@@ -6,11 +6,16 @@
   .s09b .split > *{min-width:0}
   .s09b .col{display:flex;flex-direction:column;gap:var(--gap);justify-content:center;min-height:0}
   .s09b .code{margin:0;font-size:clamp(.78rem,1.12vw,1.08rem)}
+  .s09b .main > .code{font-size:clamp(.66rem,.92vw,.98rem);line-height:1.35;padding-top:.6rem;padding-bottom:.6rem}
+  .s09b .col .hint{padding:.55rem 1rem}
+  .s09b .col .hint p{font-size:calc(var(--t-body)*.92);line-height:1.35}
+  @media (min-width:761px){.s09b .col .code{flex-shrink:0}}
   .s09b .code .sol{display:block;margin-top:.5em}
+  .s09b .hint p + p,.s09b .ck p + p{margin-top:.3rem}
   .s09b .panel p{font-size:var(--t-body);line-height:1.45;color:var(--ink-2);max-width:none}
   .s09b .panel code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
   .s09b .panel b{color:var(--ink);font-weight:650}
-  @media (max-width:760px){.s09b .code{white-space:pre-wrap;overflow-wrap:anywhere}}
+  @media (max-width:760px){.s09b .code{white-space:pre-wrap;overflow-wrap:anywhere}.s09b .panel{padding:.5rem .7rem}.s09b .panel p{font-size:.72rem;line-height:1.3}.s09b .hint p + p,.s09b .ck p + p{margin-top:.15rem}}
 </style>
 
 <!-- ============ 09 · rotura #3: la compuerta ============ -->
@@ -128,14 +133,23 @@
       <div class="col">
         <div class="code"><span class="cap">taller/tools.py · sql_query (abreviado)</span><span class="k">def</span> sql_query(sql: str) -&gt; str:
     motivo = <span class="k">None</span>
-    <span class="a"># TODO(paso-4)</span> <span class="c">validar antes de ejecutar</span><span class="sol" data-step="1">    motivo = _gate(sql)  <span class="c"># None = permitido</span></span>    <span class="k">if</span> motivo:            <span class="c"># rechazada: no se ejecuta</span>
+    <span class="a"># TODO(paso-4)</span> <span class="c">validar antes de ejecutar</span><span class="sol" data-step="2">    motivo = _gate(sql)  <span class="c"># None = permitido</span></span>    <span class="k">if</span> motivo:            <span class="c"># rechazada: no se ejecuta</span>
         <span class="k">return</span> motivo     <span class="c"># → is_error: true</span></div>
+        <div class="panel act hint">
+          <p><b>Dónde:</b> <code>taller/tools.py</code> · <code>sql_query</code> · <code># TODO(paso-4)</code>.</p>
+          <p><b>Qué:</b> llama a la compuerta y deja el resultado en <code>motivo</code> (<code>None</code> = permitido).</p>
+          <p><b>Verifica:</b> <code>uv run python -m taller.romper drop</code></p>
+        </div>
       </div>
       <div class="col">
-        <div class="panel mod" data-step="2">
+        <div class="panel mod" data-step="1">
           <p><b>bloquear_tarjeta</b> es una escritura: pide <b>confirmación humana</b> en la terminal antes de ejecutar. La compuerta cubre la lectura; las escrituras las confirma una persona.</p>
         </div>
-        <p class="note-line" data-step="3">Checkpoint: mano arriba si <b style="color:var(--ink)">romper drop</b> ya rechaza <b style="color:var(--ink)">secretos</b> y el DROP · ¿Atrás? <b style="color:var(--ink)">git stash &amp;&amp; git checkout paso-4</b></p>
+        <div class="panel ev ck" data-step="2">
+          <span class="label">Checkpoint</span>
+          <p>Mano arriba si <code>romper drop</code> ya rechaza <code>secretos</code> y el DROP.</p>
+          <p>¿Atrasado? <code>git stash &amp;&amp; git checkout paso-4</code></p>
+        </div>
       </div>
     </div>
   </div>
@@ -143,13 +157,13 @@
     <p><strong>Propósito:</strong> que cada quien escriba la llamada a la compuerta y vea, en su terminal, rechazada la lectura de <code>secretos</code> (y el DROP) antes de ejecutar. (2:00: ~0:30 leer, ~1:00 de teclado en silencio, ~0:30 punto de control)</p>
     <ol>
       <li>0:00 · Lee el código de arriba en voz alta, sin prisa: el autorizador es una función de ocho líneas.</li>
-      <li>0:30 · → (paso 1) muestra la línea que van a escribir. <strong>Silencio planeado: ~1:00</strong> mientras reemplazan <code># TODO(paso-4)</code> en <code>taller/tools.py</code> (una línea) y vuelven a correr <code>uv run python -m taller.romper drop</code>. Ahora la sección DESPUÉS rechaza las dos llamadas antes de ejecutarlas, con un <code>is_error</code> instructivo; con API, imprime el siguiente turno real del modelo.</li>
-      <li>1:30 · <strong>Punto de control:</strong> “Levanten la mano si su <code>secretos</code> ya no devuelve claves.” Si menos de la mitad: <code>git stash &amp;&amp; git checkout paso-4</code>. Retoma la predicción de la diapositiva anterior (“¿se rinde, repite o reescribe?”) con lo que el modelo hizo de verdad en las pantallas; no con lo que yo esperaba.</li>
+      <li>0:30 · → (paso 1): la confirmación humana de <code>bloquear_tarjeta</code> (lo dices antes del silencio). En pantalla ya está la pista (dónde, qué en palabras, cómo verificar) y el código con el <code># TODO(paso-4)</code>; la línea de la solución NO se muestra. <strong>Silencio planeado: ~1:00</strong> mientras reemplazan <code># TODO(paso-4)</code> en <code>taller/tools.py</code> (una línea) y vuelven a correr <code>uv run python -m taller.romper drop</code>. Ahora la sección DESPUÉS rechaza las dos llamadas antes de ejecutarlas, con un <code>is_error</code> instructivo; con API, imprime el siguiente turno real del modelo.</li>
+      <li>1:30 · Cuando termine el silencio, → (paso 2): la línea de la solución, el checkpoint y el «¿Atrasado?». <strong>Punto de control:</strong> “Levanten la mano si su <code>secretos</code> ya no devuelve claves.” Si menos de la mitad: <code>git stash &amp;&amp; git checkout paso-4</code>. Retoma la predicción de la diapositiva anterior (“¿se rinde, repite o reescribe?”) con lo que el modelo hizo de verdad en las pantallas; no con lo que yo esperaba.</li>
     </ol>
     <blockquote>La compuerta no mira texto buscando la palabra DROP. Compila la sentencia y le pregunta a SQLite qué acciones haría: leer tal columna, escribir, borrar una tabla. Un comentario o unas mayúsculas no la engañan, porque ya se compiló.</blockquote>
     <blockquote>Cualquier acción que no sea un SELECT o la lectura de una tabla permitida se niega. La tabla de secretos no está en la lista.</blockquote>
     <blockquote>Las escrituras, como bloquear una tarjeta, no pasan por aquí: las confirma una persona en la terminal.</blockquote>
-    <p>Pasos con →: 1 la solución de <code>paso-4</code>; 2 la confirmación humana de <code>bloquear_tarjeta</code>; 3 el checkpoint y el comando de respaldo.</p>
+    <p>Pasos con →: 1 la confirmación humana de <code>bloquear_tarjeta</code>; 2 (después del silencio) la solución de <code>paso-4</code>, el checkpoint y el comando de respaldo.</p>
     <p class="warn">El código de arriba es literal de <code>taller/gate.py</code>. El de abajo es <code>taller/tools.py</code> abreviado (en el repo hay más líneas entre marcadores y el rechazo se marca con el prefijo <code>rechazada:</code>); revisa que siga coincidiendo antes de presentar.</p>
     <p class="warn">Plan B sin API: <code>git stash &amp;&amp; git checkout paso-4</code> y enseña la compuerta con las pruebas: <code>uv run pytest -q tests/test_gate.py</code>.</p>
     <p><strong>Pregunta para llevarse:</strong> ¿qué herramienta de tu agente necesita una compuerta antes que cualquier otra cosa?</p>

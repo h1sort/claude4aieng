@@ -8,7 +8,13 @@
   .s07 .rules code,.s07 .lede code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
   .s07 .code{margin:0;font-size:clamp(.7rem,.98vw,1.05rem)}
   .s07 .split > *{min-width:0}
-  @media (max-width:760px){.s07 .code.ctx{display:none}.s07 .code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.6rem;padding:.45rem .6rem}.s07 .rules li{font-size:.82rem}}
+  @media (max-width:760px){.s07 .hint p{font-size:.72rem;line-height:1.3}.s07 .hint{padding:.5rem .7rem}.s07 .hint p:last-child{display:none}.s07 .checkpoint{padding:.5rem .7rem}.s07 .col .code{padding:.4rem .6rem}.s07 .col .ask h3{font-size:.95rem;margin-bottom:.3rem}.s07 .code.ctx{display:none}.s07 .code{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.6rem;padding:.45rem .6rem}.s07 .rules li{font-size:.82rem}}
+  @media (min-width:761px){.s07 .col .code{flex-shrink:0}}
+  .s07 .col .hint,.s07 .col .checkpoint{padding:.55rem 1rem}
+  .s07 .hint p{margin:0;font-size:calc(var(--t-body)*.92);line-height:1.35;color:var(--ink-2);max-width:none}
+  .s07 .hint p + p{margin-top:.2rem}
+  .s07 .hint code{font-family:var(--f-mono);font-size:.9em;color:var(--ink)}
+  .s07 .hint b{color:var(--ink);font-weight:650}
   .s07 .checkpoint{display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center}
   .s07 .ask h3{font-family:var(--f-display);font-weight:360;font-size:clamp(1.05rem,1.7vw,1.7rem);letter-spacing:-.01em;line-height:1.15;margin:.2rem 0 .5rem}
   .s07 .opts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.3rem}
@@ -43,29 +49,36 @@ without tool_result blocks immediately after</span></div>
       </div>
       <div class="col">
         <div class="code ctx"><span class="cap">taller/agent.py · el bucle · paso-2</span><span class="c">turn.calls = [ToolCall(b.id, b.name, b.input) for b in uses]</span>
-<span class="a"># TODO(paso-3)</span> <span class="c">¿y si stop_reason == "max_tokens"?</span>
+<span class="a"># TODO(paso-3)</span> <span class="c">¿y si stop_reason == "max_tokens" y hay tool_use?</span>
 <span class="c">messages.append({"role": "assistant", "content": [… todo …]})</span></div>
-        <div class="code" data-step="2"><span class="cap">paso-3 · lo que tecleas (4 líneas) · el cortado ni se guarda ni se ejecuta</span><span class="k">if</span> resp.stop_reason == <span class="s">"max_tokens"</span> <span class="k">and</span> uses:
+        <div class="panel act hint" data-step="1">
+          <p><b>Dónde:</b> <code>taller/agent.py</code> · el bucle de <code>Agent.run</code> · <code># TODO(paso-3)</code>.</p>
+          <p><b>Qué:</b> si <code>stop_reason == "max_tokens"</code> y hay <code>tool_use</code>, no lo ejecutes ni lo guardes; sube <code>max_tokens</code> y repite.</p>
+          <p><b>Verifica:</b> <code>uv run python -m taller.romper truncado</code></p>
+        </div>
+        <div class="col" data-step="2">
+        <div class="code"><span class="cap">paso-3 · lo que tecleas (4 líneas) · el cortado ni se guarda ni se ejecuta</span><span class="k">if</span> resp.stop_reason == <span class="s">"max_tokens"</span> <span class="k">and</span> uses:
     self.max_tokens = min(self.max_tokens * 4, MAX_TOKENS_TOPE)  <span class="c"># más margen</span>
     self._log(turn)
     <span class="k">continue</span>   <span class="c"># reintenta sin guardar el bloque cortado</span></div>
-        <div class="panel ev checkpoint" data-step="3">
+        <div class="panel ev checkpoint">
           <span class="label">Checkpoint</span>
           <span class="body">Mano arriba si el mensaje siguiente ya no da 400.</span>
-          <span class="body">Atrasado: <code>git stash &amp;&amp; git checkout paso-3</code></span>
+          <span class="body">¿Atrasado? <code>git stash &amp;&amp; git checkout paso-3</code></span>
+        </div>
         </div>
       </div>
     </div>
   </div>
   <aside class="notes">
     <p><strong>Propósito:</strong> que la sala vea que la llamada cortada no solo es inútil: si se guarda, rompe la conversación en el siguiente mensaje. Escriben un arreglo de ≤ 4 líneas. (3:00)</p>
-    <p><strong>Desglose:</strong> 0:30 predecir (retoma lo que dijo la sala en «¿dónde falla aun con gramática?»); 0:30 correr y ver el 400; 0:20 → mostrar la solución; 1:00 teclean (silencio del orador, ≤ 4 líneas); 0:40 volver a correr y checkpoint.</p>
+    <p><strong>Desglose:</strong> 0:30 predecir (retoma lo que dijo la sala en «¿dónde falla aun con gramática?»); 0:30 correr y ver el 400; 0:20 explicar la pista (dónde y qué, sin código); 1:00 teclean (silencio del orador, ≤ 4 líneas); 0:40 volver a correr y checkpoint (con → a la solución al terminar el silencio).</p>
     <ol>
       <li>0:00 · Predecir, sin pulsar →: “La llamada se cortó, el agente no la ejecutó, la dejó en el historial y salió. El usuario escribe otra pregunta. ¿Qué responde la API? A, B o C.” Cuenta manos en voz alta.</li>
       <li>0:30 · Corre <code>uv run python -m taller.romper truncado</code> y pide que todos lo corran. En <code>paso-2</code> la sección ANTES muestra el bloque cortado y, en la petición siguiente, el 400 de la API. Lo que se imprima es lo real; no leas de memoria. Retoma su respuesta: “la mayoría dijo ___”.</li>
-      <li>1:00 · → (paso 1) deja a la vista la salida de arriba. → (paso 2) muestra las ≤ 4 líneas de <code>paso-3</code> (para quien se atore, no para leerlas).</li>
+      <li>1:00 · → (paso 1) deja a la vista la salida de arriba y la pista (dónde, qué en palabras, cómo verificar). La solución NO se muestra todavía.</li>
       <li>1:20 · <strong>Silencio planeado: ~1:00</strong> mientras reemplazan <code># TODO(paso-3)</code> en <code>taller/agent.py</code>. No hables; camina por la sala. Después vuelven a correr <code>romper truncado</code>: el DESPUÉS ya no ejecuta ni guarda la llamada cortada, el seguimiento funciona y se reintenta con más <code>max_tokens</code>.</li>
-      <li>2:20 · → (paso 3) <strong>Punto de control:</strong> “Levanten la mano si su segundo mensaje ya no da 400.” Si menos de la mitad: todos <code>git stash &amp;&amp; git checkout paso-3</code> y seguimos.</li>
+      <li>2:20 · Cuando termine el silencio, → (paso 2): solución (≤ 4 líneas de <code>paso-3</code>), checkpoint y «¿Atrasado?». <strong>Punto de control:</strong> “Levanten la mano si su segundo mensaje ya no da 400.” Si menos de la mitad: todos <code>git stash &amp;&amp; git checkout paso-3</code> y seguimos.</li>
     </ol>
     <blockquote>Una llamada cortada no es una llamada: es un fragmento. Y si la guardas en el historial, el daño no ocurre ahora, ocurre en el siguiente mensaje.</blockquote>
     <blockquote>Se descarta, no se guarda, no se ejecuta, y se pide de nuevo con más espacio, una vez. Un bucle que reintenta sin límite es una factura, no un arreglo.</blockquote>
