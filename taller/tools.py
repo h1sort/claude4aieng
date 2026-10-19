@@ -21,7 +21,7 @@ from contextvars import ContextVar
 from taller import contracts
 from taller.contracts import ToolSpec
 
-# ---------- consola: las etapas de la demo de GBM ----------
+# ---------- consola: las etapas del bucle ----------
 
 _TTY = sys.stdout.isatty()
 DIM, BOLD, RESET = ("\033[2m", "\033[1m", "\033[0m") if _TTY else ("", "", "")

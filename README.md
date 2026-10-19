@@ -169,6 +169,6 @@ tests/                pytest
 - CodeAct: Wang et al., "Executable Code Actions Elicit Better LLM Agents", ICML 2024. https://arxiv.org/abs/2402.01030
 - Documentación de tool use de Anthropic: https://platform.claude.com/docs/en/agents-and-tools/tool-use
 
-Los hechos y sus fuentes están en `FACTS.md`; lo que no se pudo verificar está marcado ahí y no entra al taller.
+Las fuentes de cada cifra del deck están en la diapositiva de fuentes (tecla `S`); lo que no se pudo verificar no entra al taller.
 
 Autor: Carlos Haro (@h1sort) · h1sort.com

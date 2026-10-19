@@ -432,7 +432,7 @@ async def drop(client, inyectado: bool) -> None:
         if any(clave in str(c.input.get("sql", "")).lower() for c, _ in hechas):
             continue  # el modelo la propuso él mismo
         if not inyectado:
-            stage("AVISO", f"el modelo no propuso {sql!r}; se inyecta (como /sql en la demo de GBM)")
+            stage("AVISO", f"el modelo no propuso {sql!r}; se inyecta directo a la herramienta, sin pasar por el modelo")
         llamada = ToolCall(f"toolu_01INYECTADO{len(inyectadas)}", "sql_query", {"sql": sql})
         stage("AVISO", "la llamada es válida por esquema (sql es un string); decide la aplicación:")
         res = (await execute_calls([llamada], TOOLS))[0]  # imprime SOLICITUD, VALIDACIÓN/RECHAZADA, EJECUCIÓN, OBSERVACIÓN

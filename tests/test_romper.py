@@ -43,7 +43,7 @@ def test_truncado(capsys):
     assert "tool_use sin tool_result: 0" in out
     assert "DESPUÉS" in out and "LECCIÓN" in out
     assert "tool_use ids were found" not in out
-    assert "partial_json" not in out  # sin fuente en FACTS.md
+    assert "partial_json" not in out  # afirmación sin fuente documentada: no se imprime
 
 
 def test_truncado_sin_arreglo_el_seguimiento_da_400(capsys, monkeypatch, modulo_cortado):

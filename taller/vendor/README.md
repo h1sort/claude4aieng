@@ -9,7 +9,7 @@ descargar con curl ni comparar byte a byte**. Verifica en una máquina con red (
 - Obtención: WebFetch (2026-10-18) pidiendo el valor literal; el texto recibido es la plantilla completa y coincide
   con el formato conocido de Qwen3 (`<tool_call>` con JSON). No es una descarga directa: **tratar como "casi verbatim, sin
   verificar byte a byte"**. `eos_token` (`<|im_end|>`) escrito a mano; `bos_token` es `null` en Qwen3.
-- Revisión: no registrada. FACTS.md anota el último commit visible `895c8d1` ("update tokenizer_config.json"); no se confirmó que sea la revisión leída.
+- Revisión: no registrada. El último commit visible era `895c8d1` ("update tokenizer_config.json"); no se confirmó que sea la revisión leída.
 - Licencia: Apache-2.0 (repo Qwen/Qwen3-8B).
 
 ## deepseek-v3.tokenizer_config.json  — RECONSTRUIDA

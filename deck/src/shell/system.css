@@ -1,7 +1,7 @@
   /* ============================================================
      TOOL USE SIN ABSTRACCIONES — "institutional daylight" visual system (extraído de ai-en-la-banca.html)
      Ivory paper, deep green ink, copper for consequence,
-     green for evidence/authorized paths. Guía de autor: deck/SYSTEM.md.
+     green for evidence/authorized paths.
      ============================================================ */
   :root{
     /* --- paper & ink --- */
@@ -246,7 +246,7 @@
   html[data-public] .hud{display:none}   /* live site copy: no controls, notes stripped at publish */
 
 /* ============================================================
-   AUTHORING HELPERS (promovidos desde las reglas por-diapositiva de GBM)
+   AUTHORING HELPERS (compartidos entre diapositivas)
    ============================================================ */
 .hd{display:flex;flex-direction:column;gap:clamp(.4rem,1.2vh,.9rem)}            /* bloque de encabezado: eyebrow + h2 + lede */
 .hd h2{font-size:clamp(1.6rem,3.6vw,3.8rem);max-width:none}
@@ -265,7 +265,7 @@
 .ln.l1{padding-left:4ch;text-indent:0}
 
 /* ============================================================
-   PORTADA — <section class="slide cover bare"> (de s01 en GBM)
+   PORTADA — <section class="slide cover bare">
    .motif = ilustración SVG a la derecha; sus hijos directos de <g> entran escalonados.
    ============================================================ */
 .cover .motif{position:absolute;z-index:0;right:0;top:0;bottom:0;width:64%;display:flex;align-items:center;justify-content:center;pointer-events:none}

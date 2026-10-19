@@ -1,6 +1,6 @@
 """Precios por MTok (USD) de los modelos que comparamos.
 
-Fuente: https://platform.claude.com/docs/en/about-claude/pricing (copiados en FACTS.md §7)
+Fuente: https://platform.claude.com/docs/en/about-claude/pricing (consultados el 2026-10-18)
 Verificado 2026-10-18. La página no trae fecha de vigencia: revisa claude.com/pricing antes de citar cifras.
 Solo precio estándar sin caché ni Batch; medir.py no usa ninguno de los dos.
 """
